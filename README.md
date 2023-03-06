@@ -1,5 +1,7 @@
 # Skote -  Angular 13 Responsive Admin Dashboard Template 
 
+Proyecto de Administracion y Dashboard DARU.MX
+
 ## Development server
 
 Run `ng serve` for a dev server. Navigate to `http://localhost:4203/`. The app will automatically reload if you change any of the source files.
