@@ -1,0 +1,146 @@
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body">
+          <!-- Header table -->
+          <h2>
+            <p class="card-sub-title">
+              {{title}}
+            </p>
+          </h2>
+          <div class="row col-12">
+            <div class="col-lg-3 col-md-6 col-sm-12 col-xs-12">
+              <div class="dropdown" ngbDropdown>
+                <button class="btn btn-light dropdown-toggle" type="button" name="pageSize" id="pageSize"
+                  ngbDropdownToggle>
+                  Ver {{infoPage.itemsPage}} Elementos<i class="mdi mdi-chevron-down"></i>
+                </button>
+                <div class="dropdown-menu" ngbDropdownMenu>
+                  <a class="dropdown-item" (click)="asignPage(1);">1</a>
+                  <a class="dropdown-item" (click)="asignPage(5);">5</a>
+                  <a class="dropdown-item" (click)="asignPage(10);">10</a>
+                  <a class="dropdown-item" (click)="asignPage(15);">15</a>
+                  <a class="dropdown-item" (click)="asignPage(20);">20</a>
+                  <a class="dropdown-item" (click)="asignPage(50);">50</a>
+                  <a class="dropdown-item" (click)="asignPage(100);">100</a>
+                </div>
+              </div>
+            </div>
+            <!-- Activos -->
+            <div class="col-lg-3 col-md-6 col-sm-12 col-xs-12">
+              <div *ngIf="mostrarActivos" class="dropdown" ngbDropdown>
+                <button class="btn btn-light dropdown-toggle" type="button" name="filterActiveValues"
+                  id="filterActiveValues" ngbDropdownToggle>
+                  Ver {{tagFilter}} <i class="mdi mdi-chevron-down"></i>
+                </button>
+                <div class="dropdown-menu" ngbDropdownMenu>
+                  <a class="dropdown-item" (click)="asignFilter('ALL', 'Todos');">Todos(Activos/Inactivos)</a>
+                  <a class="dropdown-item" (click)="asignFilter('ACTIVE', 'Activos');">Activos</a>
+                  <a class="dropdown-item" (click)="asignFilter('INACTIVE', 'Inactivos');">Inactivos</a>
+                </div>
+              </div>
+            </div>
+            <!-- Busqueda -->
+            <div class="col-lg-3 col-md-6 col-sm-12 col-xs-12 text-right">
+              <div class="col-md-12">
+                <input class="form-control" type="search" placeholder="Buscar" [(ngModel)]="filterName"
+                  id="example-search-input">
+              </div>
+            </div>
+            <!-- <div class="col-sm-12 col-md-1">
+            </div> -->
+            <div class="col-xs-12 col-sm-6 col-md-3 d-flex flex-row justify-content-end">
+              <button type="submit" class="btn btn-light mb-2" (click)="loadData()"><i
+                  class="fas fa-search"></i></button>
+              <button *ngIf="mostrarImport" type="button" class="btn btn-light mb-2" title="Importar"
+                (click)="manageAction('import', null)"><i class="fas fa-bars"></i></button>
+              <button *ngIf="mostrarAgregar" type="button" class="btn btn-light mb-2" title="Agregar"
+                (click)="manageAction('add', null)"><i class="fas fa-plus-circle"></i></button>
+            </div>
+            <!-- End search -->
+          </div>
+          <!-- End header table -->
+          <!-- Table -->
+          <div class="table-responsive">
+            <table id="basic-datatable"
+              class="table table-bordered dt-responsive nowrap datatables no-footer dtr-inline">
+              <thead>
+                <tr>
+                  <th scope="col" class="{{column.class}}" *ngFor="let column of tableColumns">{{ column.label }}</th>
+                  <th *ngIf="mostrarActivos" scope="col" class="acciones">Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let data of data$ | async; let i=index">
+                  <td *ngFor="let val of tableColumns" class="{{val.class}}">
+                    <span *ngIf="val.property != 'active'; else activeValue">
+                      <span *ngIf="val.class == 'numero'">{{ formatoMoneda(data[val.property], true) }}</span>
+                      <span *ngIf="val.class != 'numero'">
+                        <span *ngIf="val.class != 'img'">
+                          <span *ngIf="val.property=='suppliersProd.idProveedor'">
+                            {{data.suppliersProd.idProveedor.toUpperCase()}}
+                          </span>
+                          <span *ngIf="val.property=='product.name'">
+                            {{data.product.name}}
+                          </span>
+                          <span *ngIf="val.property=='product.description'">
+                            {{data.product.description}}
+                          </span>
+                          <span *ngIf="val.property=='client.name'">
+                            {{data.client.name}} {{data.client.lastname}}
+                          </span>
+                          <span *ngIf="val.property=='user.name'">
+                            {{data.user.name}} {{data.client.lastname}}
+                          </span>
+                          <span *ngIf="val.property!='product.description' && val.property!='product.description'">
+                            {{ data[val.property]}}
+                          </span>
+                        </span>
+                        <span *ngIf="val.class == 'img'">
+                          <img src="{{ data[val.property]}}" class="img-fluid img-thumbnail mx-auto d-block"
+                            alt="{{ data.name}}">
+                        </span>
+                      </span>
+                    </span>
+                    <ng-template #activeValue>
+                      <span *ngIf="data[val.property] == true"><i class="fas fa-check-circle"></i></span>
+                      <span *ngIf="data[val.property] == false"><i class="fas fa-times-circle"></i></span>
+                    </ng-template>
+                  </td>
+                  <th *ngIf="mostrarActivos" scope="col" class="centrado">
+                    <button type="button" class="btn btn-sm btn-secondary m-1" (click)="manageAction('edit', data)"><i
+                        class="fas fa-edit"></i></button>
+                    <button *ngIf="mostrarBoton" type="button" class="btn btn-sm btn-info m-1"
+                      (click)="manageAction('info', data)"><i class="fas fa-info-circle"></i></button>
+                    <button *ngIf="data.active == true && mostrarBoton" type="button" class="btn btn-sm btn-danger m-1"
+                      (click)="manageAction('block', data)"><i class="fas fa-lock"></i></button>
+                    <button *ngIf="data.active != true && mostrarBoton" type="button" class="btn btn-sm btn-danger m-1"
+                      (click)="manageAction('unblock', data)"><i class="fas fa-lock-open"></i></button>
+                  </th>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <!-- End table -->
+          <div class="row justify-content-md-between align-items-md-center mt-2" *ngIf="infoPage.pages > 1">
+            <div class="row col-2">
+              <div class="dataTables_info mb-2" id="tickets-table_info" role="status" aria-live="polite">
+                Pág. {{infoPage.page}} de {{infoPage.total}}
+              </div>
+            </div>
+            <!-- Pagination -->
+            <div class="row col-10">
+              <div class="text-md-right float-md-end pagination-rounded">
+                <ngb-pagination [collectionSize]="infoPage.total" [(page)]="infoPage.page" (pageChange)="changePage()"
+                  [pageSize]="infoPage.itemsPage" [maxSize]="14" [rotate]="true" [boundaryLinks]="true">
+                </ngb-pagination>
+              </div>
+            </div>
+            <!-- End Pagination -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

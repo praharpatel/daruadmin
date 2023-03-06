@@ -1,0 +1,121 @@
+<div class="container-fluid p-0">
+  <div class="row g-0">
+    <div class="col-xl-9">
+      <div class="auth-full-bg pt-lg-5 p-4">
+        <div class="w-100">
+          <div class="bg-overlay"></div>
+          <div class="d-flex h-100 flex-column">
+            <div class="p-4 mt-auto">
+              <div class="row justify-content-center">
+                <div class="col-lg-7">
+                  <div class="text-center">
+                    <h4 class="mb-3"><i class="bx bxs-quote-alt-left text-primary h1 align-middle me-3"></i><span
+                        class="text-primary">Tablero</span> de Control</h4>
+                    <div dir="ltr">
+                      <!-- <owl-carousel-o class="owl-theme auth-review-carousel" [options]="carouselOption">
+                        <ng-template carouselSlide>
+                          <div class="item">
+                            <div class="py-3">
+                              <p class="font-size-16 mb-4">Conoce las principales estadísticas del sitio.
+                              </p>
+                              <div>
+                                <h4 class="font-size-16 text-primary"></h4>
+                                <p class="font-size-14 mb-0"></p>
+                              </div>
+                            </div>
+                          </div>
+                        </ng-template>
+                        <ng-template carouselSlide>
+                          <div class="item">
+                            <div class="py-3">
+                              <p class="font-size-16 mb-4">Conoce los mejores productos</p>
+                              <div>
+                                <h4 class="font-size-16 text-primary"></h4>
+                                <p class="font-size-14 mb-0"></p>
+                              </div>
+                            </div>
+                          </div>
+                        </ng-template>
+                      </owl-carousel-o> -->
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- end col -->
+    <div class="col-xl-3">
+      <div class="auth-full-page-content p-md-5 p-4">
+        <div class="w-100">
+          <div class="d-flex flex-column h-100">
+            <div class="mb-4 mb-md-5">
+              <a routerLink="/" class="d-block auth-logo">
+                <img src="assets/images/logo-dark.png" alt="" height="18" class="auth-logo-dark">
+                <img src="assets/images/logo-light.png" alt="" height="50" class="auth-logo-light">
+              </a>
+            </div>
+            <div class="my-auto">
+              <div>
+                <h5 class="text-primary">Registra una cuenta</h5>
+                <p class="text-muted"></p>
+              </div>
+              <div class="mt-4">
+                <form [formGroup]="signupForm" (ngSubmit)="onSubmit()">
+                  <ngb-alert type="success" *ngIf="successmsg" [dismissible]="false">Registro Satisfactorio.
+                  </ngb-alert>
+                  <ngb-alert type="danger" *ngIf="error" [dismissible]="false">{{ error }}</ngb-alert>
+                  <div class="mb-3">
+                    <label for="username">Usuario</label>
+                    <input type="text" formControlName="username" class="form-control" id="username"
+                      [ngClass]="{ 'is-invalid': submitted && f.username.errors }" placeholder="Enter username">
+                    <div *ngIf="submitted && f.username.errors" class="invalid-feedback">
+                      <div *ngIf="f.username.errors.required">El usuario es requerido</div>
+                    </div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="useremail">Correo</label>
+                    <input type="email" formControlName="email"
+                      [ngClass]="{ 'is-invalid': submitted && f.email.errors }" class="form-control" id="useremail"
+                      placeholder="Enter email">
+                    <div *ngIf="submitted && f.email.errors" class="invalid-feedback">
+                      <div *ngIf="f.email.errors.required">Correo Electrónico requerido</div>
+                      <div *ngIf="f.email.errors.email">El correo electrónico debe ser una dirección de correo
+                        electrónico válida
+                      </div>
+                    </div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="userpassword">Clave</label>
+                    <input type="password" formControlName="password"
+                      [ngClass]="{ 'is-invalid': submitted && f.password.errors }" class="form-control"
+                      id="userpassword" placeholder="Enter password">
+                    <div *ngIf="submitted && f.password.errors" class="invalid-feedback">
+                      <div *ngIf="f.password.errors.required">La clave es requida</div>
+                    </div>
+                  </div>
+                  <div class="mt-4 d-grid">
+                    <button class="btn btn-primary btn-block" type="submit">Registrar</button>
+                  </div>
+                </form>
+                <div class="mt-5 text-center">
+                  <p>¿Ya tienes una cuenta? <a routerLink="/auth/login" class="fw-medium text-primary">Login</a>
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="mt-4 mt-md-5 text-center">
+              <p class="mb-0">©
+                {{year}} Daru.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- end col -->
+  </div>
+  <!-- end row -->
+</div>
+<!-- end container-fluid -->

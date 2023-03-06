@@ -1,0 +1,12 @@
+{
+  "/xl4.asmx" : {
+    "target": "http://ws.exel.com.mx:8181",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/catalogo_clientes_xml/*" : {
+    "target": "http://www.grupocva.com",
+    "secure": false,
+    "changeOrigin": true
+  }
+}

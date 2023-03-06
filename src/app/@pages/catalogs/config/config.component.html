@@ -1,0 +1,69 @@
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body">
+          <header>
+            <h2>
+              <p class="card-sub-title">
+                {{title}}
+              </p>
+            </h2>
+          </header>
+          <div class="row">
+            <div class="col-12">
+              <div class="d-flex flex-row justify-content-end p-1">
+                <button type="button" class="btn btn-light mb-2" title="Modifcar Configuraciones"
+                  (click)="onModificar()"><i class="fas fa-edit">Modificar</i></button>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <form [formGroup]="captureConfig">
+              <div class="container-fluid p-0">
+                <div class="row">
+                  <div class="col-3">
+                    <label for="id">Clave</label>
+                    <input type="text" class="form-control" id="id" formControlName="id" placeholder="ID"
+                      [attr.disabled]="true">
+                  </div>
+                  <div class="col-3"></div>
+                  <div class="col-3">
+                    <label for="exchange_rate">Tipo de Cambio</label>
+                    <input type="text" class="form-control" id="exchange_rate" formControlName="exchange_rate"
+                      [attr.disabled]="onlyView ? true : null" mask="000.000.000.000.000,00" data-reverse="true">
+                  </div>
+                  <div class="col-3">
+                    <label for="offer">Cantidad Minima Ofertas</label>
+                    <input type="number" class="form-control" id="offer" formControlName="offer"
+                      [attr.disabled]="onlyView ? true : null" min="1" pattern="^[0-9]+">
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-12">
+                    <label for="message">Descripcion</label>
+                    <input type="text" class="form-control" id="message" formControlName="message"
+                      placeholder="Teclea la descripción" [attr.disabled]="onlyView ? true : null">
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="row">
+            <div class="row col-12">&nbsp;</div>
+          </div>
+          <div class="row">
+            <div class="row col-12">
+              <div *ngIf="visualizarBotones" class="col-12 d-flex flex-row justify-content-end">
+                <button type="button" class="btn btn-danger btn-label waves-light" (click)="onCancelar()"><i
+                    class="bx bx-x t label-icon"></i> Cancelar</button>
+                <button type="button" class="btn btn-success btn-label waves-light" [disabled]="captureConfig.invalid"
+                  (click)="onGrabar()"><i class="bx bx-check-double label-icon"></i> Grabar</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,179 @@
+<ng-template #content role="document" let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title mt-0">{{titulo}}</h5>
+    <button type="button" class="btn-close" aria-hidden="true" (click)="onCloseModal()"></button>
+  </div>
+
+  <div class="modal-body">
+    <div class="container-fluid">
+      <form [formGroup]="importForm" (ngSubmit)="onSubmit()" #forma="ngForm">
+        <ul ngbNav #justifiednav="ngbNav" [activeId]="1" class="nav-pills nav-justified">
+          <li [ngbNavItem]="1">
+            <a ngbNavLink>
+              <span class="d-block d-sm-none"><i class="fas fa-home"></i></span>
+              <span class="d-none d-sm-block">API Proveedores</span>
+            </a>
+            <ng-template ngbNavContent>
+              <ng-template [ngTemplateOutlet]="TabContent"></ng-template>
+            </ng-template>
+          </li>
+          <li [ngbNavItem]="2">
+            <a ngbNavLink>
+              <span class="d-block d-sm-none"><i class="far fa-user"></i></span>
+              <span class="d-none d-sm-block">Archivo JSON</span>
+            </a>
+            <ng-template ngbNavContent>
+              <ng-template [ngTemplateOutlet]="TabContent1"></ng-template>
+            </ng-template>
+          </li>
+        </ul>
+        <div [ngbNavOutlet]="justifiednav"></div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <button type="button" class="btn btn-danger btn-label waves-light" (click)="onCloseModal()"><i
+        class="bx bx-x t label-icon"></i> Cancelar</button>
+    <button type="button" class="btn btn-success btn-label waves-light" [disabled]="!habilitaGuardar"
+      (click)="onSubmit()"><i class="bx bx-check-double label-icon"></i> Grabar</button>
+  </div>
+</ng-template>
+
+<!-- Tab Content -->
+<ng-template #TabContent>
+  <div class="row">
+    <div class="col-lg-12">
+      <div class="card">
+        <div class="card-body">
+          <div class="row">
+            <div class="col-lg-2">
+              <h5>Proveedor</h5>
+              <select class="form-select" [(ngModel)]="supplier" (ngModelChange)="onSelectSupplier()">
+                <option *ngFor="let proveedor of suppliers" [ngValue]="proveedor">
+                  {{ proveedor.name }}
+                </option>
+              </select>
+            </div>
+            <div class="col-lg-4">
+              <h5>API</h5>
+              <input type="text" class="form-control" id="apiName" [(ngModel)]="apiName" [attr.disabled]="true">
+            </div>
+            <div class="col-lg-3">
+              <h5>Búsqueda</h5>
+              <select class="form-select" [(ngModel)]="apiSelect" (ngModelChange)="onSelectApi()">
+                <option *ngFor="let apiSelect of apisFilter" [ngValue]="apiSelect">
+                  {{ apiSelect.operation + '/' + apiSelect.suboperation }}
+                </option>
+              </select>
+            </div>
+            <div class="col-lg-1">
+              <h5>Valor</h5>
+              <select class="form-select" [(ngModel)]="valorSearch">
+                <option *ngFor="let valorSearch of catalogValues" [ngValue]="valorSearch">
+                  {{ valorSearch.name }}
+                </option>
+              </select>
+            </div>
+            <div class="col-lg-1">
+              <h5>Minimo</h5>
+              <input type="number" class="form-control" id="stockMinimo" [(ngModel)]="stockMinimo" min="1"
+                pattern="^[0-9]+">
+            </div>
+            <div class="col-lg-1">
+              <h5>&nbsp;</h5>
+              <button type="button" class="btn btn-primary" (click)='onEjecutarAPI()'
+                [disabled]="!habilitaEjecutar">Ejecutar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div *ngIf="dataSupplier" class="row">
+    <div *ngIf="dataSupplier.length > 0" class="col-lg-12">
+      <div *ngIf="dataSupplier.length > 0" class="row">
+        <div class="col-lg-9">
+          <h5 class="modal-title mt-0">{{title}}</h5>
+        </div>
+        <div class="col-lg-3">
+          <a csvLink [data]="dataExport">Descargar archivo CSV</a>
+        </div>
+      </div>
+      <!-- Table -->
+      <div class="table-responsive">
+        <table *ngIf="catalog != 'productos'" id="basic-datatable"
+          class="table table-bordered dt-responsive nowrap datatables no-footer dtr-inline">
+          <thead>
+            <tr>
+              <th style="width: 10%">No.</th>
+              <th style="width: 10%">Clave</th>
+              <th style="width: 60%">Descripcion</th>
+              <th style="width: 20%">Estatus</th>
+              <th style="width: 20%">Clave Externa</th>
+              <th style="width: 20%">Descripcion Externa</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let element of data">
+              <td style="width: 10%">{{element.id}}</td>
+              <td style="width: 10%">{{element.slug}}</td>
+              <td style="width: 60%">{{element.nombre || element.description}}</td>
+              <td style="width: 20%">
+                <span *ngIf="element.active == true"><i class="fas fa-check-circle"></i></span>
+                <span *ngIf="element.active == false"><i class="fas fa-times-circle"></i></span>
+              </td>
+              <td style="width: 20%">{{element.suppliersCat[0].slug}}</td>
+              <td style="width: 20%">{{element.suppliersCat[0].name}}</td>
+            </tr>
+          </tbody>
+        </table>
+        <table *ngIf="catalog == 'productos'" id="basic-datatable" style="width: 100%"
+          class="table table-bordered dt-responsive nowrap datatables no-footer dtr-inline">
+          <thead style="width: 100%">
+            <tr>
+              <th style="width: 10%">Clave</th>
+              <th style="width: 20%">Marca</th>
+              <th style="width: 50%">Descripcion</th>
+              <th style="width: 10%">Stock</th>
+              <th style="width: 10%">Precio</th>
+            </tr>
+          </thead>
+          <tbody style="width: 100%">
+            <tr *ngFor="let element of dataSupplier">
+              <td style="width: 10%">{{element.id}}</td>
+              <td style="width: 20%">{{element.brand}}</td>
+              <td style="width: 50%">{{element.short_desc}}</td>
+              <td style="width: 10%">{{element.stock}}</td>
+              <td style="width: 10%">{{element.price}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<!-- Tab Content -->
+<ng-template #TabContent1>
+  <div class="row">
+    <div class="col-lg-12">
+      <div class="card">
+        <div class="card-body">
+          <div class="row">
+            <div class="col-lg-3"></div>
+            <div class="col-lg-6">
+              <div class="input-group">
+                <input type="file" class="form-control" id="inputGroupFileJson" aria-describedby="inputGroupFileAddJson"
+                  aria-label="Cargar">
+                <button class="btn btn-primary" type="button" id="inputGroupFileAddJson"
+                  (click)="onCargar()">Cargar</button>
+              </div>
+            </div>
+            <div class="col-lg-3"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>
