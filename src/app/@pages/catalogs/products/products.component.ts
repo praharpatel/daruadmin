@@ -88,6 +88,16 @@ export class ProductsComponent implements OnInit {
         class: 'descriptionShort'
       },
       {
+        property: 'featured',
+        label: 'Promo',
+        class: 'id'
+      },
+      {
+        property: 'top',
+        label: 'Top',
+        class: 'id'
+      },
+      {
         property: 'price',
         label: 'Precio',
         class: 'numero'

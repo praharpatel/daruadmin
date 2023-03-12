@@ -6,7 +6,7 @@ import { IApis, IParameters, ISupplier } from '@core/interfaces/supplier.interfa
 import { AddCatalog, Catalog, SupplierCat } from '@core/models/catalog.models';
 import {
   AddProduct, Brands, Categorys, Picture, Product, UnidadDeMedida, BranchOffices,
-  SupplierProd, ProductExport, Descuentos, Promociones
+  SupplierProd, ProductExport, Descuentos, Promociones, PromocionBranchOffice, Vigente
 } from '@core/models/product.models';
 import { BrandsService } from '@core/services/brand.service';
 import { CategoriesService } from '@core/services/categorie.service';
@@ -87,7 +87,7 @@ export class ImportarComponent implements OnInit {
   ) { }
 
   // Define requests
-  private httpReq1$ = this.httpClient.get('assets/uploads/json/ct_productos.json');
+  private httpReq1$ = this.httpClient.get('assets/uploads/json/productos.json');
   private httpReq2$ = this.httpClient.get('assets/uploads/json/ct_almacenes.json');
 
   // convenience getter for easy access to form fields
@@ -821,15 +821,36 @@ export class ImportarComponent implements OnInit {
   }
 
   getAlmacenCant(x): BranchOffices {
-    // tslint:disable-next-line: forin
-    for (const property in x) {
-      const almacen = new BranchOffices();
-      almacen.name = this.getCtAlmacenes(property);
-      // TO DO - Detectar cuando sea una promocion y guardarla
-      almacen.cantidad = x[property];
-      console.log('almacen: ',almacen);
-      return almacen;
-    }
+    const almacen = new BranchOffices();
+    Object.keys(x).forEach((branch, index) => {
+      almacen.name = this.getCtAlmacenes(branch);
+      almacen.cantidad = x[branch];
+      // Si el dato es un objeto entonces viene una promocion.
+      if (typeof x[branch] === 'object') {
+        const promoBranch = x[branch];
+        const promocion = new PromocionBranchOffice();
+        // Divide la promocion en precio y vencia
+        Object.keys(promoBranch).forEach((promo, indexZ) => {
+          if (indexZ === 0) {
+            promocion.price = parseFloat(promoBranch[promo]);
+          } else if (indexZ === 1) {
+            const vigencia = promoBranch[promo];
+            const vigente = new Vigente();
+            // Divide la vigencia en inicio y fin.
+            Object.keys(vigencia).forEach((vig, indexZ) => {
+              if (indexZ === 0) {
+                vigente.ini = vigencia[vig];
+              } else if (indexZ === 1) {
+                vigente.fin = vigencia[vig];
+              }
+            });
+            promocion.vigente = vigente;
+          }
+        });
+        almacen.promocionBranchOffice = promocion;
+      }
+    });
+    return almacen;
   }
 
   getCtAlmacenes(id: string): string {
@@ -882,8 +903,7 @@ export class ImportarComponent implements OnInit {
           const precioLista = parseFloat(item.precios.precio_lista);
           const precioDescuento = parseFloat(item.precios.precio_descuento);
           const precioEspecial = parseFloat(item.precios.precio_especial);
-          let top = null;
-          let featured = null;
+          let featured = false;
           if (precioEspecial < precioLista) {                   // Catalogar como producto feature
             featured = true;
             desc.total_descuento = precioEspecial;
@@ -892,14 +912,14 @@ export class ImportarComponent implements OnInit {
           }
           itemData.descuentos = desc;
           if (precioDescuento < precioEspecial) {               // Catalogar como producto TOP
-            top = true;
+            featured = true;
             promo.clave_promocion = '';
             promo.descripcion_promocion = 'Producto con Descuento';
             promo.vencimiento_promocion = 'Total Existencias: ' + item.total_existencia.toString();
             promo.disponible_en_promocion = precioDescuento;
           }
           itemData.promociones = promo;
-          itemData.top = top;
+          itemData.top = false;
           itemData.featured = featured;
           itemData.new = null;
           itemData.sold = null;
@@ -939,13 +959,13 @@ export class ImportarComponent implements OnInit {
           itemData.pictures = [];
           i.width = '600';
           i.height = '600';
-          i.url = item.img_portada === '' ? item.marca_logo :  item.img_portada;
+          i.url = item.img_portada === '' ? item.marca_logo : item.img_portada;
           itemData.pictures.push(i);
           // Imagenes pequeñas
           itemData.sm_pictures = [];
           is.width = '300';
           is.height = '300';
-          is.url = item.img_portada === '' ? item.marca_logo :  item.img_portada;
+          is.url = item.img_portada === '' ? item.marca_logo : item.img_portada;
           itemData.variants = [];
           itemData.sm_pictures.push(is);
         }
@@ -962,7 +982,7 @@ export class ImportarComponent implements OnInit {
           itemData.review = 0;
           itemData.ratings = 0;
           itemData.until = this.getFechas(new Date());
-          itemData.top = item.PrecioDescuento !== 'Sin Descuento' ? true : false;
+          itemData.top = false;
           if (item.PrecioDescuento !== 'Sin Descuento') {
             desc.total_descuento = item.TotalDescuento === '' ? 0 : parseFloat(item.TotalDescuento);
             desc.moneda_descuento = item.MonedaDescuento;
@@ -1030,12 +1050,23 @@ export class ImportarComponent implements OnInit {
         disponible = 0;
         if (item.almacenes.length > 0) {
           const branchOffices: BranchOffices[] = [];
+          let featured = false;
           item.almacenes.forEach(element => {
             const almacen = this.getAlmacenCant(element);
             disponible += almacen.cantidad;
             branchOffices.push(almacen);
           });
           if (disponible >= this.stockMinimo) {                         // Si hay mas de 10 elementos disponibles
+            // Si hay promociones en los almacenes ocupa el primero y asigna el total de disponibilidad
+            if (item.almacenes[0].promocion) {
+              featured = true;
+              promo.clave_promocion = '';
+              promo.descripcion_promocion = 'Producto con Descuento';
+              promo.inicio_promocion = item.almacenes[0].promocion.vigente.ini;
+              promo.vencimiento_promocion = item.almacenes[0].promocion.vigente.fin;
+              promo.disponible_en_promocion = item.almacenes[0].promocion.precio;
+              itemData.promociones = promo;
+            }
             itemData.id = productJson.clave;
             itemData.name = productJson.nombre;
             itemData.slug = slugify(productJson.nombre, { lower: true });
@@ -1050,8 +1081,8 @@ export class ImportarComponent implements OnInit {
             itemData.review = 0;
             itemData.ratings = 0;
             itemData.until = this.getFechas(new Date());
-            itemData.top = null;
-            itemData.featured = null;
+            itemData.top = false;
+            itemData.featured = featured;
             itemData.new = null;
             itemData.sold = null;
             itemData.stock = disponible;
@@ -1103,6 +1134,7 @@ export class ImportarComponent implements OnInit {
             is.url = productJson.imagen;
             itemData.variants = [];
             itemData.sm_pictures.push(is);
+            console.log('itemData: ', itemData);
             return itemData;
           }
         }
@@ -1118,8 +1150,8 @@ export class ImportarComponent implements OnInit {
         itemData.review = 0;
         itemData.ratings = 0;
         itemData.until = this.getFechas(new Date());
-        itemData.top = null;
-        itemData.featured = null;
+        itemData.top = false;
+        itemData.featured = false;
         itemData.new = item.nuevo = 1 ? true : false;
         itemData.sold = null;
         itemData.stock = item.stock;
