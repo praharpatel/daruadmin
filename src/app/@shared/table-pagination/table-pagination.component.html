@@ -75,37 +75,47 @@
                 <tr *ngFor="let data of data$ | async; let i=index">
                   <td *ngFor="let val of tableColumns" class="{{val.class}}">
                     <span *ngIf="val.property != 'active'; else activeValue">
-                      <span *ngIf="val.class == 'numero'">{{ formatoMoneda(data[val.property], true) }}</span>
-                      <span *ngIf="val.class != 'numero'">
-                        <span *ngIf="val.class != 'img'">
-                          <span *ngIf="val.property=='suppliersProd.idProveedor'">
-                            {{data.suppliersProd.idProveedor.toUpperCase()}}
+                      <span *ngIf="val.property != 'featured'; else featuredValue">
+                        <span *ngIf="val.property != 'top'; else topValue">
+                          <span *ngIf="val.class == 'numero'">{{ formatoMoneda(data[val.property], true) }}</span>
+                          <span *ngIf="val.class != 'numero'">
+                            <span *ngIf="val.class != 'img'">
+                              <span *ngIf="val.property=='suppliersProd.idProveedor'">
+                                {{data.suppliersProd.idProveedor.toUpperCase()}}
+                              </span>
+                              <span *ngIf="val.property=='product.name'">
+                                {{data.product.name}}
+                              </span>
+                              <span *ngIf="val.property=='product.description'">
+                                {{data.product.description}}
+                              </span>
+                              <span *ngIf="val.property=='client.name'">
+                                {{data.client.name}} {{data.client.lastname}}
+                              </span>
+                              <span *ngIf="val.property=='user.name'">
+                                {{data.user.name}} {{data.client.lastname}}
+                              </span>
+                              <span *ngIf="val.property!='product.description' && val.property!='product.description'">
+                                {{ data[val.property]}}
+                              </span>
+                            </span>
+                            <span *ngIf="val.class == 'img'">
+                              <img src="{{ data[val.property]}}" class="img-fluid img-thumbnail mx-auto d-block"
+                                alt="{{ data.name}}">
+                            </span>
                           </span>
-                          <span *ngIf="val.property=='product.name'">
-                            {{data.product.name}}
-                          </span>
-                          <span *ngIf="val.property=='product.description'">
-                            {{data.product.description}}
-                          </span>
-                          <span *ngIf="val.property=='client.name'">
-                            {{data.client.name}} {{data.client.lastname}}
-                          </span>
-                          <span *ngIf="val.property=='user.name'">
-                            {{data.user.name}} {{data.client.lastname}}
-                          </span>
-                          <span *ngIf="val.property!='product.description' && val.property!='product.description'">
-                            {{ data[val.property]}}
-                          </span>
-                        </span>
-                        <span *ngIf="val.class == 'img'">
-                          <img src="{{ data[val.property]}}" class="img-fluid img-thumbnail mx-auto d-block"
-                            alt="{{ data.name}}">
                         </span>
                       </span>
                     </span>
                     <ng-template #activeValue>
                       <span *ngIf="data[val.property] == true"><i class="fas fa-check-circle"></i></span>
                       <span *ngIf="data[val.property] == false"><i class="fas fa-times-circle"></i></span>
+                    </ng-template>
+                    <ng-template #featuredValue>
+                      <span *ngIf="data[val.property] == true"><i class="fas fa-check-circle"></i></span>
+                    </ng-template>
+                    <ng-template #topValue>
+                      <span *ngIf="data[val.property] == true"><i class="fas fa-check-circle"></i></span>
                     </ng-template>
                   </td>
                   <th *ngIf="mostrarActivos" scope="col" class="centrado">

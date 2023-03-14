@@ -111,6 +111,7 @@ export class SupplierProd {
 export class BranchOffices {
   name: string;
   cantidad: number;
+  promocionBranchOffice: PromocionBranchOffice;
 }
 
 export class PromocionBranchOffice {
@@ -132,6 +133,7 @@ export class Descuentos {
 export class Promociones {
   clave_promocion: string;
   descripcion_promocion: string;
+  inicio_promocion: string;
   vencimiento_promocion: string;
   disponible_en_promocion: number;
 }
