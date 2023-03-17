@@ -106,6 +106,7 @@ export interface ISupplierProd {
 
 export interface IBranchOffices {
   name: string;
+  estado: string;
   cantidad: number;
 }
 

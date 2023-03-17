@@ -110,6 +110,7 @@ export class SupplierProd {
 
 export class BranchOffices {
   name: string;
+  estado: string;
   cantidad: number;
   promocionBranchOffice: PromocionBranchOffice;
 }

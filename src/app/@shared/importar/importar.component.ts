@@ -823,7 +823,9 @@ export class ImportarComponent implements OnInit {
   getAlmacenCant(x): BranchOffices {
     const almacen = new BranchOffices();
     Object.keys(x).forEach((branch, index) => {
-      almacen.name = this.getCtAlmacenes(branch);
+      const almacenEstado = this.getCtAlmacenes(branch);
+      almacen.name = almacenEstado.Sucursal;
+      almacen.estado = almacenEstado.Estado;
       almacen.cantidad = x[branch];
       // Si el dato es un objeto entonces viene una promocion.
       if (typeof x[branch] === 'object') {
@@ -853,12 +855,12 @@ export class ImportarComponent implements OnInit {
     return almacen;
   }
 
-  getCtAlmacenes(id: string): string {
+  getCtAlmacenes(id: string): any {
     // return this.ctAlmacenes
     // tslint:disable-next-line: no-shadowed-variable
     const almacen = this.ctAlmacenes.filter(almacen => almacen.id === id);
     if (almacen.length > 0) {
-      const sucursal = almacen.map(element => element.Sucursal);
+      const sucursal = almacen.map(element => element);
       return sucursal[0];
     }
     return '';
