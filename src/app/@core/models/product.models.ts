@@ -112,6 +112,7 @@ export class BranchOffices {
   name: string;
   estado: string;
   cantidad: number;
+  cp: string;
   latitud: string;
   longitud: string;
   promocionBranchOffice: PromocionBranchOffice;

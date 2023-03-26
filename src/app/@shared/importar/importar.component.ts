@@ -826,6 +826,7 @@ export class ImportarComponent implements OnInit {
       const almacenEstado = this.getCtAlmacenes(branch);
       almacen.name = almacenEstado.Sucursal;
       almacen.estado = almacenEstado.Estado;
+      almacen.cp = almacenEstado.CP;
       almacen.latitud = almacenEstado.latitud;
       almacen.longitud = almacenEstado.longitud;
       almacen.cantidad = x[branch];
