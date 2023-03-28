@@ -824,6 +824,7 @@ export class ImportarComponent implements OnInit {
     const almacen = new BranchOffices();
     Object.keys(x).forEach((branch, index) => {
       const almacenEstado = this.getCtAlmacenes(branch);
+      almacen.id = almacenEstado.id;
       almacen.name = almacenEstado.Sucursal;
       almacen.estado = almacenEstado.Estado;
       almacen.cp = almacenEstado.CP;
