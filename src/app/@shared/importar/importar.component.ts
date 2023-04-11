@@ -893,16 +893,17 @@ export class ImportarComponent implements OnInit {
     const desc = new Descuentos();
     const promo = new Promociones();
     let disponible = 0;
+    let sale_price = 0;
 
     switch (proveedor) {
       case 'syscom':
+        sale_price = 0;
         if (item.total_existencia >= this.stockMinimo) {
           itemData.id = item.producto_id;
           itemData.name = item.titulo === '' ? item.modelo : item.titulo;
           itemData.slug = slugify(item.titulo === '' ? item.modelo : item.titulo, { lower: true });
           itemData.short_desc = item.titulo + '. Modelo: ' + item.modelo;
           itemData.price = parseFloat(item.precios.precio_lista);
-          itemData.sale_price = parseFloat(item.precios.precio_descuento);
           itemData.review = 0;
           itemData.ratings = 0;
           itemData.until = this.getFechas(new Date());
@@ -915,6 +916,7 @@ export class ImportarComponent implements OnInit {
             desc.total_descuento = precioEspecial;
             desc.moneda_descuento = 'MXN';
             desc.precio_descuento = precioEspecial;
+            sale_price = precioEspecial;
           }
           itemData.descuentos = desc;
           if (precioDescuento < precioEspecial) {               // Catalogar como producto TOP
@@ -923,7 +925,9 @@ export class ImportarComponent implements OnInit {
             promo.descripcion_promocion = 'Producto con Descuento';
             promo.vencimiento_promocion = 'Total Existencias: ' + item.total_existencia.toString();
             promo.disponible_en_promocion = precioDescuento;
+            sale_price = precioDescuento;
           }
+          itemData.sale_price = sale_price;
           itemData.promociones = promo;
           itemData.top = false;
           itemData.featured = featured;
@@ -978,13 +982,13 @@ export class ImportarComponent implements OnInit {
         return itemData;
 
       case 'cva':
+        sale_price = 0;
         if (item.disponible >= this.stockMinimo) {
           itemData.id = item.id;
           itemData.name = item.descripcion;
           itemData.slug = slugify(item.descripcion, { lower: true });
           itemData.short_desc = item.clave + '. Grupo: ' + item.grupo;
           itemData.price = parseFloat(item.precio);
-          itemData.sale_price = parseFloat(item.precio);
           itemData.review = 0;
           itemData.ratings = 0;
           itemData.until = this.getFechas(new Date());
@@ -993,6 +997,7 @@ export class ImportarComponent implements OnInit {
             desc.total_descuento = item.TotalDescuento === '' ? 0 : parseFloat(item.TotalDescuento);
             desc.moneda_descuento = item.MonedaDescuento;
             desc.precio_descuento = item.PrecioDescuento === '' ? 0 : parseFloat(item.PrecioDescuento);
+            sale_price = desc.precio_descuento;
           }
           itemData.descuentos = desc;
           itemData.featured = item.DisponibleEnPromocion !== 'Sin Descuento' ? true : false;
@@ -1002,6 +1007,7 @@ export class ImportarComponent implements OnInit {
             promo.vencimiento_promocion = item.VencimientoPromocion;
             promo.disponible_en_promocion = item.DisponibleEnPromocion === '' ? 0 : parseFloat(item.DisponibleEnPromocion);
           }
+          itemData.sale_price = sale_price;
           itemData.promociones = promo;
           itemData.new = false;
           itemData.sold = null;
@@ -1054,6 +1060,7 @@ export class ImportarComponent implements OnInit {
 
       case 'ct':
         disponible = 0;
+        sale_price = 0;
         if (item.almacenes.length > 0) {
           const branchOffices: BranchOffices[] = [];
           let featured = false;
@@ -1071,6 +1078,7 @@ export class ImportarComponent implements OnInit {
               promo.inicio_promocion = item.almacenes[0].promocion.vigente.ini;
               promo.vencimiento_promocion = item.almacenes[0].promocion.vigente.fin;
               promo.disponible_en_promocion = item.almacenes[0].promocion.precio;
+              sale_price = item.almacenes[0].promocion.precio;
               itemData.promociones = promo;
             }
             itemData.id = productJson.clave;
@@ -1079,10 +1087,10 @@ export class ImportarComponent implements OnInit {
             itemData.short_desc = productJson.descripcion_corta;
             if (item.moneda === 'USD') {
               itemData.price = parseFloat((parseFloat(item.precio) * this.exchangeRate).toFixed(2));
-              itemData.sale_price = parseFloat((parseFloat(item.precio) * this.exchangeRate).toFixed(2));
+              itemData.sale_price = parseFloat((sale_price * this.exchangeRate).toFixed(2));
             } else {
               itemData.price = parseFloat(item.precio);
-              itemData.sale_price = parseFloat(item.precio);
+              itemData.sale_price = sale_price;
             }
             itemData.review = 0;
             itemData.ratings = 0;
@@ -1147,12 +1155,13 @@ export class ImportarComponent implements OnInit {
         return itemData;
 
       case 'exel':
+        sale_price = 0
         itemData.id = item.id_producto;
         itemData.name = item.descripcion;
         itemData.slug = slugify(item.descripcion, { lower: true });
         itemData.short_desc = item.subcategoria + '. Codigo: ' + item.codigo_proveedor;
         itemData.price = item.precioLista;
-        itemData.sale_price = item.precioLista;
+        itemData.sale_price = sale_price;
         itemData.review = 0;
         itemData.ratings = 0;
         itemData.until = this.getFechas(new Date());
