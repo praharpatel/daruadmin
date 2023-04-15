@@ -1011,7 +1011,8 @@ export class ImportarComponent implements OnInit {
           itemData.promociones = promo;
           itemData.new = false;
           itemData.sold = null;
-          itemData.stock = parseInt(item.disponible, 10);
+          disponible = item.disponiblecd > 0 ? parseInt(item.disponiblecd, 10) : parseInt(item.disponible, 10);
+          itemData.stock = disponible;
           itemData.sku = item.clave;
           itemData.partnumber = item.codigo_fabricante;
           itemData.upc = item.codigo_fabricante;
@@ -1037,7 +1038,8 @@ export class ImportarComponent implements OnInit {
           s.moneda = 'MXN';
           s.branchOffices = [];
           bo.name = 'Villahermosa';
-          bo.cantidad = parseInt(item.disponible, 10);
+          disponible = item.disponiblecd > 0 ? parseInt(item.disponiblecd, 10) : parseInt(item.disponible, 10);
+          bo.cantidad = disponible;
           s.branchOffices.push(bo);
           itemData.suppliersProd = s;
           // Imagenes
@@ -1133,6 +1135,7 @@ export class ImportarComponent implements OnInit {
             s.moneda = item.moneda;
             s.branchOffices = branchOffices;
             itemData.suppliersProd = s;
+            itemData.model = productJson.modelo;
             // Imagenes
             itemData.pictures = [];
             // const i = new Picture();

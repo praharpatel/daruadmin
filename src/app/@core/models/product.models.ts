@@ -24,6 +24,8 @@ export class Product extends ProductExport {
   category: Categorys[];
   brand: string;
   brands: Brands[];
+  model: string;
+  peso: number;
   pictures: Picture[];
   sm_pictures?: Picture[];
   variants?: Variant[];
