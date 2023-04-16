@@ -1194,7 +1194,7 @@ export class ImportarComponent implements OnInit {
         // SupplierProd
         s.idProveedor = proveedor;
         s.codigo = item.id_producto;
-        s.price = item.precioLista;
+        s.price = parseFloat(item.precioLista);
         s.moneda = 'MXN';
         s.branchOffices = [];
         if (productJson.length > 0) {
