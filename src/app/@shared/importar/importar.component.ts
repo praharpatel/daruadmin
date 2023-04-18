@@ -60,6 +60,7 @@ export class ImportarComponent implements OnInit {
   categories: Catalog[];
   groups: Catalog[];
   ctAlmacenes: any[];
+  cvaAlmacenes: any[];
   exchangeRate: number;
   offer: number;
 
@@ -219,6 +220,21 @@ export class ImportarComponent implements OnInit {
         infoEventAlert('No es posible importar el catalogo.', error.message, TYPE_ALERT.ERROR);
       });
     return almacenesCt;
+  }
+
+  async getCvaAlmacenes(supplier: ISupplier): Promise<any> {
+    const ApiSelect = this.apis.filter(api => api.return === 'sucursales');
+    if (ApiSelect.length > 0) {
+      return await this.getCatalogo(supplier, ApiSelect[0])
+        .then(
+          async (result) => {
+            return await result;
+          }
+        )
+        .catch((error: Error) => {
+          infoEventAlert('No es posible importar el catalogo.', error.message, TYPE_ALERT.ERROR);
+        });
+    }
   }
 
   async onOpenModalProduct(products: [Product]) {
@@ -492,6 +508,8 @@ export class ImportarComponent implements OnInit {
                         }
                       });
                       return await data;
+                    } else if (apiSelect.operation === 'sucursales.xml') {
+                      return await result;
                     } else {
                       result.forEach(async item => {
                         const itemData = new Catalog();
@@ -596,12 +614,12 @@ export class ImportarComponent implements OnInit {
   async getCatalogoAllBrands(supplier: ISupplier, apiSelect: IApis, catalogValues: Catalog[]): Promise<any> {
     // Cuando la consulta externa no requiere token
     if (!supplier.token) {
-      let productos: Product[];
+      const productos: Product[] = [];
       let resultados;
       switch (supplier.slug) {
         case 'cva':
-          productos = [];
           // Carga de Productos
+          this.cvaAlmacenes = await this.getCvaAlmacenes(supplier);
           resultados = await this.externalAuthService.getCatalogXMLAllBrands(supplier, apiSelect, this.valorSearch.id, catalogValues)
             .then(async result => {
               if (result.length > 0) {
@@ -621,6 +639,7 @@ export class ImportarComponent implements OnInit {
                     let itemData = new Product();
                     itemData = this.setProduct(supplier.slug, item);
                     if (itemData.id !== undefined) {
+                      console.log('itemData: ', itemData);
                       productos.push(itemData);
                     }
                   });
@@ -648,7 +667,6 @@ export class ImportarComponent implements OnInit {
               }
               if (result.length > 0) {
                 try {
-                  productos = [];
                   // Api para Cargar Precios y Disponibilidad
                   let apiPrecio: IApis;
                   supplier.apis.forEach(api => {
@@ -756,7 +774,7 @@ export class ImportarComponent implements OnInit {
         default:
           break;
       }
-    } else {                                                                  // Syscom
+    } else {                                                                  // Syscom, CT
       return await this.externalAuthService.getSyscomToken(supplier, apiSelect)
         .then(
           async result => {
@@ -860,7 +878,6 @@ export class ImportarComponent implements OnInit {
   }
 
   getCtAlmacenes(id: string): any {
-    // return this.ctAlmacenes
     // tslint:disable-next-line: no-shadowed-variable
     const almacen = this.ctAlmacenes.filter(almacen => almacen.id === id);
     if (almacen.length > 0) {
@@ -879,6 +896,258 @@ export class ImportarComponent implements OnInit {
     dtS = dt < 10 ? '0' + dt : dt.toString();
     monthS = month < 10 ? '0' + month : month.toString();
     return year + '-' + monthS + '-' + dtS;
+  }
+
+  setCvaAlmacenes(item: any): BranchOffices[] {
+    const branchOffices: BranchOffices[] = [];
+    this.cvaAlmacenes.forEach(almacen => {
+      let cantidad = 0;
+      const branchOffice = new BranchOffices();
+      branchOffice.id = almacen.clave;
+      branchOffice.name = almacen.nombre;
+      branchOffice.cp = almacen.cp;
+      switch (almacen.clave) {
+        case '1':
+          cantidad = parseInt(item.VENTAS_GUADALAJARA);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '3':
+          cantidad = parseInt(item.VENTAS_MORELIA);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '4':
+          cantidad = parseInt(item.VENTAS_LEON);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '5':
+          cantidad = parseInt(item.VENTAS_CULIACAN);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '6':
+          cantidad = parseInt(item.VENTAS_QUERETARO);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '7':
+          cantidad = parseInt(item.VENTAS_TORREON);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '8':
+          cantidad = parseInt(item.VENTAS_TEPIC);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '9':
+          cantidad = parseInt(item.VENTAS_MONTERREY);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '10':
+          cantidad = parseInt(item.VENTAS_PUEBLA);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '11':
+          cantidad = parseInt(item.VENTAS_VERACRUZ);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '12':
+          cantidad = parseInt(item.VENTAS_VILLAHERMOSA);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '13':
+          cantidad = parseInt(item.VENTAS_TUXTLA);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '14':
+          cantidad = parseInt(item.VENTAS_HERMOSILLO);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '18':
+          cantidad = parseInt(item.VENTAS_MERIDA);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '19':
+          cantidad = parseInt(item.VENTAS_CANCUN);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '23':
+          cantidad = parseInt(item.VENTAS_AGUASCALIENTES);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '24':
+          cantidad = parseInt(item.VENTAS_CDMX);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '26':
+          cantidad = parseInt(item.VENTAS_SAN_LUIS_POTOSI);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '27':
+          cantidad = parseInt(item.VENTAS_CHIHUAHUA);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '28':
+          cantidad = parseInt(item.VENTAS_DURANGO);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '29':
+          cantidad = parseInt(item.VENTAS_TOLUCA);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '31':
+          cantidad = parseInt(item.VENTAS_OAXACA);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '32':
+          cantidad = parseInt(item.VENTAS_LAPAZ);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '33':
+          cantidad = parseInt(item.VENTAS_TIJUANA);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '35':
+          cantidad = parseInt(item.VENTAS_COLIMA);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '36':
+          cantidad = parseInt(item.VENTAS_ZACATECAS);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '38':
+          cantidad = parseInt(item.VENTAS_CAMPECHE);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '39':
+          cantidad = parseInt(item.VENTAS_TAMPICO);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '40':
+          cantidad = parseInt(item.VENTAS_PACHUCA);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '43':
+          cantidad = parseInt(item.VENTAS_ACAPULCO);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '46':
+          cantidad = parseInt(item.VENTAS_CEDISGUADALAJARA);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '47':
+          cantidad = parseInt(item.VENTAS_CUERNAVACA);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '51':
+          cantidad = parseInt(item.VENTAS_CEDISCDMX);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '52':
+          cantidad = parseInt(item.VENTAS_ASPHALT);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+      }
+    });
+    return branchOffices;
   }
 
   setProduct(proveedor: string, item: any, productJson: any = null, imagenes: any = null) {
@@ -983,6 +1252,8 @@ export class ImportarComponent implements OnInit {
 
       case 'cva':
         sale_price = 0;
+        let branchOffices: BranchOffices[] = [];
+        branchOffices = this.setCvaAlmacenes(item);
         if (item.disponible >= this.stockMinimo) {
           itemData.id = item.id;
           itemData.name = item.descripcion;
@@ -1036,11 +1307,11 @@ export class ImportarComponent implements OnInit {
           s.codigo = item.clave;
           s.price = parseFloat(item.precio);
           s.moneda = 'MXN';
-          s.branchOffices = [];
-          bo.name = 'Villahermosa';
-          disponible = item.disponiblecd > 0 ? parseInt(item.disponiblecd, 10) : parseInt(item.disponible, 10);
-          bo.cantidad = disponible;
-          s.branchOffices.push(bo);
+          s.branchOffices = branchOffices;
+          // bo.name = 'Villahermosa';
+          // disponible = item.disponiblecd > 0 ? parseInt(item.disponiblecd, 10) : parseInt(item.disponible, 10);
+          // bo.cantidad = disponible;
+          // s.branchOffices.push(bo);
           itemData.suppliersProd = s;
           // Imagenes
           itemData.pictures = [];
@@ -1151,7 +1422,6 @@ export class ImportarComponent implements OnInit {
             is.url = productJson.imagen;
             itemData.variants = [];
             itemData.sm_pictures.push(is);
-            console.log('itemData: ', itemData);
             return itemData;
           }
         }
