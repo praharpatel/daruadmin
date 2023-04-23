@@ -7,13 +7,17 @@
     <form [formGroup]="captureForm" (ngSubmit)="onSubmit()" #forma="ngForm">
       <div class="container-fluid p-0">
         <div class="row">
-          <div class="col-3">
+          <div class="col-4">
             <label for="clave">Clave</label>
             <input type="text" class="form-control" id="clave" formControlName="clave" placeholder="Teclea la clave"
               [attr.disabled]="true">
           </div>
-          <div class="col-6"></div>
-          <div class="col-3">
+          <div class="col-4">
+            <label for="order">Orden</label>
+            <input type="text" class="form-control" id="order" formControlName="order" placeholder="Teclea el orden"
+              [attr.disabled]="onlyView ? true : null">
+          </div>
+          <div class="col-4">
             <label for="estatus">Estatus</label>
             <input type="text" class="form-control" id="estatus" formControlName="estatus" [attr.disabled]="true">
           </div>

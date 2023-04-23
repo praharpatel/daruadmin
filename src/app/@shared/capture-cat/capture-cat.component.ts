@@ -37,6 +37,7 @@ export class CaptureCatComponent implements OnInit {
     this.captureForm = this.formBuilder.group({
       clave: ['1', [Validators.required]],
       estatus: ['Activos'],
+      order: [0],
       active: [true],
       description: ['', [Validators.required]]
     });
@@ -46,11 +47,13 @@ export class CaptureCatComponent implements OnInit {
     if (catalog) {
       this.captureForm.controls.clave.setValue(catalog.id);
       this.captureForm.controls.description.setValue(catalog.description);
+      this.captureForm.controls.order.setValue(catalog.order);
       this.captureForm.controls.active.setValue(catalog.active);
       return
     }
     this.catalog.id = this.captureForm.controls.clave.value;
     this.catalog.description = this.captureForm.controls.description.value;
+    this.catalog.order = parseInt(this.captureForm.controls.order.value);
     this.catalog.active = this.captureForm.controls.active.value;
   }
 
@@ -79,6 +82,7 @@ export class CaptureCatComponent implements OnInit {
     this.captureForm.controls.clave.setValue(this.catalog.id);
     this.captureForm.controls.estatus.setValue(valorEditar);
     this.captureForm.controls.description.setValue(this.catalog.description);
+    this.captureForm.controls.order.setValue(this.catalog.order);
     this.modal.open(this.content, { size: 'lg' });
   }
 

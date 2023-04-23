@@ -60,9 +60,14 @@ export class ModelsComponent implements OnInit {
         class: 'clave'
       },
       {
+        property: 'order',
+        label: 'Orden',
+        class: 'clave'
+      },
+      {
         property: 'description',
-        label: 'Modelos',
-        class: 'description'
+        label: 'Marca',
+        class: 'descriptionShort'
       },
       {
         property: 'slug',
@@ -110,6 +115,7 @@ export class ModelsComponent implements OnInit {
       id: this.nextId,
       description: '',
       slug: '',
+      order: 0,
       active: true
     };
   }

@@ -62,9 +62,14 @@ export class CategoriesComponent implements OnInit {
         class: 'clave'
       },
       {
+        property: 'order',
+        label: 'Orden',
+        class: 'clave'
+      },
+      {
         property: 'description',
-        label: 'Categorias',
-        class: 'description'
+        label: 'Marca',
+        class: 'descriptionShort'
       },
       {
         property: 'slug',
@@ -125,6 +130,7 @@ export class CategoriesComponent implements OnInit {
     this.catalog = {
       id: this.nextId,
       description: '',
+      order: 0,
       slug: '',
       active: true
     };

@@ -2,6 +2,7 @@ export class Catalog {
   id: string;
   description: string;
   slug: string;
+  order: number;
   active: boolean;
   suppliersCat?: SupplierCat[];
 }
