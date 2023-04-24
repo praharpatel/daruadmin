@@ -37,7 +37,7 @@ export class CaptureCatComponent implements OnInit {
     this.captureForm = this.formBuilder.group({
       clave: ['1', [Validators.required]],
       estatus: ['Activos'],
-      order: [0],
+      order: [1000],
       active: [true],
       description: ['', [Validators.required]]
     });

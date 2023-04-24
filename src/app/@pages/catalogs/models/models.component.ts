@@ -115,7 +115,7 @@ export class ModelsComponent implements OnInit {
       id: this.nextId,
       description: '',
       slug: '',
-      order: 0,
+      order: 1000,
       active: true
     };
   }

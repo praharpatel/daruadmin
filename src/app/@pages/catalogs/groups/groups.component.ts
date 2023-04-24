@@ -131,7 +131,7 @@ export class GroupsComponent implements OnInit {
       id: this.nextId,
       description: '',
       slug: '',
-      order: 0,
+      order: 1000,
       active: true
     };
   }
