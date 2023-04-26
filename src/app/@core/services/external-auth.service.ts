@@ -169,8 +169,8 @@ export class ExternalAuthService {
             if (apiSelect.parameters) {
               apiSelect.parameters.forEach(param => {
                 if (param.name === 'cliente') {
-                  params = params.set(param.name, '23534');
-                } else if (param.name === 'promos' || param.name === 'porcentajes' || param.name === 'sucursales') {
+                  params = params.set(param.name, param.value);
+                } else if (param.name === 'promos' || param.name === 'porcentajes' || param.name === 'sucursales' || param.name === 'TotalSuc') {
                   params = params.set(param.name, param.value);
                 } else {
                   params = params.set(param.name, item.slug.toUpperCase());

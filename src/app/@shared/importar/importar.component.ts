@@ -639,7 +639,6 @@ export class ImportarComponent implements OnInit {
                     let itemData = new Product();
                     itemData = this.setProduct(supplier.slug, item);
                     if (itemData.id !== undefined) {
-                      console.log('itemData: ', itemData);
                       productos.push(itemData);
                     }
                   });
@@ -653,6 +652,7 @@ export class ImportarComponent implements OnInit {
             .catch(async (error: Error) => {
               throw await new Error(error.message);
             });
+            console.log('productos/resultados: ', resultados);
           return await resultados;
         case 'exel':
           // Carga de todos los Productos
@@ -1020,7 +1020,7 @@ export class ImportarComponent implements OnInit {
           }
           break;
         case '24':
-          cantidad = parseInt(item.VENTAS_CDMX);
+          cantidad = parseInt(item.VENTAS_DF_TALLER);
           if (cantidad > 0) {
             branchOffice.cantidad = cantidad;
             branchOffices.push(branchOffice);
@@ -1144,6 +1144,7 @@ export class ImportarComponent implements OnInit {
             branchOffice.cantidad = cantidad;
             branchOffices.push(branchOffice);
           }
+
           break;
       }
     });
@@ -1253,81 +1254,85 @@ export class ImportarComponent implements OnInit {
       case 'cva':
         sale_price = 0;
         let branchOffices: BranchOffices[] = [];
-        branchOffices = this.setCvaAlmacenes(item);
-        if (item.disponible >= this.stockMinimo) {
-          itemData.id = item.id;
-          itemData.name = item.descripcion;
-          itemData.slug = slugify(item.descripcion, { lower: true });
-          itemData.short_desc = item.clave + '. Grupo: ' + item.grupo;
-          itemData.price = parseFloat(item.precio);
-          itemData.review = 0;
-          itemData.ratings = 0;
-          itemData.until = this.getFechas(new Date());
-          itemData.top = false;
-          if (item.PrecioDescuento !== 'Sin Descuento') {
-            desc.total_descuento = item.TotalDescuento === '' ? 0 : parseFloat(item.TotalDescuento);
-            desc.moneda_descuento = item.MonedaDescuento;
-            desc.precio_descuento = item.PrecioDescuento === '' ? 0 : parseFloat(item.PrecioDescuento);
-            sale_price = desc.precio_descuento;
+        let disponibilidadAlmacenes = 0;
+        if (item.ExsTotal >= this.stockMinimo) {                  // Si existencias totales.
+          branchOffices = this.setCvaAlmacenes(item);
+          if (branchOffices.length > 0) {
+            branchOffices.forEach(branchOffice => {
+              disponibilidadAlmacenes += branchOffice.cantidad;
+            });
           }
-          itemData.descuentos = desc;
-          itemData.featured = item.DisponibleEnPromocion !== 'Sin Descuento' ? true : false;
-          if (item.DisponibleEnPromocion !== 'Sin Descuento') {
-            promo.clave_promocion = item.ClavePromocion;
-            promo.descripcion_promocion = item.DescripcionPromocion;
-            promo.vencimiento_promocion = item.VencimientoPromocion;
-            promo.disponible_en_promocion = item.DisponibleEnPromocion === '' ? 0 : parseFloat(item.DisponibleEnPromocion);
+          if (disponibilidadAlmacenes >= this.stockMinimo) {      // Si la sumatoria de los almacenes.
+            itemData.id = item.id;
+            itemData.name = item.descripcion;
+            itemData.slug = slugify(item.descripcion, { lower: true });
+            itemData.short_desc = item.clave + '. Grupo: ' + item.grupo;
+            itemData.price = parseFloat(item.precio);
+            itemData.review = 0;
+            itemData.ratings = 0;
+            itemData.until = this.getFechas(new Date());
+            itemData.top = false;
+            if (item.PrecioDescuento !== 'Sin Descuento') {
+              desc.total_descuento = item.TotalDescuento === '' ? 0 : parseFloat(item.TotalDescuento);
+              desc.moneda_descuento = item.MonedaDescuento;
+              desc.precio_descuento = item.PrecioDescuento === '' ? 0 : parseFloat(item.PrecioDescuento);
+              sale_price = desc.precio_descuento;
+            }
+            itemData.descuentos = desc;
+            itemData.featured = item.DisponibleEnPromocion !== 'Sin Descuento' ? true : false;
+            if (item.DisponibleEnPromocion !== 'Sin Descuento') {
+              promo.clave_promocion = item.ClavePromocion;
+              promo.descripcion_promocion = item.DescripcionPromocion;
+              promo.vencimiento_promocion = item.VencimientoPromocion;
+              promo.disponible_en_promocion = item.DisponibleEnPromocion === '' ? 0 : parseFloat(item.DisponibleEnPromocion);
+            }
+            itemData.sale_price = sale_price;
+            itemData.promociones = promo;
+            itemData.new = false;
+            itemData.sold = null;
+            disponible = disponibilidadAlmacenes;
+            itemData.stock = disponible;
+            itemData.sku = item.clave;
+            itemData.partnumber = item.codigo_fabricante;
+            itemData.upc = item.codigo_fabricante;
+            unidad.id = 'PZ';
+            unidad.name = 'Pieza';
+            unidad.slug = 'pieza';
+            itemData.unidadDeMedida = unidad;
+            // Categorias
+            itemData.category = [];
+            c.name = item.grupo;
+            c.slug = slugify(item.grupo, { lower: true });
+            itemData.category.push(c);
+            // Marcas
+            itemData.brand = item.marca.toLowerCase();
+            itemData.brands = [];
+            b.name = item.marca;
+            b.slug = slugify(item.marca, { lower: true });
+            itemData.brands.push(b);
+            // SupplierProd
+            s.idProveedor = proveedor;
+            s.codigo = item.clave;
+            s.price = parseFloat(item.precio);
+            s.moneda = 'MXN';
+            s.branchOffices = branchOffices;
+            itemData.suppliersProd = s;
+            // Imagenes
+            itemData.pictures = [];
+            // const i = new Picture();
+            i.width = '600';
+            i.height = '600';
+            i.url = item.imagen;
+            itemData.pictures.push(i);
+            // Imagenes pequeñas
+            itemData.sm_pictures = [];
+            // const is = new Picture();
+            is.width = '300';
+            is.height = '300';
+            is.url = item.imagen;
+            itemData.variants = [];
+            itemData.sm_pictures.push(is);
           }
-          itemData.sale_price = sale_price;
-          itemData.promociones = promo;
-          itemData.new = false;
-          itemData.sold = null;
-          disponible = item.disponiblecd > 0 ? parseInt(item.disponiblecd, 10) : parseInt(item.disponible, 10);
-          itemData.stock = disponible;
-          itemData.sku = item.clave;
-          itemData.partnumber = item.codigo_fabricante;
-          itemData.upc = item.codigo_fabricante;
-          unidad.id = 'PZ';
-          unidad.name = 'Pieza';
-          unidad.slug = 'pieza';
-          itemData.unidadDeMedida = unidad;
-          // Categorias
-          itemData.category = [];
-          c.name = item.grupo;
-          c.slug = slugify(item.grupo, { lower: true });
-          itemData.category.push(c);
-          // Marcas
-          itemData.brand = item.marca.toLowerCase();
-          itemData.brands = [];
-          b.name = item.marca;
-          b.slug = slugify(item.marca, { lower: true });
-          itemData.brands.push(b);
-          // SupplierProd
-          s.idProveedor = proveedor;
-          s.codigo = item.clave;
-          s.price = parseFloat(item.precio);
-          s.moneda = 'MXN';
-          s.branchOffices = branchOffices;
-          // bo.name = 'Villahermosa';
-          // disponible = item.disponiblecd > 0 ? parseInt(item.disponiblecd, 10) : parseInt(item.disponible, 10);
-          // bo.cantidad = disponible;
-          // s.branchOffices.push(bo);
-          itemData.suppliersProd = s;
-          // Imagenes
-          itemData.pictures = [];
-          // const i = new Picture();
-          i.width = '600';
-          i.height = '600';
-          i.url = item.imagen;
-          itemData.pictures.push(i);
-          // Imagenes pequeñas
-          itemData.sm_pictures = [];
-          // const is = new Picture();
-          is.width = '300';
-          is.height = '300';
-          is.url = item.imagen;
-          itemData.variants = [];
-          itemData.sm_pictures.push(is);
         }
         return itemData;
 
