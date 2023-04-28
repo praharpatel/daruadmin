@@ -37,6 +37,8 @@ export const PRODUCT_FRAGMENT = gql`
         brand_id
       }
     }
+    model
+    peso
     pictures {
       width
       height
@@ -87,6 +89,7 @@ export const PRODUCT_FRAGMENT = gql`
       moneda
       branchOffices {
         name
+        estado
         cantidad
       }
     }

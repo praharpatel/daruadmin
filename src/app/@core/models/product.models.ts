@@ -24,6 +24,8 @@ export class Product extends ProductExport {
   category: Categorys[];
   brand: string;
   brands: Brands[];
+  model: string;
+  peso: number;
   pictures: Picture[];
   sm_pictures?: Picture[];
   variants?: Variant[];
@@ -109,8 +111,13 @@ export class SupplierProd {
 }
 
 export class BranchOffices {
+  id: string;
   name: string;
+  estado: string;
   cantidad: number;
+  cp: string;
+  latitud: string;
+  longitud: string;
   promocionBranchOffice: PromocionBranchOffice;
 }
 

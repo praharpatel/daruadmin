@@ -169,9 +169,9 @@ export class ExternalAuthService {
             if (apiSelect.parameters) {
               apiSelect.parameters.forEach(param => {
                 if (param.name === 'cliente') {
-                  params = params.set(param.name, '23534');
-                } else if (param.name === 'promos' || param.name === 'porcentajes') {
-                  params = params.set(param.name, '1');
+                  params = params.set(param.name, param.value);
+                } else if (param.name === 'promos' || param.name === 'porcentajes' || param.name === 'sucursales' || param.name === 'TotalSuc') {
+                  params = params.set(param.name, param.value);
                 } else {
                   params = params.set(param.name, item.slug.toUpperCase());
                 }
@@ -286,6 +286,11 @@ export class ExternalAuthService {
         return await xml2js
           .parseStringPromise(xml, { explicitArray: false })
           .then(response => response.soluciones.solucion)
+          .catch(err => { return err });
+      case 'sucursales.xml':
+        return await xml2js
+          .parseStringPromise(xml, { explicitArray: false })
+          .then(response => response.sucursales.sucursal)
           .catch(err => { return err });
       case 'Obtener_Marcas':                                                                // SOAP Exel
         return await xml2js

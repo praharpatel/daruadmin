@@ -62,9 +62,14 @@ export class GroupsComponent implements OnInit {
         class: 'clave'
       },
       {
+        property: 'order',
+        label: 'Orden',
+        class: 'clave'
+      },
+      {
         property: 'description',
-        label: 'Grupos',
-        class: 'description'
+        label: 'Marca',
+        class: 'descriptionShort'
       },
       {
         property: 'slug',
@@ -126,6 +131,7 @@ export class GroupsComponent implements OnInit {
       id: this.nextId,
       description: '',
       slug: '',
+      order: 1000,
       active: true
     };
   }

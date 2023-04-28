@@ -5,6 +5,7 @@ export const GROUP_FRAGMENT = gql`
     id
     description
     slug
+    order
     active
     suppliersCat {
       idProveedor
