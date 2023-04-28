@@ -167,6 +167,8 @@ export class ProductsComponent implements OnInit {
       category: [],
       brand: '',
       brands: [],
+      model: '',
+      peso: 0,
       pictures: [],
       sm_pictures: [],
       variants: [],

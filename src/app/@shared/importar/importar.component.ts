@@ -60,6 +60,7 @@ export class ImportarComponent implements OnInit {
   categories: Catalog[];
   groups: Catalog[];
   ctAlmacenes: any[];
+  cvaAlmacenes: any[];
   exchangeRate: number;
   offer: number;
 
@@ -219,6 +220,21 @@ export class ImportarComponent implements OnInit {
         infoEventAlert('No es posible importar el catalogo.', error.message, TYPE_ALERT.ERROR);
       });
     return almacenesCt;
+  }
+
+  async getCvaAlmacenes(supplier: ISupplier): Promise<any> {
+    const ApiSelect = this.apis.filter(api => api.return === 'sucursales');
+    if (ApiSelect.length > 0) {
+      return await this.getCatalogo(supplier, ApiSelect[0])
+        .then(
+          async (result) => {
+            return await result;
+          }
+        )
+        .catch((error: Error) => {
+          infoEventAlert('No es posible importar el catalogo.', error.message, TYPE_ALERT.ERROR);
+        });
+    }
   }
 
   async onOpenModalProduct(products: [Product]) {
@@ -492,6 +508,8 @@ export class ImportarComponent implements OnInit {
                         }
                       });
                       return await data;
+                    } else if (apiSelect.operation === 'sucursales.xml') {
+                      return await result;
                     } else {
                       result.forEach(async item => {
                         const itemData = new Catalog();
@@ -596,12 +614,12 @@ export class ImportarComponent implements OnInit {
   async getCatalogoAllBrands(supplier: ISupplier, apiSelect: IApis, catalogValues: Catalog[]): Promise<any> {
     // Cuando la consulta externa no requiere token
     if (!supplier.token) {
-      let productos: Product[];
+      const productos: Product[] = [];
       let resultados;
       switch (supplier.slug) {
         case 'cva':
-          productos = [];
           // Carga de Productos
+          this.cvaAlmacenes = await this.getCvaAlmacenes(supplier);
           resultados = await this.externalAuthService.getCatalogXMLAllBrands(supplier, apiSelect, this.valorSearch.id, catalogValues)
             .then(async result => {
               if (result.length > 0) {
@@ -634,6 +652,7 @@ export class ImportarComponent implements OnInit {
             .catch(async (error: Error) => {
               throw await new Error(error.message);
             });
+            console.log('productos/resultados: ', resultados);
           return await resultados;
         case 'exel':
           // Carga de todos los Productos
@@ -648,7 +667,6 @@ export class ImportarComponent implements OnInit {
               }
               if (result.length > 0) {
                 try {
-                  productos = [];
                   // Api para Cargar Precios y Disponibilidad
                   let apiPrecio: IApis;
                   supplier.apis.forEach(api => {
@@ -756,7 +774,7 @@ export class ImportarComponent implements OnInit {
         default:
           break;
       }
-    } else {                                                                  // Syscom
+    } else {                                                                  // Syscom, CT
       return await this.externalAuthService.getSyscomToken(supplier, apiSelect)
         .then(
           async result => {
@@ -824,8 +842,12 @@ export class ImportarComponent implements OnInit {
     const almacen = new BranchOffices();
     Object.keys(x).forEach((branch, index) => {
       const almacenEstado = this.getCtAlmacenes(branch);
+      almacen.id = almacenEstado.id;
       almacen.name = almacenEstado.Sucursal;
       almacen.estado = almacenEstado.Estado;
+      almacen.cp = almacenEstado.CP;
+      almacen.latitud = almacenEstado.latitud;
+      almacen.longitud = almacenEstado.longitud;
       almacen.cantidad = x[branch];
       // Si el dato es un objeto entonces viene una promocion.
       if (typeof x[branch] === 'object') {
@@ -856,7 +878,6 @@ export class ImportarComponent implements OnInit {
   }
 
   getCtAlmacenes(id: string): any {
-    // return this.ctAlmacenes
     // tslint:disable-next-line: no-shadowed-variable
     const almacen = this.ctAlmacenes.filter(almacen => almacen.id === id);
     if (almacen.length > 0) {
@@ -877,6 +898,259 @@ export class ImportarComponent implements OnInit {
     return year + '-' + monthS + '-' + dtS;
   }
 
+  setCvaAlmacenes(item: any): BranchOffices[] {
+    const branchOffices: BranchOffices[] = [];
+    this.cvaAlmacenes.forEach(almacen => {
+      let cantidad = 0;
+      const branchOffice = new BranchOffices();
+      branchOffice.id = almacen.clave;
+      branchOffice.name = almacen.nombre;
+      branchOffice.cp = almacen.cp;
+      switch (almacen.clave) {
+        case '1':
+          cantidad = parseInt(item.VENTAS_GUADALAJARA);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '3':
+          cantidad = parseInt(item.VENTAS_MORELIA);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '4':
+          cantidad = parseInt(item.VENTAS_LEON);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '5':
+          cantidad = parseInt(item.VENTAS_CULIACAN);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '6':
+          cantidad = parseInt(item.VENTAS_QUERETARO);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '7':
+          cantidad = parseInt(item.VENTAS_TORREON);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '8':
+          cantidad = parseInt(item.VENTAS_TEPIC);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '9':
+          cantidad = parseInt(item.VENTAS_MONTERREY);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '10':
+          cantidad = parseInt(item.VENTAS_PUEBLA);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '11':
+          cantidad = parseInt(item.VENTAS_VERACRUZ);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '12':
+          cantidad = parseInt(item.VENTAS_VILLAHERMOSA);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '13':
+          cantidad = parseInt(item.VENTAS_TUXTLA);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '14':
+          cantidad = parseInt(item.VENTAS_HERMOSILLO);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '18':
+          cantidad = parseInt(item.VENTAS_MERIDA);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '19':
+          cantidad = parseInt(item.VENTAS_CANCUN);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '23':
+          cantidad = parseInt(item.VENTAS_AGUASCALIENTES);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '24':
+          cantidad = parseInt(item.VENTAS_DF_TALLER);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '26':
+          cantidad = parseInt(item.VENTAS_SAN_LUIS_POTOSI);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '27':
+          cantidad = parseInt(item.VENTAS_CHIHUAHUA);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '28':
+          cantidad = parseInt(item.VENTAS_DURANGO);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '29':
+          cantidad = parseInt(item.VENTAS_TOLUCA);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '31':
+          cantidad = parseInt(item.VENTAS_OAXACA);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '32':
+          cantidad = parseInt(item.VENTAS_LAPAZ);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '33':
+          cantidad = parseInt(item.VENTAS_TIJUANA);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '35':
+          cantidad = parseInt(item.VENTAS_COLIMA);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '36':
+          cantidad = parseInt(item.VENTAS_ZACATECAS);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '38':
+          cantidad = parseInt(item.VENTAS_CAMPECHE);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '39':
+          cantidad = parseInt(item.VENTAS_TAMPICO);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '40':
+          cantidad = parseInt(item.VENTAS_PACHUCA);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '43':
+          cantidad = parseInt(item.VENTAS_ACAPULCO);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '46':
+          cantidad = parseInt(item.VENTAS_CEDISGUADALAJARA);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '47':
+          cantidad = parseInt(item.VENTAS_CUERNAVACA);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '51':
+          cantidad = parseInt(item.VENTAS_CEDISCDMX);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '52':
+          cantidad = parseInt(item.VENTAS_ASPHALT);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+
+          break;
+      }
+    });
+    return branchOffices;
+  }
+
   setProduct(proveedor: string, item: any, productJson: any = null, imagenes: any = null) {
     const itemData = new Product();
     const unidad = new UnidadDeMedida();
@@ -889,16 +1163,17 @@ export class ImportarComponent implements OnInit {
     const desc = new Descuentos();
     const promo = new Promociones();
     let disponible = 0;
+    let sale_price = 0;
 
     switch (proveedor) {
       case 'syscom':
+        sale_price = 0;
         if (item.total_existencia >= this.stockMinimo) {
           itemData.id = item.producto_id;
           itemData.name = item.titulo === '' ? item.modelo : item.titulo;
           itemData.slug = slugify(item.titulo === '' ? item.modelo : item.titulo, { lower: true });
           itemData.short_desc = item.titulo + '. Modelo: ' + item.modelo;
           itemData.price = parseFloat(item.precios.precio_lista);
-          itemData.sale_price = parseFloat(item.precios.precio_descuento);
           itemData.review = 0;
           itemData.ratings = 0;
           itemData.until = this.getFechas(new Date());
@@ -911,6 +1186,7 @@ export class ImportarComponent implements OnInit {
             desc.total_descuento = precioEspecial;
             desc.moneda_descuento = 'MXN';
             desc.precio_descuento = precioEspecial;
+            sale_price = precioEspecial;
           }
           itemData.descuentos = desc;
           if (precioDescuento < precioEspecial) {               // Catalogar como producto TOP
@@ -919,7 +1195,9 @@ export class ImportarComponent implements OnInit {
             promo.descripcion_promocion = 'Producto con Descuento';
             promo.vencimiento_promocion = 'Total Existencias: ' + item.total_existencia.toString();
             promo.disponible_en_promocion = precioDescuento;
+            sale_price = precioDescuento;
           }
+          itemData.sale_price = sale_price;
           itemData.promociones = promo;
           itemData.top = false;
           itemData.featured = featured;
@@ -974,82 +1252,93 @@ export class ImportarComponent implements OnInit {
         return itemData;
 
       case 'cva':
-        if (item.disponible >= this.stockMinimo) {
-          itemData.id = item.id;
-          itemData.name = item.descripcion;
-          itemData.slug = slugify(item.descripcion, { lower: true });
-          itemData.short_desc = item.clave + '. Grupo: ' + item.grupo;
-          itemData.price = parseFloat(item.precio);
-          itemData.sale_price = parseFloat(item.precio);
-          itemData.review = 0;
-          itemData.ratings = 0;
-          itemData.until = this.getFechas(new Date());
-          itemData.top = false;
-          if (item.PrecioDescuento !== 'Sin Descuento') {
-            desc.total_descuento = item.TotalDescuento === '' ? 0 : parseFloat(item.TotalDescuento);
-            desc.moneda_descuento = item.MonedaDescuento;
-            desc.precio_descuento = item.PrecioDescuento === '' ? 0 : parseFloat(item.PrecioDescuento);
+        sale_price = 0;
+        let branchOffices: BranchOffices[] = [];
+        let disponibilidadAlmacenes = 0;
+        if (item.ExsTotal >= this.stockMinimo) {                  // Si existencias totales.
+          branchOffices = this.setCvaAlmacenes(item);
+          if (branchOffices.length > 0) {
+            branchOffices.forEach(branchOffice => {
+              disponibilidadAlmacenes += branchOffice.cantidad;
+            });
           }
-          itemData.descuentos = desc;
-          itemData.featured = item.DisponibleEnPromocion !== 'Sin Descuento' ? true : false;
-          if (item.DisponibleEnPromocion !== 'Sin Descuento') {
-            promo.clave_promocion = item.ClavePromocion;
-            promo.descripcion_promocion = item.DescripcionPromocion;
-            promo.vencimiento_promocion = item.VencimientoPromocion;
-            promo.disponible_en_promocion = item.DisponibleEnPromocion === '' ? 0 : parseFloat(item.DisponibleEnPromocion);
+          if (disponibilidadAlmacenes >= this.stockMinimo) {      // Si la sumatoria de los almacenes.
+            itemData.id = item.id;
+            itemData.name = item.descripcion;
+            itemData.slug = slugify(item.descripcion, { lower: true });
+            itemData.short_desc = item.clave + '. Grupo: ' + item.grupo;
+            itemData.price = parseFloat(item.precio);
+            itemData.review = 0;
+            itemData.ratings = 0;
+            itemData.until = this.getFechas(new Date());
+            itemData.top = false;
+            if (item.PrecioDescuento !== 'Sin Descuento') {
+              desc.total_descuento = item.TotalDescuento === '' ? 0 : parseFloat(item.TotalDescuento);
+              desc.moneda_descuento = item.MonedaDescuento;
+              desc.precio_descuento = item.PrecioDescuento === '' ? 0 : parseFloat(item.PrecioDescuento);
+              sale_price = desc.precio_descuento;
+            }
+            itemData.descuentos = desc;
+            itemData.featured = item.DisponibleEnPromocion !== 'Sin Descuento' ? true : false;
+            if (item.DisponibleEnPromocion !== 'Sin Descuento') {
+              promo.clave_promocion = item.ClavePromocion;
+              promo.descripcion_promocion = item.DescripcionPromocion;
+              promo.vencimiento_promocion = item.VencimientoPromocion;
+              promo.disponible_en_promocion = item.DisponibleEnPromocion === '' ? 0 : parseFloat(item.DisponibleEnPromocion);
+            }
+            itemData.sale_price = sale_price;
+            itemData.promociones = promo;
+            itemData.new = false;
+            itemData.sold = null;
+            disponible = disponibilidadAlmacenes;
+            itemData.stock = disponible;
+            itemData.sku = item.clave;
+            itemData.partnumber = item.codigo_fabricante;
+            itemData.upc = item.codigo_fabricante;
+            unidad.id = 'PZ';
+            unidad.name = 'Pieza';
+            unidad.slug = 'pieza';
+            itemData.unidadDeMedida = unidad;
+            // Categorias
+            itemData.category = [];
+            c.name = item.grupo;
+            c.slug = slugify(item.grupo, { lower: true });
+            itemData.category.push(c);
+            // Marcas
+            itemData.brand = item.marca.toLowerCase();
+            itemData.brands = [];
+            b.name = item.marca;
+            b.slug = slugify(item.marca, { lower: true });
+            itemData.brands.push(b);
+            // SupplierProd
+            s.idProveedor = proveedor;
+            s.codigo = item.clave;
+            s.price = parseFloat(item.precio);
+            s.moneda = 'MXN';
+            s.branchOffices = branchOffices;
+            itemData.suppliersProd = s;
+            // Imagenes
+            itemData.pictures = [];
+            // const i = new Picture();
+            i.width = '600';
+            i.height = '600';
+            i.url = item.imagen;
+            itemData.pictures.push(i);
+            // Imagenes pequeñas
+            itemData.sm_pictures = [];
+            // const is = new Picture();
+            is.width = '300';
+            is.height = '300';
+            is.url = item.imagen;
+            itemData.variants = [];
+            itemData.sm_pictures.push(is);
           }
-          itemData.promociones = promo;
-          itemData.new = false;
-          itemData.sold = null;
-          itemData.stock = parseInt(item.disponible, 10);
-          itemData.sku = item.clave;
-          itemData.partnumber = item.codigo_fabricante;
-          itemData.upc = item.codigo_fabricante;
-          unidad.id = 'PZ';
-          unidad.name = 'Pieza';
-          unidad.slug = 'pieza';
-          itemData.unidadDeMedida = unidad;
-          // Categorias
-          itemData.category = [];
-          c.name = item.grupo;
-          c.slug = slugify(item.grupo, { lower: true });
-          itemData.category.push(c);
-          // Marcas
-          itemData.brand = item.marca.toLowerCase();
-          itemData.brands = [];
-          b.name = item.marca;
-          b.slug = slugify(item.marca, { lower: true });
-          itemData.brands.push(b);
-          // SupplierProd
-          s.idProveedor = proveedor;
-          s.codigo = item.clave;
-          s.price = parseFloat(item.precio);
-          s.moneda = 'MXN';
-          s.branchOffices = [];
-          bo.name = 'Villahermosa';
-          bo.cantidad = parseInt(item.disponible, 10);
-          s.branchOffices.push(bo);
-          itemData.suppliersProd = s;
-          // Imagenes
-          itemData.pictures = [];
-          // const i = new Picture();
-          i.width = '600';
-          i.height = '600';
-          i.url = item.imagen;
-          itemData.pictures.push(i);
-          // Imagenes pequeñas
-          itemData.sm_pictures = [];
-          // const is = new Picture();
-          is.width = '300';
-          is.height = '300';
-          is.url = item.imagen;
-          itemData.variants = [];
-          itemData.sm_pictures.push(is);
         }
         return itemData;
 
       case 'ct':
         disponible = 0;
+        sale_price = 0;
         if (item.almacenes.length > 0) {
           const branchOffices: BranchOffices[] = [];
           let featured = false;
@@ -1067,6 +1356,7 @@ export class ImportarComponent implements OnInit {
               promo.inicio_promocion = item.almacenes[0].promocion.vigente.ini;
               promo.vencimiento_promocion = item.almacenes[0].promocion.vigente.fin;
               promo.disponible_en_promocion = item.almacenes[0].promocion.precio;
+              sale_price = item.almacenes[0].promocion.precio;
               itemData.promociones = promo;
             }
             itemData.id = productJson.clave;
@@ -1075,10 +1365,10 @@ export class ImportarComponent implements OnInit {
             itemData.short_desc = productJson.descripcion_corta;
             if (item.moneda === 'USD') {
               itemData.price = parseFloat((parseFloat(item.precio) * this.exchangeRate).toFixed(2));
-              itemData.sale_price = parseFloat((parseFloat(item.precio) * this.exchangeRate).toFixed(2));
+              itemData.sale_price = parseFloat((sale_price * this.exchangeRate).toFixed(2));
             } else {
               itemData.price = parseFloat(item.precio);
-              itemData.sale_price = parseFloat(item.precio);
+              itemData.sale_price = sale_price;
             }
             itemData.review = 0;
             itemData.ratings = 0;
@@ -1121,6 +1411,7 @@ export class ImportarComponent implements OnInit {
             s.moneda = item.moneda;
             s.branchOffices = branchOffices;
             itemData.suppliersProd = s;
+            itemData.model = productJson.modelo;
             // Imagenes
             itemData.pictures = [];
             // const i = new Picture();
@@ -1136,19 +1427,19 @@ export class ImportarComponent implements OnInit {
             is.url = productJson.imagen;
             itemData.variants = [];
             itemData.sm_pictures.push(is);
-            console.log('itemData: ', itemData);
             return itemData;
           }
         }
         return itemData;
 
       case 'exel':
+        sale_price = 0
         itemData.id = item.id_producto;
         itemData.name = item.descripcion;
         itemData.slug = slugify(item.descripcion, { lower: true });
         itemData.short_desc = item.subcategoria + '. Codigo: ' + item.codigo_proveedor;
         itemData.price = item.precioLista;
-        itemData.sale_price = item.precioLista;
+        itemData.sale_price = sale_price;
         itemData.review = 0;
         itemData.ratings = 0;
         itemData.until = this.getFechas(new Date());
@@ -1178,7 +1469,7 @@ export class ImportarComponent implements OnInit {
         // SupplierProd
         s.idProveedor = proveedor;
         s.codigo = item.id_producto;
-        s.price = item.precioLista;
+        s.price = parseFloat(item.precioLista);
         s.moneda = 'MXN';
         s.branchOffices = [];
         if (productJson.length > 0) {
