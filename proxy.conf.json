@@ -8,5 +8,10 @@
     "target": "http://www.grupocva.com",
     "secure": false,
     "changeOrigin": true
+  },
+  "/pedidos_web/*" : {
+    "target": "http://www.grupocva.com",
+    "secure": false,
+    "changeOrigin": true
   }
 }
