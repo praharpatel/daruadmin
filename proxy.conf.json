@@ -4,6 +4,11 @@
     "secure": false,
     "changeOrigin": true
   },
+  "/oauth/oauth30/token" : {
+    "target": "https://api.ingrammicro.com:443/",
+    "secure": false,
+    "changeOrigin": true
+  },
   "/catalogo_clientes_xml/*" : {
     "target": "http://www.grupocva.com",
     "secure": false,
