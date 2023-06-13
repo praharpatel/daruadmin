@@ -31,9 +31,20 @@ export class ExternalAuthService {
   }
 
   async getSyscomToken(supplier: ISupplier, apiSelect: IApis): Promise<any> {
-    // application/x-www-form-urlencoded
     let headers = new HttpHeaders();
-    headers = headers.set('Content-Type', 'application/x-www-form-urlencoded');
+    if (supplier.token.header_parameters.length > 0) {
+      supplier.token.header_parameters.forEach(header => {
+        if (supplier.token.basic_auth_password !== '' && header.name === 'Authorization') {
+          const username = supplier.token.basic_auth_username;
+          const password = supplier.token.basic_auth_password;
+          // Codificar las credenciales en Base64
+          const base64Credentials = btoa(`${username}:${password}`);
+          headers = headers.set(header.name, base64Credentials);
+        } else {
+          headers = headers.set(header.name, header.value);
+        }
+      });
+    }
 
     let params = new HttpParams();
     if (supplier.token.body_parameters.length > 0) {
@@ -43,7 +54,6 @@ export class ExternalAuthService {
     }
 
     const options = { headers };
-
     return await this.http.post(supplier.token.url_base_token, params, options).toPromise();
   }
 
