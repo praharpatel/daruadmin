@@ -90,6 +90,7 @@ export class ImportarComponent implements OnInit {
   // Define requests
   private httpReq1$ = this.httpClient.get('assets/uploads/json/productos.json');
   private httpReq2$ = this.httpClient.get('assets/uploads/json/ct_almacenes.json');
+  private httpReq3$ = this.httpClient.get('assets/uploads/json/ingram_products.json');
 
   // convenience getter for easy access to form fields
   get f() { return this.importForm.controls; }
@@ -196,8 +197,25 @@ export class ImportarComponent implements OnInit {
     return await this.httpReq2$.toPromise();
   }
 
+  async getProductosIngram(): Promise<any> {
+    return await this.httpReq3$.toPromise();
+  }
+
+
   async getProducts() {
     const productsCt = await this.getProd()
+      .then(
+        async (result) => {
+          return await result;
+        }
+      )
+      .catch((error: Error) => {
+        infoEventAlert('No es posible importar el catalogo.', error.message, TYPE_ALERT.ERROR);
+      });
+    return productsCt;
+  }
+  async getProductsIngram() {
+    const productsCt = await this.getProductosIngram()
       .then(
         async (result) => {
           return await result;
@@ -331,6 +349,10 @@ export class ImportarComponent implements OnInit {
             this.apiName = this.supplier.url_base_api;
             this.apisFilter.push(api);
           }
+          if (this.supplier.slug === 'ingram' && api.return === 'existencia') {
+            this.apiName = this.supplier.url_base_api;
+            this.apisFilter.push(api);
+          }
         }
       });
       if (this.apisFilter.length > 0) {
@@ -438,7 +460,8 @@ export class ImportarComponent implements OnInit {
           infoEventAlert('No es posible importar el catalogo.', error.message, TYPE_ALERT.ERROR);
         });
     } else {
-      if (this.catalogValues.length > 0 || this.supplier.slug === 'ct' || this.supplier.slug === 'exel') {
+      if (this.catalogValues.length > 0 || this.supplier.slug === 'ct' ||
+        this.supplier.slug === 'ingram' || this.supplier.slug === 'exel') {
         loadData('Importando los productos', 'Esperar la carga de los productos.');
         return await this.getCatalogoAllBrands(this.supplier, this.apiSelect, this.catalogValues)
           .then(
@@ -652,7 +675,7 @@ export class ImportarComponent implements OnInit {
             .catch(async (error: Error) => {
               throw await new Error(error.message);
             });
-            console.log('productos/resultados: ', resultados);
+          console.log('productos/resultados: ', resultados);
           return await resultados;
         case 'exel':
           // Carga de todos los Productos
@@ -774,7 +797,7 @@ export class ImportarComponent implements OnInit {
         default:
           break;
       }
-    } else {                                                                  // Syscom, CT
+    } else {                                                                  // Syscom, CT, Ingram
       return await this.externalAuthService.getSyscomToken(supplier, apiSelect)
         .then(
           async result => {
@@ -785,12 +808,18 @@ export class ImportarComponent implements OnInit {
               case 'syscom':
                 this.token = result.access_token;
                 break;
+              case 'ingram':
+                this.token = result.access_token;
+                break;
               default:
                 break;
             }
+            console.log('this.token: ', this.token);
             if (this.token) {
               const productos: Product[] = [];
-              this.ctAlmacenes = await this.getAlmacenes();
+              if (supplier.slug === 'ct') {
+                this.ctAlmacenes = await this.getAlmacenes();
+              }
               // Carga de Productos
               const resultados = await this.externalAuthService.getSyscomCatalogAllBrands(supplier, apiSelect, this.token, catalogValues)
                 // tslint:disable-next-line: no-shadowed-variable
@@ -905,7 +934,10 @@ export class ImportarComponent implements OnInit {
       const branchOffice = new BranchOffices();
       branchOffice.id = almacen.clave;
       branchOffice.name = almacen.nombre;
+      branchOffice.estado = almacen.nombre;
       branchOffice.cp = almacen.cp;
+      branchOffice.latitud = "";
+      branchOffice.longitud = "";
       switch (almacen.clave) {
         case '1':
           cantidad = parseInt(item.VENTAS_GUADALAJARA);

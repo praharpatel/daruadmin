@@ -9,6 +9,11 @@
     "secure": false,
     "changeOrigin": true
   },
+  "/resellers/v6/catalog" : {
+    "target": "https://api.ingrammicro.com:443/sandbox/",
+    "secure": false,
+    "changeOrigin": true
+  },
   "/catalogo_clientes_xml/*" : {
     "target": "http://www.grupocva.com",
     "secure": false,
