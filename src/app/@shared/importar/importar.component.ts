@@ -814,11 +814,14 @@ export class ImportarComponent implements OnInit {
               default:
                 break;
             }
-            console.log('this.token: ', this.token);
             if (this.token) {
               const productos: Product[] = [];
               if (supplier.slug === 'ct') {
                 this.ctAlmacenes = await this.getAlmacenes();
+              }
+              if (supplier.slug === 'ingram') {
+                this.onReadTxtIngram();
+                return await [];
               }
               // Carga de Productos
               const resultados = await this.externalAuthService.getSyscomCatalogAllBrands(supplier, apiSelect, this.token, catalogValues)
@@ -840,6 +843,9 @@ export class ImportarComponent implements OnInit {
                             }
                           });
                         });
+                      } else if (supplier.slug === 'ingram') {
+                        const products = this.onReadTxtIngram;
+                        console.log('products: ', products);
                       } else {
                         result.forEach(item => {
                           let itemData = new Product();
@@ -936,11 +942,11 @@ export class ImportarComponent implements OnInit {
       branchOffice.name = almacen.nombre;
       branchOffice.estado = almacen.nombre;
       branchOffice.cp = almacen.cp;
-      branchOffice.latitud = "";
-      branchOffice.longitud = "";
+      branchOffice.latitud = '';
+      branchOffice.longitud = '';
       switch (almacen.clave) {
         case '1':
-          cantidad = parseInt(item.VENTAS_GUADALAJARA);
+          cantidad = parseInt(item.VENTAS_GUADALAJARA, 10);
           if (cantidad > 0) {
             branchOffice.cantidad = cantidad;
             branchOffices.push(branchOffice);
@@ -1465,7 +1471,7 @@ export class ImportarComponent implements OnInit {
         return itemData;
 
       case 'exel':
-        sale_price = 0
+        sale_price = 0;
         itemData.id = item.id_producto;
         itemData.name = item.descripcion;
         itemData.slug = slugify(item.descripcion, { lower: true });
@@ -1554,4 +1560,40 @@ export class ImportarComponent implements OnInit {
     }
   }
 
+  onReadTxtIngram() {
+    const filePath = 'assets/uploads/txt/PRICE.TXT';
+    const jsonData = [];
+    this.httpClient.get(filePath, { responseType: 'text' })
+      .subscribe(data => {
+        const lines = data.split('\n');
+        lines.forEach(line => {
+          const fields = line.split(',');
+          const rowData = {};
+          fields.forEach((field, index) => {
+            const fieldName = `field${index + 1}`;
+            rowData[fieldName] = field;
+          });
+          jsonData.push(rowData);
+        });
+        const cleanedData = this.cleanUpData(jsonData);
+        console.log(cleanedData);
+        // Aquí puedes realizar las operaciones necesarias con los datos JSON
+      },
+        error => {
+          console.error('Error al leer el archivo:', error);
+        });
+  }
+
+  cleanUpData(jsonData: any[]) {
+    const cleanedData = [];
+    jsonData.forEach(item => {
+      const cleanedItem = {};
+      Object.entries(item).forEach(([key, value]) => {
+        const cleanedValue = (value as string).replace(/"/g, '').trim();
+        cleanedItem[key] = cleanedValue;
+      });
+      cleanedData.push(cleanedItem);
+    });
+    return cleanedData;
+  }
 }
