@@ -30,32 +30,56 @@ export class ExternalAuthService {
   ) {
   }
 
-  async getSyscomToken(supplier: ISupplier, apiSelect: IApis): Promise<any> {
-    let headers = new HttpHeaders();
-    if (supplier.token.header_parameters.length > 0) {
-      supplier.token.header_parameters.forEach(header => {
-        if (supplier.token.basic_auth_password !== '' && header.name === 'Authorization') {
-          const username = supplier.token.basic_auth_username;
-          const password = supplier.token.basic_auth_password;
-          // Codificar las credenciales en Base64
-          const base64Credentials = btoa(`${username}:${password}`);
-          headers = headers.set(header.name, base64Credentials);
-        } else {
-          headers = headers.set(header.name, header.value);
-        }
-      });
+  //#region Token
+  async getToken(
+    supplier: ISupplier
+  ): Promise<any> {
+    const headers = new Headers();
+    const params = new HttpParams();
+    switch (supplier.slug) {
+      case 'ct':
+        const optionsCT = {
+          method: 'POST',
+          headers: {
+            accept: 'application/json',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            email: 'david.silva@daru.mx',
+            cliente: 'VHA2391',
+            rfc: 'DIN2206222D3'
+          })
+        };
+        return await fetch('http://connect.ctonline.mx:3001/cliente/token', optionsCT)
+          .then(response => response.json())
+          .then(async response => {
+            return await response;
+          })
+          .catch(err => console.error(err));
+      case 'cva':
+        const tokenBearer = '7ee694a5bae5098487a5a8b9d8392666';
+        return await tokenBearer;
+      case '99minutos':
+        const options = {
+          method: 'POST',
+          headers: {
+            accept: 'application/json',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            client_id: '18b99050-5cb7-4e67-928d-3f16d109b8c5',
+            client_secret: 'gdKeiQVGBxRAY~ICpdnJ_7aKEd'
+          })
+        };
+        return await fetch('99minutos/api/v3/oauth/token', options)
+          .then(response => response.json())
+          .then(async response => {
+            return await response;
+          })
+          .catch(err => console.error(err));
     }
-
-    let params = new HttpParams();
-    if (supplier.token.body_parameters.length > 0) {
-      supplier.token.body_parameters.forEach(param => {
-        params = params.set(param.name, param.value);
-      });
-    }
-
-    const options = { headers };
-    return await this.http.post(supplier.token.url_base_token, params, options).toPromise();
   }
+  //#endregion Token
 
   async getSyscomCatalog(supplier: ISupplier, apiSelect: IApis, token: string, search: string = ''): Promise<any> {
     if (apiSelect.parameters) {

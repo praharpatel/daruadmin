@@ -573,7 +573,7 @@ export class ImportarComponent implements OnInit {
     } else {
       switch (supplier.slug) {
         case 'syscom':
-          return this.externalAuthService.getSyscomToken(supplier, apiSelect)
+          return this.externalAuthService.getToken(supplier)
             .then(
               async result => {
                 this.token = result.access_token;
@@ -798,7 +798,7 @@ export class ImportarComponent implements OnInit {
           break;
       }
     } else {                                                                  // Syscom, CT, Ingram
-      return await this.externalAuthService.getSyscomToken(supplier, apiSelect)
+      return await this.externalAuthService.getToken(supplier)
         .then(
           async result => {
             switch (supplier.slug) {
