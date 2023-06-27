@@ -59,6 +59,27 @@ export class ExternalAuthService {
       case 'cva':
         const tokenBearer = '7ee694a5bae5098487a5a8b9d8392666';
         return await tokenBearer;
+      case 'ingram':
+        const username = 'ZpGbzheF2yQlsfA00vuvu4JdXkf76w9L';
+        const password = 'WOPaXqEcyG3kQGJw';
+        const encodedCredentials = btoa(`${username}:${password}`);
+        const optionsIngram = {
+          method: 'POST',
+          headers: {
+            Authorization: `Basic ${encodedCredentials}`,
+            'Content-Type': 'application/x-www-form-urlencoded'
+          },
+          body: new URLSearchParams({
+            grant_type: 'client_credentials'
+          }).toString(),
+          redirect: 'manual' as RequestRedirect
+        };
+        return await fetch('https://api.ingrammicro.com:443/oauth/oauth30/token', optionsIngram)
+          .then(response => response.json())
+          .then(async response => {
+            return await response;
+          })
+          .catch(err => console.error(err));
       case '99minutos':
         const options = {
           method: 'POST',
