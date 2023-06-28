@@ -147,7 +147,7 @@ export class ExternalAuthService {
     if (apiSelect.parameters) {
       switch (supplier.slug) {
         case 'syscom':
-          let products: Product[] = [];
+          const products: Product[] = [];
           const promises = [];
           catalogValues.forEach(async item => {
             let params = new HttpParams();
@@ -207,7 +207,7 @@ export class ExternalAuthService {
     if (apiSelect.parameters) {
       switch (supplier.slug) {
         case 'cva':
-          let products: Product[] = [];
+          const products: Product[] = [];
           const promises = [];
           catalogValues.forEach(item => {
             const headers = new HttpHeaders();
@@ -241,7 +241,7 @@ export class ExternalAuthService {
                   responseType: 'text'
                 })
                 .pipe(map(async (xml: any) => {
-                  return await this.parseXmlToJson(xml, apiSelect.operation)
+                  return await this.parseXmlToJson(xml, apiSelect.operation);
                 }))
                 .toPromise()
             );
@@ -321,57 +321,60 @@ export class ExternalAuthService {
         return await xml2js
           .parseStringPromise(xml, { explicitArray: false })
           .then(response => response.articulos.item)
-          .catch(err => { return err });
+          .catch(err => err);
       case 'marcas2.xml':
         return await xml2js
           .parseStringPromise(xml, { explicitArray: false })
           .then(response => response.marcas.marca)
-          .catch(err => { return err });
+          .catch(err => err);
       case 'grupos.xml':
         return await xml2js
           .parseStringPromise(xml, { explicitArray: false })
           .then(response => response.grupos.grupo)
-          .catch(err => { return err });
+          .catch(err => err);
       case 'grupos2.xml':
         return await xml2js
           .parseStringPromise(xml, { explicitArray: false })
           .then(response => response.grupos.grupo)
-          .catch(err => { return err });
+          .catch(err => err);
       case 'soluciones.xml':
         return await xml2js
           .parseStringPromise(xml, { explicitArray: false })
           .then(response => response.soluciones.solucion)
-          .catch(err => { return err });
+          .catch(err => err);
       case 'sucursales.xml':
         return await xml2js
           .parseStringPromise(xml, { explicitArray: false })
           .then(response => response.sucursales.sucursal)
-          .catch(err => { return err });
+          .catch(err => err);
       case 'Obtener_Marcas':                                                                // SOAP Exel
         return await xml2js
           .parseStringPromise(xml, { explicitArray: false })
-          .then(response => JSON.parse(response['soap:Envelope']['soap:Body']['Obtener_MarcasResponse']['Obtener_MarcasResult']))
-          .catch(err => { return new Error(err.message) });
+          .then(response => JSON.parse(response['soap:Envelope']['soap:Body'].Obtener_MarcasResponse.Obtener_MarcasResult))
+          .catch(err => new Error(err.message));
       case 'Obtener_Categorias':                                                            // SOAP Exel
         return await xml2js
           .parseStringPromise(xml, { explicitArray: false })
-          .then(response => JSON.parse(response['soap:Envelope']['soap:Body']['Obtener_Productos_HuellaLogisticaResponse']['Obtener_Productos_HuellaLogisticaResult']))
-          .catch(err => { return new Error(err.message) });
+          .then(response => JSON.parse(response['soap:Envelope']['soap:Body'].Obtener_CategoriasResponse.Obtener_CategoriasResult))
+          .catch(err => new Error(err.message));
       case 'Obtener_Productos_Listado':                                                     // SOAP Exel
         return await xml2js
           .parseStringPromise(xml, { explicitArray: false })
-          .then(response => JSON.parse(response['soap:Envelope']['soap:Body']['Obtener_Productos_ListadoResponse']['Obtener_Productos_ListadoResult']))
-          .catch(err => { return new Error(err.message) });
+          .then(response => JSON.parse(response['soap:Envelope']['soap:Body']
+            .Obtener_Productos_ListadoResponse.Obtener_Productos_ListadoResult))
+          .catch(err => new Error(err.message));
       case 'Obtener_Productos_PrecioYExistencia':                                           // SOAP Exel
         return await xml2js
           .parseStringPromise(xml, { explicitArray: false })
-          .then(response => JSON.parse(response['soap:Envelope']['soap:Body']['Obtener_Productos_PrecioYExistenciaResponse']['Obtener_Productos_PrecioYExistenciaResult']))
-          .catch(err => { return new Error(err.message) });
+          .then(response => JSON.parse(response['soap:Envelope']['soap:Body']
+            .Obtener_Productos_PrecioYExistenciaResponse.Obtener_Productos_PrecioYExistenciaResult))
+          .catch(err => new Error(err.message));
       case 'Obtener_GaleriaDeImagenes':                                                     // SOAP Exel
         return await xml2js
           .parseStringPromise(xml, { explicitArray: false })
-          .then(response => JSON.parse(response['soap:Envelope']['soap:Body']['Obtener_GaleriaDeImagenesResponse']['Obtener_GaleriaDeImagenesResult']))
-          .catch(err => { return new Error(err.message) });
+          .then(response => JSON.parse(response['soap:Envelope']['soap:Body']
+            .Obtener_GaleriaDeImagenesResponse.Obtener_GaleriaDeImagenesResult))
+          .catch(err => new Error(err.message));
       default:
         break;
     }
@@ -385,16 +388,16 @@ export class ExternalAuthService {
           soapBody = 'Obtener_Marcas';
           break;
         case 'Obtener_Categorias':
-          soapBody = 'Obtener_Productos_HuellaLogistica';
+          soapBody = 'Obtener_Categorias';
           break;
         case 'Obtener_Productos_Listado':
           soapBody = 'Obtener_Productos_Listado';
           break;
         case 'Obtener_Productos_PrecioYExistencia':
-          soapBody = 'Obtener_Productos_PrecioYExistencia'
+          soapBody = 'Obtener_Productos_PrecioYExistencia';
           break;
         case 'Obtener_GaleriaDeImagenes':
-          soapBody = 'Obtener_GaleriaDeImagenes'
+          soapBody = 'Obtener_GaleriaDeImagenes';
           break;
         default:
           break;
@@ -409,8 +412,8 @@ export class ExternalAuthService {
             </${soapBody}>
           </soap:Body>
         </soap:Envelope>`;
-      var searchParams = new axios.AxiosHeaders();
-      var params = new axios.AxiosHeaders();
+      const searchParams = new axios.AxiosHeaders();
+      const params = new axios.AxiosHeaders();
       searchParams.set('Content-Type', 'text/xml');
       if (supplier.token) {
         if (supplier.token.body_parameters.length > 0) {

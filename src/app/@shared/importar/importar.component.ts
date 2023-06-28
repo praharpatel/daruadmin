@@ -675,7 +675,6 @@ export class ImportarComponent implements OnInit {
             .catch(async (error: Error) => {
               throw await new Error(error.message);
             });
-          console.log('productos/resultados: ', resultados);
           return await resultados;
         case 'exel':
           // Carga de todos los Productos
@@ -845,7 +844,6 @@ export class ImportarComponent implements OnInit {
                         });
                       } else if (supplier.slug === 'ingram') {
                         const products = this.onReadTxtIngram;
-                        console.log('products: ', products);
                       } else {
                         result.forEach(item => {
                           let itemData = new Product();
@@ -889,10 +887,10 @@ export class ImportarComponent implements OnInit {
         const promoBranch = x[branch];
         const promocion = new PromocionBranchOffice();
         // Divide la promocion en precio y vencia
-        Object.keys(promoBranch).forEach((promo, indexZ) => {
-          if (indexZ === 0) {
+        Object.keys(promoBranch).forEach((promo, indexY) => {
+          if (indexY === 0) {
             promocion.price = parseFloat(promoBranch[promo]);
-          } else if (indexZ === 1) {
+          } else if (indexY === 1) {
             const vigencia = promoBranch[promo];
             const vigente = new Vigente();
             // Divide la vigencia en inicio y fin.
@@ -953,231 +951,231 @@ export class ImportarComponent implements OnInit {
           }
           break;
         case '3':
-          cantidad = parseInt(item.VENTAS_MORELIA);
+          cantidad = parseInt(item.VENTAS_MORELIA, 10);
           if (cantidad > 0) {
             branchOffice.cantidad = cantidad;
             branchOffices.push(branchOffice);
           }
           break;
         case '4':
-          cantidad = parseInt(item.VENTAS_LEON);
+          cantidad = parseInt(item.VENTAS_LEON, 10);
           if (cantidad > 0) {
             branchOffice.cantidad = cantidad;
             branchOffices.push(branchOffice);
           }
           break;
         case '5':
-          cantidad = parseInt(item.VENTAS_CULIACAN);
+          cantidad = parseInt(item.VENTAS_CULIACAN, 10);
           if (cantidad > 0) {
             branchOffice.cantidad = cantidad;
             branchOffices.push(branchOffice);
           }
           break;
         case '6':
-          cantidad = parseInt(item.VENTAS_QUERETARO);
+          cantidad = parseInt(item.VENTAS_QUERETARO, 10);
           if (cantidad > 0) {
             branchOffice.cantidad = cantidad;
             branchOffices.push(branchOffice);
           }
           break;
         case '7':
-          cantidad = parseInt(item.VENTAS_TORREON);
+          cantidad = parseInt(item.VENTAS_TORREON, 10);
           if (cantidad > 0) {
             branchOffice.cantidad = cantidad;
             branchOffices.push(branchOffice);
           }
           break;
         case '8':
-          cantidad = parseInt(item.VENTAS_TEPIC);
+          cantidad = parseInt(item.VENTAS_TEPIC, 10);
           if (cantidad > 0) {
             branchOffice.cantidad = cantidad;
             branchOffices.push(branchOffice);
           }
           break;
         case '9':
-          cantidad = parseInt(item.VENTAS_MONTERREY);
+          cantidad = parseInt(item.VENTAS_MONTERREY, 10);
           if (cantidad > 0) {
             branchOffice.cantidad = cantidad;
             branchOffices.push(branchOffice);
           }
           break;
         case '10':
-          cantidad = parseInt(item.VENTAS_PUEBLA);
+          cantidad = parseInt(item.VENTAS_PUEBLA, 10);
           if (cantidad > 0) {
             branchOffice.cantidad = cantidad;
             branchOffices.push(branchOffice);
           }
           break;
         case '11':
-          cantidad = parseInt(item.VENTAS_VERACRUZ);
+          cantidad = parseInt(item.VENTAS_VERACRUZ, 10);
           if (cantidad > 0) {
             branchOffice.cantidad = cantidad;
             branchOffices.push(branchOffice);
           }
           break;
         case '12':
-          cantidad = parseInt(item.VENTAS_VILLAHERMOSA);
+          cantidad = parseInt(item.VENTAS_VILLAHERMOSA, 10);
           if (cantidad > 0) {
             branchOffice.cantidad = cantidad;
             branchOffices.push(branchOffice);
           }
           break;
         case '13':
-          cantidad = parseInt(item.VENTAS_TUXTLA);
+          cantidad = parseInt(item.VENTAS_TUXTLA, 10);
           if (cantidad > 0) {
             branchOffice.cantidad = cantidad;
             branchOffices.push(branchOffice);
           }
           break;
         case '14':
-          cantidad = parseInt(item.VENTAS_HERMOSILLO);
+          cantidad = parseInt(item.VENTAS_HERMOSILLO, 10);
           if (cantidad > 0) {
             branchOffice.cantidad = cantidad;
             branchOffices.push(branchOffice);
           }
           break;
         case '18':
-          cantidad = parseInt(item.VENTAS_MERIDA);
+          cantidad = parseInt(item.VENTAS_MERIDA, 10);
           if (cantidad > 0) {
             branchOffice.cantidad = cantidad;
             branchOffices.push(branchOffice);
           }
           break;
         case '19':
-          cantidad = parseInt(item.VENTAS_CANCUN);
+          cantidad = parseInt(item.VENTAS_CANCUN, 10);
           if (cantidad > 0) {
             branchOffice.cantidad = cantidad;
             branchOffices.push(branchOffice);
           }
           break;
         case '23':
-          cantidad = parseInt(item.VENTAS_AGUASCALIENTES);
+          cantidad = parseInt(item.VENTAS_AGUASCALIENTES, 10);
           if (cantidad > 0) {
             branchOffice.cantidad = cantidad;
             branchOffices.push(branchOffice);
           }
           break;
         case '24':
-          cantidad = parseInt(item.VENTAS_DF_TALLER);
+          cantidad = parseInt(item.VENTAS_DF_TALLER, 10);
           if (cantidad > 0) {
             branchOffice.cantidad = cantidad;
             branchOffices.push(branchOffice);
           }
           break;
         case '26':
-          cantidad = parseInt(item.VENTAS_SAN_LUIS_POTOSI);
+          cantidad = parseInt(item.VENTAS_SAN_LUIS_POTOSI, 10);
           if (cantidad > 0) {
             branchOffice.cantidad = cantidad;
             branchOffices.push(branchOffice);
           }
           break;
         case '27':
-          cantidad = parseInt(item.VENTAS_CHIHUAHUA);
+          cantidad = parseInt(item.VENTAS_CHIHUAHUA, 10);
           if (cantidad > 0) {
             branchOffice.cantidad = cantidad;
             branchOffices.push(branchOffice);
           }
           break;
         case '28':
-          cantidad = parseInt(item.VENTAS_DURANGO);
+          cantidad = parseInt(item.VENTAS_DURANGO, 10);
           if (cantidad > 0) {
             branchOffice.cantidad = cantidad;
             branchOffices.push(branchOffice);
           }
           break;
         case '29':
-          cantidad = parseInt(item.VENTAS_TOLUCA);
+          cantidad = parseInt(item.VENTAS_TOLUCA, 10);
           if (cantidad > 0) {
             branchOffice.cantidad = cantidad;
             branchOffices.push(branchOffice);
           }
           break;
         case '31':
-          cantidad = parseInt(item.VENTAS_OAXACA);
+          cantidad = parseInt(item.VENTAS_OAXACA, 10);
           if (cantidad > 0) {
             branchOffice.cantidad = cantidad;
             branchOffices.push(branchOffice);
           }
           break;
         case '32':
-          cantidad = parseInt(item.VENTAS_LAPAZ);
+          cantidad = parseInt(item.VENTAS_LAPAZ, 10);
           if (cantidad > 0) {
             branchOffice.cantidad = cantidad;
             branchOffices.push(branchOffice);
           }
           break;
         case '33':
-          cantidad = parseInt(item.VENTAS_TIJUANA);
+          cantidad = parseInt(item.VENTAS_TIJUANA, 10);
           if (cantidad > 0) {
             branchOffice.cantidad = cantidad;
             branchOffices.push(branchOffice);
           }
           break;
         case '35':
-          cantidad = parseInt(item.VENTAS_COLIMA);
+          cantidad = parseInt(item.VENTAS_COLIMA, 10);
           if (cantidad > 0) {
             branchOffice.cantidad = cantidad;
             branchOffices.push(branchOffice);
           }
           break;
         case '36':
-          cantidad = parseInt(item.VENTAS_ZACATECAS);
+          cantidad = parseInt(item.VENTAS_ZACATECAS, 10);
           if (cantidad > 0) {
             branchOffice.cantidad = cantidad;
             branchOffices.push(branchOffice);
           }
           break;
         case '38':
-          cantidad = parseInt(item.VENTAS_CAMPECHE);
+          cantidad = parseInt(item.VENTAS_CAMPECHE, 10);
           if (cantidad > 0) {
             branchOffice.cantidad = cantidad;
             branchOffices.push(branchOffice);
           }
           break;
         case '39':
-          cantidad = parseInt(item.VENTAS_TAMPICO);
+          cantidad = parseInt(item.VENTAS_TAMPICO, 10);
           if (cantidad > 0) {
             branchOffice.cantidad = cantidad;
             branchOffices.push(branchOffice);
           }
           break;
         case '40':
-          cantidad = parseInt(item.VENTAS_PACHUCA);
+          cantidad = parseInt(item.VENTAS_PACHUCA, 10);
           if (cantidad > 0) {
             branchOffice.cantidad = cantidad;
             branchOffices.push(branchOffice);
           }
           break;
         case '43':
-          cantidad = parseInt(item.VENTAS_ACAPULCO);
+          cantidad = parseInt(item.VENTAS_ACAPULCO, 10);
           if (cantidad > 0) {
             branchOffice.cantidad = cantidad;
             branchOffices.push(branchOffice);
           }
           break;
         case '46':
-          cantidad = parseInt(item.VENTAS_CEDISGUADALAJARA);
+          cantidad = parseInt(item.VENTAS_CEDISGUADALAJARA, 10);
           if (cantidad > 0) {
             branchOffice.cantidad = cantidad;
             branchOffices.push(branchOffice);
           }
           break;
         case '47':
-          cantidad = parseInt(item.VENTAS_CUERNAVACA);
+          cantidad = parseInt(item.VENTAS_CUERNAVACA, 10);
           if (cantidad > 0) {
             branchOffice.cantidad = cantidad;
             branchOffices.push(branchOffice);
           }
           break;
         case '51':
-          cantidad = parseInt(item.VENTAS_CEDISCDMX);
+          cantidad = parseInt(item.VENTAS_CEDISCDMX, 10);
           if (cantidad > 0) {
             branchOffice.cantidad = cantidad;
             branchOffices.push(branchOffice);
           }
           break;
         case '52':
-          cantidad = parseInt(item.VENTAS_ASPHALT);
+          cantidad = parseInt(item.VENTAS_ASPHALT, 10);
           if (cantidad > 0) {
             branchOffice.cantidad = cantidad;
             branchOffices.push(branchOffice);
@@ -1201,11 +1199,11 @@ export class ImportarComponent implements OnInit {
     const desc = new Descuentos();
     const promo = new Promociones();
     let disponible = 0;
-    let sale_price = 0;
+    let salePrice = 0;
 
     switch (proveedor) {
       case 'syscom':
-        sale_price = 0;
+        salePrice = 0;
         if (item.total_existencia >= this.stockMinimo) {
           itemData.id = item.producto_id;
           itemData.name = item.titulo === '' ? item.modelo : item.titulo;
@@ -1224,7 +1222,7 @@ export class ImportarComponent implements OnInit {
             desc.total_descuento = precioEspecial;
             desc.moneda_descuento = 'MXN';
             desc.precio_descuento = precioEspecial;
-            sale_price = precioEspecial;
+            salePrice = precioEspecial;
           }
           itemData.descuentos = desc;
           if (precioDescuento < precioEspecial) {               // Catalogar como producto TOP
@@ -1233,9 +1231,9 @@ export class ImportarComponent implements OnInit {
             promo.descripcion_promocion = 'Producto con Descuento';
             promo.vencimiento_promocion = 'Total Existencias: ' + item.total_existencia.toString();
             promo.disponible_en_promocion = precioDescuento;
-            sale_price = precioDescuento;
+            salePrice = precioDescuento;
           }
-          itemData.sale_price = sale_price;
+          itemData.sale_price = salePrice;
           itemData.promociones = promo;
           itemData.top = false;
           itemData.featured = featured;
@@ -1290,7 +1288,7 @@ export class ImportarComponent implements OnInit {
         return itemData;
 
       case 'cva':
-        sale_price = 0;
+        salePrice = 0;
         let branchOffices: BranchOffices[] = [];
         let disponibilidadAlmacenes = 0;
         if (item.ExsTotal >= this.stockMinimo) {                  // Si existencias totales.
@@ -1314,7 +1312,7 @@ export class ImportarComponent implements OnInit {
               desc.total_descuento = item.TotalDescuento === '' ? 0 : parseFloat(item.TotalDescuento);
               desc.moneda_descuento = item.MonedaDescuento;
               desc.precio_descuento = item.PrecioDescuento === '' ? 0 : parseFloat(item.PrecioDescuento);
-              sale_price = desc.precio_descuento;
+              salePrice = desc.precio_descuento;
             }
             itemData.descuentos = desc;
             itemData.featured = item.DisponibleEnPromocion !== 'Sin Descuento' ? true : false;
@@ -1324,7 +1322,7 @@ export class ImportarComponent implements OnInit {
               promo.vencimiento_promocion = item.VencimientoPromocion;
               promo.disponible_en_promocion = item.DisponibleEnPromocion === '' ? 0 : parseFloat(item.DisponibleEnPromocion);
             }
-            itemData.sale_price = sale_price;
+            itemData.sale_price = salePrice;
             itemData.promociones = promo;
             itemData.new = false;
             itemData.sold = null;
@@ -1376,14 +1374,14 @@ export class ImportarComponent implements OnInit {
 
       case 'ct':
         disponible = 0;
-        sale_price = 0;
+        salePrice = 0;
         if (item.almacenes.length > 0) {
-          const branchOffices: BranchOffices[] = [];
+          const branchOfficesCt: BranchOffices[] = [];
           let featured = false;
           item.almacenes.forEach(element => {
             const almacen = this.getAlmacenCant(element);
             disponible += almacen.cantidad;
-            branchOffices.push(almacen);
+            branchOfficesCt.push(almacen);
           });
           if (disponible >= this.stockMinimo) {                         // Si hay mas de 10 elementos disponibles
             // Si hay promociones en los almacenes ocupa el primero y asigna el total de disponibilidad
@@ -1394,7 +1392,7 @@ export class ImportarComponent implements OnInit {
               promo.inicio_promocion = item.almacenes[0].promocion.vigente.ini;
               promo.vencimiento_promocion = item.almacenes[0].promocion.vigente.fin;
               promo.disponible_en_promocion = item.almacenes[0].promocion.precio;
-              sale_price = item.almacenes[0].promocion.precio;
+              salePrice = item.almacenes[0].promocion.precio;
               itemData.promociones = promo;
             }
             itemData.id = productJson.clave;
@@ -1403,10 +1401,10 @@ export class ImportarComponent implements OnInit {
             itemData.short_desc = productJson.descripcion_corta;
             if (item.moneda === 'USD') {
               itemData.price = parseFloat((parseFloat(item.precio) * this.exchangeRate).toFixed(2));
-              itemData.sale_price = parseFloat((sale_price * this.exchangeRate).toFixed(2));
+              itemData.sale_price = parseFloat((salePrice * this.exchangeRate).toFixed(2));
             } else {
               itemData.price = parseFloat(item.precio);
-              itemData.sale_price = sale_price;
+              itemData.sale_price = salePrice;
             }
             itemData.review = 0;
             itemData.ratings = 0;
@@ -1447,7 +1445,7 @@ export class ImportarComponent implements OnInit {
               s.price = parseFloat(item.precio);
             }
             s.moneda = item.moneda;
-            s.branchOffices = branchOffices;
+            s.branchOffices = branchOfficesCt;
             itemData.suppliersProd = s;
             itemData.model = productJson.modelo;
             // Imagenes
@@ -1471,13 +1469,13 @@ export class ImportarComponent implements OnInit {
         return itemData;
 
       case 'exel':
-        sale_price = 0;
+        salePrice = 0;
         itemData.id = item.id_producto;
         itemData.name = item.descripcion;
         itemData.slug = slugify(item.descripcion, { lower: true });
         itemData.short_desc = item.subcategoria + '. Codigo: ' + item.codigo_proveedor;
         itemData.price = item.precioLista;
-        itemData.sale_price = sale_price;
+        itemData.sale_price = salePrice;
         itemData.review = 0;
         itemData.ratings = 0;
         itemData.until = this.getFechas(new Date());
@@ -1576,7 +1574,6 @@ export class ImportarComponent implements OnInit {
           jsonData.push(rowData);
         });
         const cleanedData = this.cleanUpData(jsonData);
-        console.log(cleanedData);
         // Aquí puedes realizar las operaciones necesarias con los datos JSON
       },
         error => {
