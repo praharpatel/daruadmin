@@ -839,9 +839,16 @@ export class ImportarComponent implements OnInit {
                           });
                         });
                       } else if (supplier.slug === 'ingram') {
-                        const products = result;
-                        // TODO Procesar productos.
-                        console.log('products: ', products);
+                        const rows = Object.values(result).slice(0, -1);
+                        // tslint:disable-next-line: forin
+                        for (const idR in rows) {
+                          const item = result[idR];
+                          let itemData = new Product();
+                          itemData = this.setProduct(supplier.slug, item);
+                          if (itemData.id !== undefined) {
+                            productos.push(itemData);
+                          }
+                        }
                       } else {
                         result.forEach(item => {
                           let itemData = new Product();
@@ -1200,6 +1207,77 @@ export class ImportarComponent implements OnInit {
     let salePrice = 0;
 
     switch (proveedor) {
+      case 'ingram':
+        const stock = parseInt(item.field26, 10);
+        if (stock >= this.stockMinimo) {
+          salePrice = 0;
+          itemData.id = item.field2;
+          itemData.name = item.field5;
+          itemData.slug = slugify(item.field5, { lower: true });
+          itemData.short_desc = item.field5 + '. ' + item.field6;
+          itemData.price = parseFloat(item.field7);
+          itemData.sale_price = salePrice;
+          itemData.review = 0;
+          itemData.ratings = 0;
+          itemData.until = this.getFechas(new Date());
+          itemData.top = false;
+          itemData.featured = false;
+          itemData.new = false;
+          itemData.sold = null;
+          itemData.stock = stock;
+          itemData.sku = item.field2;
+          itemData.partnumber = item.field8;
+          itemData.upc = item.field10;
+          unidad.id = 'PZ';
+          unidad.name = 'Pieza';
+          unidad.slug = 'pieza';
+          itemData.unidadDeMedida = unidad;
+          // Categorias
+          itemData.category = [];
+          c.name = 'item.categoria';
+          c.slug = ''; // slugify(item.categoria, { lower: true });
+          itemData.category.push(c);
+          // Marcas
+          itemData.brand = item.field4.toUpperCase();
+          itemData.brands = [];
+          b.name = item.field4;
+          b.slug = slugify(item.field4, { lower: true });
+          itemData.brands.push(b);
+          // SupplierProd
+          s.idProveedor = proveedor;
+          s.codigo = item.field2;
+          s.price = parseFloat(item.field7);
+          s.moneda = 'MXN';
+          s.branchOffices = [];
+          // if (productJson.length > 0) {
+          //   productJson.forEach(almacen => {
+          //     const branchoffice = new BranchOffices();
+          //     branchoffice.name = almacen.localidad;
+          //     branchoffice.cantidad = parseInt(almacen.existencia, 10);
+          //     s.branchOffices.push(branchoffice);
+          //   });
+          // }
+          itemData.variants = [];
+          itemData.suppliersProd = s;
+          // Imagenes
+          // if (imagenes.length > 0) {
+          //   imagenes.forEach(image => {
+          //     itemData.pictures = [];
+          //     i.width = '600';
+          //     i.height = '600';
+          //     i.url = image.url;
+          //     itemData.pictures.push(i);
+          //     // Imagenes pequeñas
+          //     itemData.sm_pictures = [];
+          //     is.width = '300';
+          //     is.height = '300';
+          //     is.url = image.url;
+          //     itemData.sm_pictures.push(is);
+          //   });
+          // }
+        }
+        return itemData;
+
       case 'syscom':
         salePrice = 0;
         if (item.total_existencia >= this.stockMinimo) {
