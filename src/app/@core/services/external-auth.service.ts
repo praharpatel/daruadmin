@@ -197,6 +197,29 @@ export class ExternalAuthService {
                 'Content-type': 'application/json'
               }
             }).toPromise();
+
+        case 'ingram':
+          // return await this.onReadTxtIngram().toPromise();
+          const filePath = 'assets/uploads/txt/PRICE.TXT';
+          const jsonData = [];
+          try {
+            const data = await this.http.get(filePath, { responseType: 'text' }).toPromise();
+            const lines = data.split('\n');
+            lines.forEach(line => {
+              const fields = line.split(',');
+              const rowData = {};
+              fields.forEach((field, index) => {
+                const fieldName = `field${index + 1}`;
+                rowData[fieldName] = field;
+              });
+              jsonData.push(rowData);
+            });
+            const cleanedData = await this.cleanUpData(jsonData);
+            return cleanedData;
+          } catch (error) {
+            console.error('Error al leer el archivo:', error);
+            throw error;
+          }
         default:
           break;
       }
@@ -444,6 +467,42 @@ export class ExternalAuthService {
           });
       });
     }
+  }
+
+  async onReadTxtIngram(): Promise<any> {
+    const filePath = 'assets/uploads/txt/PRICE.TXT';
+    const jsonData = [];
+    return await this.http.get(filePath, { responseType: 'text' })
+      .subscribe(async data => {
+        const lines = data.split('\n');
+        lines.forEach(line => {
+          const fields = line.split(',');
+          const rowData = {};
+          fields.forEach((field, index) => {
+            const fieldName = `field${index + 1}`;
+            rowData[fieldName] = field;
+          });
+          jsonData.push(rowData);
+        });
+        return await await this.cleanUpData(jsonData);
+        // Aquí puedes realizar las operaciones necesarias con los datos JSON
+      },
+        error => {
+          console.error('Error al leer el archivo:', error);
+        });
+  }
+
+  async cleanUpData(jsonData: any[]) {
+    const cleanedData = [];
+    jsonData.forEach(item => {
+      const cleanedItem = {};
+      Object.entries(item).forEach(([key, value]) => {
+        const cleanedValue = (value as string).replace(/"/g, '').trim();
+        cleanedItem[key] = cleanedValue;
+      });
+      cleanedData.push(cleanedItem);
+    });
+    return await cleanedData;
   }
 
 }

@@ -818,10 +818,6 @@ export class ImportarComponent implements OnInit {
               if (supplier.slug === 'ct') {
                 this.ctAlmacenes = await this.getAlmacenes();
               }
-              if (supplier.slug === 'ingram') {
-                this.onReadTxtIngram();
-                return await [];
-              }
               // Carga de Productos
               const resultados = await this.externalAuthService.getSyscomCatalogAllBrands(supplier, apiSelect, this.token, catalogValues)
                 // tslint:disable-next-line: no-shadowed-variable
@@ -843,7 +839,9 @@ export class ImportarComponent implements OnInit {
                           });
                         });
                       } else if (supplier.slug === 'ingram') {
-                        const products = this.onReadTxtIngram;
+                        const products = result;
+                        // TODO Procesar productos.
+                        console.log('products: ', products);
                       } else {
                         result.forEach(item => {
                           let itemData = new Product();
@@ -1558,39 +1556,4 @@ export class ImportarComponent implements OnInit {
     }
   }
 
-  onReadTxtIngram() {
-    const filePath = 'assets/uploads/txt/PRICE.TXT';
-    const jsonData = [];
-    this.httpClient.get(filePath, { responseType: 'text' })
-      .subscribe(data => {
-        const lines = data.split('\n');
-        lines.forEach(line => {
-          const fields = line.split(',');
-          const rowData = {};
-          fields.forEach((field, index) => {
-            const fieldName = `field${index + 1}`;
-            rowData[fieldName] = field;
-          });
-          jsonData.push(rowData);
-        });
-        const cleanedData = this.cleanUpData(jsonData);
-        // Aquí puedes realizar las operaciones necesarias con los datos JSON
-      },
-        error => {
-          console.error('Error al leer el archivo:', error);
-        });
-  }
-
-  cleanUpData(jsonData: any[]) {
-    const cleanedData = [];
-    jsonData.forEach(item => {
-      const cleanedItem = {};
-      Object.entries(item).forEach(([key, value]) => {
-        const cleanedValue = (value as string).replace(/"/g, '').trim();
-        cleanedItem[key] = cleanedValue;
-      });
-      cleanedData.push(cleanedItem);
-    });
-    return cleanedData;
-  }
 }
