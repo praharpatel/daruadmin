@@ -30,22 +30,77 @@ export class ExternalAuthService {
   ) {
   }
 
-  async getSyscomToken(supplier: ISupplier, apiSelect: IApis): Promise<any> {
-    // application/x-www-form-urlencoded
-    let headers = new HttpHeaders();
-    headers = headers.set('Content-Type', 'application/x-www-form-urlencoded');
-
-    let params = new HttpParams();
-    if (supplier.token.body_parameters.length > 0) {
-      supplier.token.body_parameters.forEach(param => {
-        params = params.set(param.name, param.value);
-      });
+  //#region Token
+  async getToken(
+    supplier: ISupplier
+  ): Promise<any> {
+    const headers = new Headers();
+    const params = new HttpParams();
+    switch (supplier.slug) {
+      case 'ct':
+        const optionsCT = {
+          method: 'POST',
+          headers: {
+            accept: 'application/json',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            email: 'david.silva@daru.mx',
+            cliente: 'VHA2391',
+            rfc: 'DIN2206222D3'
+          })
+        };
+        return await fetch('http://connect.ctonline.mx:3001/cliente/token', optionsCT)
+          .then(response => response.json())
+          .then(async response => {
+            return await response;
+          })
+          .catch(err => console.error(err));
+      case 'cva':
+        const tokenBearer = '7ee694a5bae5098487a5a8b9d8392666';
+        return await tokenBearer;
+      case 'ingram':
+        const username = 'ZpGbzheF2yQlsfA00vuvu4JdXkf76w9L';
+        const password = 'WOPaXqEcyG3kQGJw';
+        const encodedCredentials = btoa(`${username}:${password}`);
+        const optionsIngram = {
+          method: 'POST',
+          headers: {
+            Authorization: `Basic ${encodedCredentials}`,
+            'Content-Type': 'application/x-www-form-urlencoded'
+          },
+          body: new URLSearchParams({
+            grant_type: 'client_credentials'
+          }).toString(),
+          redirect: 'manual' as RequestRedirect
+        };
+        return await fetch('https://api.ingrammicro.com:443/oauth/oauth30/token', optionsIngram)
+          .then(response => response.json())
+          .then(async response => {
+            return await response;
+          })
+          .catch(err => console.error(err));
+      case '99minutos':
+        const options = {
+          method: 'POST',
+          headers: {
+            accept: 'application/json',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            client_id: '18b99050-5cb7-4e67-928d-3f16d109b8c5',
+            client_secret: 'gdKeiQVGBxRAY~ICpdnJ_7aKEd'
+          })
+        };
+        return await fetch('99minutos/api/v3/oauth/token', options)
+          .then(response => response.json())
+          .then(async response => {
+            return await response;
+          })
+          .catch(err => console.error(err));
     }
-
-    const options = { headers };
-
-    return await this.http.post(supplier.token.url_base_token, params, options).toPromise();
   }
+  //#endregion Token
 
   async getSyscomCatalog(supplier: ISupplier, apiSelect: IApis, token: string, search: string = ''): Promise<any> {
     if (apiSelect.parameters) {
@@ -92,7 +147,7 @@ export class ExternalAuthService {
     if (apiSelect.parameters) {
       switch (supplier.slug) {
         case 'syscom':
-          let products: Product[] = [];
+          const products: Product[] = [];
           const promises = [];
           catalogValues.forEach(async item => {
             let params = new HttpParams();
@@ -142,6 +197,29 @@ export class ExternalAuthService {
                 'Content-type': 'application/json'
               }
             }).toPromise();
+
+        case 'ingram':
+          // return await this.onReadTxtIngram().toPromise();
+          const filePath = 'assets/uploads/txt/PRICE.TXT';
+          const jsonData = [];
+          try {
+            const data = await this.http.get(filePath, { responseType: 'text' }).toPromise();
+            const lines = data.split('\n');
+            lines.forEach(line => {
+              const fields = line.split(',');
+              const rowData = {};
+              fields.forEach((field, index) => {
+                const fieldName = `field${index + 1}`;
+                rowData[fieldName] = field;
+              });
+              jsonData.push(rowData);
+            });
+            const cleanedData = await this.cleanUpData(jsonData);
+            return cleanedData;
+          } catch (error) {
+            console.error('Error al leer el archivo:', error);
+            throw error;
+          }
         default:
           break;
       }
@@ -152,7 +230,7 @@ export class ExternalAuthService {
     if (apiSelect.parameters) {
       switch (supplier.slug) {
         case 'cva':
-          let products: Product[] = [];
+          const products: Product[] = [];
           const promises = [];
           catalogValues.forEach(item => {
             const headers = new HttpHeaders();
@@ -186,7 +264,7 @@ export class ExternalAuthService {
                   responseType: 'text'
                 })
                 .pipe(map(async (xml: any) => {
-                  return await this.parseXmlToJson(xml, apiSelect.operation)
+                  return await this.parseXmlToJson(xml, apiSelect.operation);
                 }))
                 .toPromise()
             );
@@ -266,57 +344,60 @@ export class ExternalAuthService {
         return await xml2js
           .parseStringPromise(xml, { explicitArray: false })
           .then(response => response.articulos.item)
-          .catch(err => { return err });
+          .catch(err => err);
       case 'marcas2.xml':
         return await xml2js
           .parseStringPromise(xml, { explicitArray: false })
           .then(response => response.marcas.marca)
-          .catch(err => { return err });
+          .catch(err => err);
       case 'grupos.xml':
         return await xml2js
           .parseStringPromise(xml, { explicitArray: false })
           .then(response => response.grupos.grupo)
-          .catch(err => { return err });
+          .catch(err => err);
       case 'grupos2.xml':
         return await xml2js
           .parseStringPromise(xml, { explicitArray: false })
           .then(response => response.grupos.grupo)
-          .catch(err => { return err });
+          .catch(err => err);
       case 'soluciones.xml':
         return await xml2js
           .parseStringPromise(xml, { explicitArray: false })
           .then(response => response.soluciones.solucion)
-          .catch(err => { return err });
+          .catch(err => err);
       case 'sucursales.xml':
         return await xml2js
           .parseStringPromise(xml, { explicitArray: false })
           .then(response => response.sucursales.sucursal)
-          .catch(err => { return err });
+          .catch(err => err);
       case 'Obtener_Marcas':                                                                // SOAP Exel
         return await xml2js
           .parseStringPromise(xml, { explicitArray: false })
-          .then(response => JSON.parse(response['soap:Envelope']['soap:Body']['Obtener_MarcasResponse']['Obtener_MarcasResult']))
-          .catch(err => { return new Error(err.message) });
+          .then(response => JSON.parse(response['soap:Envelope']['soap:Body'].Obtener_MarcasResponse.Obtener_MarcasResult))
+          .catch(err => new Error(err.message));
       case 'Obtener_Categorias':                                                            // SOAP Exel
         return await xml2js
           .parseStringPromise(xml, { explicitArray: false })
-          .then(response => JSON.parse(response['soap:Envelope']['soap:Body']['Obtener_Productos_HuellaLogisticaResponse']['Obtener_Productos_HuellaLogisticaResult']))
-          .catch(err => { return new Error(err.message) });
+          .then(response => JSON.parse(response['soap:Envelope']['soap:Body'].Obtener_CategoriasResponse.Obtener_CategoriasResult))
+          .catch(err => new Error(err.message));
       case 'Obtener_Productos_Listado':                                                     // SOAP Exel
         return await xml2js
           .parseStringPromise(xml, { explicitArray: false })
-          .then(response => JSON.parse(response['soap:Envelope']['soap:Body']['Obtener_Productos_ListadoResponse']['Obtener_Productos_ListadoResult']))
-          .catch(err => { return new Error(err.message) });
+          .then(response => JSON.parse(response['soap:Envelope']['soap:Body']
+            .Obtener_Productos_ListadoResponse.Obtener_Productos_ListadoResult))
+          .catch(err => new Error(err.message));
       case 'Obtener_Productos_PrecioYExistencia':                                           // SOAP Exel
         return await xml2js
           .parseStringPromise(xml, { explicitArray: false })
-          .then(response => JSON.parse(response['soap:Envelope']['soap:Body']['Obtener_Productos_PrecioYExistenciaResponse']['Obtener_Productos_PrecioYExistenciaResult']))
-          .catch(err => { return new Error(err.message) });
+          .then(response => JSON.parse(response['soap:Envelope']['soap:Body']
+            .Obtener_Productos_PrecioYExistenciaResponse.Obtener_Productos_PrecioYExistenciaResult))
+          .catch(err => new Error(err.message));
       case 'Obtener_GaleriaDeImagenes':                                                     // SOAP Exel
         return await xml2js
           .parseStringPromise(xml, { explicitArray: false })
-          .then(response => JSON.parse(response['soap:Envelope']['soap:Body']['Obtener_GaleriaDeImagenesResponse']['Obtener_GaleriaDeImagenesResult']))
-          .catch(err => { return new Error(err.message) });
+          .then(response => JSON.parse(response['soap:Envelope']['soap:Body']
+            .Obtener_GaleriaDeImagenesResponse.Obtener_GaleriaDeImagenesResult))
+          .catch(err => new Error(err.message));
       default:
         break;
     }
@@ -330,16 +411,16 @@ export class ExternalAuthService {
           soapBody = 'Obtener_Marcas';
           break;
         case 'Obtener_Categorias':
-          soapBody = 'Obtener_Productos_HuellaLogistica';
+          soapBody = 'Obtener_Categorias';
           break;
         case 'Obtener_Productos_Listado':
           soapBody = 'Obtener_Productos_Listado';
           break;
         case 'Obtener_Productos_PrecioYExistencia':
-          soapBody = 'Obtener_Productos_PrecioYExistencia'
+          soapBody = 'Obtener_Productos_PrecioYExistencia';
           break;
         case 'Obtener_GaleriaDeImagenes':
-          soapBody = 'Obtener_GaleriaDeImagenes'
+          soapBody = 'Obtener_GaleriaDeImagenes';
           break;
         default:
           break;
@@ -354,8 +435,8 @@ export class ExternalAuthService {
             </${soapBody}>
           </soap:Body>
         </soap:Envelope>`;
-      var searchParams = new axios.AxiosHeaders();
-      var params = new axios.AxiosHeaders();
+      const searchParams = new axios.AxiosHeaders();
+      const params = new axios.AxiosHeaders();
       searchParams.set('Content-Type', 'text/xml');
       if (supplier.token) {
         if (supplier.token.body_parameters.length > 0) {
@@ -386,6 +467,42 @@ export class ExternalAuthService {
           });
       });
     }
+  }
+
+  async onReadTxtIngram(): Promise<any> {
+    const filePath = 'assets/uploads/txt/PRICE.TXT';
+    const jsonData = [];
+    return await this.http.get(filePath, { responseType: 'text' })
+      .subscribe(async data => {
+        const lines = data.split('\n');
+        lines.forEach(line => {
+          const fields = line.split(',');
+          const rowData = {};
+          fields.forEach((field, index) => {
+            const fieldName = `field${index + 1}`;
+            rowData[fieldName] = field;
+          });
+          jsonData.push(rowData);
+        });
+        return await await this.cleanUpData(jsonData);
+        // Aquí puedes realizar las operaciones necesarias con los datos JSON
+      },
+        error => {
+          console.error('Error al leer el archivo:', error);
+        });
+  }
+
+  async cleanUpData(jsonData: any[]) {
+    const cleanedData = [];
+    jsonData.forEach(item => {
+      const cleanedItem = {};
+      Object.entries(item).forEach(([key, value]) => {
+        const cleanedValue = (value as string).replace(/"/g, '').trim();
+        cleanedItem[key] = cleanedValue;
+      });
+      cleanedData.push(cleanedItem);
+    });
+    return await cleanedData;
   }
 
 }
