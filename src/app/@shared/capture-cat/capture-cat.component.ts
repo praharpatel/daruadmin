@@ -1,8 +1,8 @@
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { IPicture } from '@core/interfaces/product.interface';
 import { AddCatalog, Catalog } from '@core/models/catalog.models';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { ICatalog } from 'src/app/@core/interfaces/catalog.interface';
 import { basicAlert } from 'src/app/@shared/alert/toasts';
 import { TYPE_ALERT } from 'src/app/@shared/alert/values.config';
 
@@ -18,6 +18,9 @@ export class CaptureCatComponent implements OnInit {
   submitted = false;
   captureForm: FormGroup;
   titulo = 'Capturando elemento';
+
+  files: File[] = [];
+  pictures: IPicture[];
 
   // @Input() catalog: ICatalog;
   @Input() catalog: Catalog;
@@ -37,20 +40,25 @@ export class CaptureCatComponent implements OnInit {
     this.captureForm = this.formBuilder.group({
       clave: ['1', [Validators.required]],
       estatus: ['Activos'],
+      order: [1000],
       active: [true],
       description: ['', [Validators.required]]
     });
   }
 
-  onSetCatalog(catalog: ICatalog = undefined) {
+  onSetCatalog(catalog: Catalog = undefined) {
     if (catalog) {
+      this.pictures = [];
+      this.pictures = catalog.pictures;
       this.captureForm.controls.clave.setValue(catalog.id);
       this.captureForm.controls.description.setValue(catalog.description);
+      this.captureForm.controls.order.setValue(catalog.order);
       this.captureForm.controls.active.setValue(catalog.active);
       return
     }
     this.catalog.id = this.captureForm.controls.clave.value;
     this.catalog.description = this.captureForm.controls.description.value;
+    this.catalog.order = parseInt(this.captureForm.controls.order.value);
     this.catalog.active = this.captureForm.controls.active.value;
   }
 
@@ -65,6 +73,7 @@ export class CaptureCatComponent implements OnInit {
     addCatalog.tipo = 'item';
     addCatalog.item = this.catalog;
     addCatalog.list = [];
+    addCatalog.files = this.files;
     this.catalogChange.emit(addCatalog);
   }
 
@@ -79,6 +88,7 @@ export class CaptureCatComponent implements OnInit {
     this.captureForm.controls.clave.setValue(this.catalog.id);
     this.captureForm.controls.estatus.setValue(valorEditar);
     this.captureForm.controls.description.setValue(this.catalog.description);
+    this.captureForm.controls.order.setValue(this.catalog.order);
     this.modal.open(this.content, { size: 'lg' });
   }
 
@@ -86,4 +96,58 @@ export class CaptureCatComponent implements OnInit {
     this.modal.dismissAll();
   }
 
+  onSelect(event) {
+    let existFile = false;
+    if (this.files.length > 0) {
+      this.files.forEach(file => {
+        event.addedFiles.forEach(newFile => {
+          if (file.name === newFile.name) {
+            existFile = true;
+            basicAlert(TYPE_ALERT.WARNING, 'Ya existe en la lista un archivo con el mismo nombre. Verificar');
+          }
+        });
+      });
+    }
+    if (!existFile) {
+      this.files.push(...event.addedFiles);
+    }
+  }
+
+  readFile(input) {
+    const fr = new FileReader();
+    fr.readAsDataURL(input);
+    fr.addEventListener('load', () => {
+      const res = fr.result;
+    })
+  }
+
+  onInitDropzone() {
+    this.files = [];
+    this.pictures.forEach(picture => {
+      fetch(picture.url, {
+        'mode': 'cors',
+        'headers': {
+          'Access-Control-Allow-Origin': '*',
+        }
+      })
+        .then(res => res.blob())
+        .then(blob => {
+          const splitUrl = picture.url.split('/');
+          const iSplit = splitUrl.length;
+          const fileName = splitUrl[iSplit - 1];
+          const splitName = fileName.split('.');
+          const name = splitName[0];
+          const file = new File([blob], name, { type: blob.type });
+          this.files.push(file);
+          this.readFile(blob);
+        }).catch((error) => {
+          console.log('Request failed', error);
+        });
+    });
+  }
+
+  onRemove(event) {
+    this.files.splice(this.files.indexOf(event), 1);
+    this.pictures.splice(this.pictures.indexOf(event), 1);
+  }
 }

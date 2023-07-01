@@ -5,6 +5,7 @@ export const SUBCATEGORIE_FRAGMENT = gql`
     id
     description
     slug
+    order
     active
   }
 `;

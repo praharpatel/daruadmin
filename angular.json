@@ -20,7 +20,7 @@
             "allowedCommonJsDependencies": [
               "rxjs", "core-js", "chart.js", "chartist"
             ],
-            "outputPath": "dist/daru",
+            "outputPath": "dist",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",

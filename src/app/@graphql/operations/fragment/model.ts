@@ -5,6 +5,7 @@ export const MODEL_FRAGMENT = gql`
     id
     description
     slug
+    order
     active
   }
 `;

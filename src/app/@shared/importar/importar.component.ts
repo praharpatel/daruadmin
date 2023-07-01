@@ -6,7 +6,7 @@ import { IApis, IParameters, ISupplier } from '@core/interfaces/supplier.interfa
 import { AddCatalog, Catalog, SupplierCat } from '@core/models/catalog.models';
 import {
   AddProduct, Brands, Categorys, Picture, Product, UnidadDeMedida, BranchOffices,
-  SupplierProd, ProductExport, Descuentos, Promociones
+  SupplierProd, ProductExport, Descuentos, Promociones, PromocionBranchOffice, Vigente
 } from '@core/models/product.models';
 import { BrandsService } from '@core/services/brand.service';
 import { CategoriesService } from '@core/services/categorie.service';
@@ -60,6 +60,7 @@ export class ImportarComponent implements OnInit {
   categories: Catalog[];
   groups: Catalog[];
   ctAlmacenes: any[];
+  cvaAlmacenes: any[];
   exchangeRate: number;
   offer: number;
 
@@ -87,8 +88,9 @@ export class ImportarComponent implements OnInit {
   ) { }
 
   // Define requests
-  private httpReq1$ = this.httpClient.get('assets/uploads/json/ct_productos.json');
+  private httpReq1$ = this.httpClient.get('assets/uploads/json/productos.json');
   private httpReq2$ = this.httpClient.get('assets/uploads/json/ct_almacenes.json');
+  private httpReq3$ = this.httpClient.get('assets/uploads/json/ingram_products.json');
 
   // convenience getter for easy access to form fields
   get f() { return this.importForm.controls; }
@@ -195,8 +197,25 @@ export class ImportarComponent implements OnInit {
     return await this.httpReq2$.toPromise();
   }
 
+  async getProductosIngram(): Promise<any> {
+    return await this.httpReq3$.toPromise();
+  }
+
+
   async getProducts() {
     const productsCt = await this.getProd()
+      .then(
+        async (result) => {
+          return await result;
+        }
+      )
+      .catch((error: Error) => {
+        infoEventAlert('No es posible importar el catalogo.', error.message, TYPE_ALERT.ERROR);
+      });
+    return productsCt;
+  }
+  async getProductsIngram() {
+    const productsCt = await this.getProductosIngram()
       .then(
         async (result) => {
           return await result;
@@ -219,6 +238,21 @@ export class ImportarComponent implements OnInit {
         infoEventAlert('No es posible importar el catalogo.', error.message, TYPE_ALERT.ERROR);
       });
     return almacenesCt;
+  }
+
+  async getCvaAlmacenes(supplier: ISupplier): Promise<any> {
+    const ApiSelect = this.apis.filter(api => api.return === 'sucursales');
+    if (ApiSelect.length > 0) {
+      return await this.getCatalogo(supplier, ApiSelect[0])
+        .then(
+          async (result) => {
+            return await result;
+          }
+        )
+        .catch((error: Error) => {
+          infoEventAlert('No es posible importar el catalogo.', error.message, TYPE_ALERT.ERROR);
+        });
+    }
   }
 
   async onOpenModalProduct(products: [Product]) {
@@ -312,6 +346,10 @@ export class ImportarComponent implements OnInit {
             this.apisFilter.push(api);
           }
           if (this.supplier.slug === 'ct' && api.return === 'existencia') {
+            this.apiName = this.supplier.url_base_api;
+            this.apisFilter.push(api);
+          }
+          if (this.supplier.slug === 'ingram' && api.return === 'existencia') {
             this.apiName = this.supplier.url_base_api;
             this.apisFilter.push(api);
           }
@@ -422,7 +460,8 @@ export class ImportarComponent implements OnInit {
           infoEventAlert('No es posible importar el catalogo.', error.message, TYPE_ALERT.ERROR);
         });
     } else {
-      if (this.catalogValues.length > 0 || this.supplier.slug === 'ct' || this.supplier.slug === 'exel') {
+      if (this.catalogValues.length > 0 || this.supplier.slug === 'ct' ||
+        this.supplier.slug === 'ingram' || this.supplier.slug === 'exel') {
         loadData('Importando los productos', 'Esperar la carga de los productos.');
         return await this.getCatalogoAllBrands(this.supplier, this.apiSelect, this.catalogValues)
           .then(
@@ -492,6 +531,8 @@ export class ImportarComponent implements OnInit {
                         }
                       });
                       return await data;
+                    } else if (apiSelect.operation === 'sucursales.xml') {
+                      return await result;
                     } else {
                       result.forEach(async item => {
                         const itemData = new Catalog();
@@ -532,7 +573,7 @@ export class ImportarComponent implements OnInit {
     } else {
       switch (supplier.slug) {
         case 'syscom':
-          return this.externalAuthService.getSyscomToken(supplier, apiSelect)
+          return this.externalAuthService.getToken(supplier)
             .then(
               async result => {
                 this.token = result.access_token;
@@ -596,12 +637,12 @@ export class ImportarComponent implements OnInit {
   async getCatalogoAllBrands(supplier: ISupplier, apiSelect: IApis, catalogValues: Catalog[]): Promise<any> {
     // Cuando la consulta externa no requiere token
     if (!supplier.token) {
-      let productos: Product[];
+      const productos: Product[] = [];
       let resultados;
       switch (supplier.slug) {
         case 'cva':
-          productos = [];
           // Carga de Productos
+          this.cvaAlmacenes = await this.getCvaAlmacenes(supplier);
           resultados = await this.externalAuthService.getCatalogXMLAllBrands(supplier, apiSelect, this.valorSearch.id, catalogValues)
             .then(async result => {
               if (result.length > 0) {
@@ -648,7 +689,6 @@ export class ImportarComponent implements OnInit {
               }
               if (result.length > 0) {
                 try {
-                  productos = [];
                   // Api para Cargar Precios y Disponibilidad
                   let apiPrecio: IApis;
                   supplier.apis.forEach(api => {
@@ -756,8 +796,8 @@ export class ImportarComponent implements OnInit {
         default:
           break;
       }
-    } else {                                                                  // Syscom
-      return await this.externalAuthService.getSyscomToken(supplier, apiSelect)
+    } else {                                                                  // Syscom, CT, Ingram
+      return await this.externalAuthService.getToken(supplier)
         .then(
           async result => {
             switch (supplier.slug) {
@@ -767,12 +807,17 @@ export class ImportarComponent implements OnInit {
               case 'syscom':
                 this.token = result.access_token;
                 break;
+              case 'ingram':
+                this.token = result.access_token;
+                break;
               default:
                 break;
             }
             if (this.token) {
               const productos: Product[] = [];
-              this.ctAlmacenes = await this.getAlmacenes();
+              if (supplier.slug === 'ct') {
+                this.ctAlmacenes = await this.getAlmacenes();
+              }
               // Carga de Productos
               const resultados = await this.externalAuthService.getSyscomCatalogAllBrands(supplier, apiSelect, this.token, catalogValues)
                 // tslint:disable-next-line: no-shadowed-variable
@@ -793,6 +838,17 @@ export class ImportarComponent implements OnInit {
                             }
                           });
                         });
+                      } else if (supplier.slug === 'ingram') {
+                        const rows = Object.values(result).slice(0, -1);
+                        // tslint:disable-next-line: forin
+                        for (const idR in rows) {
+                          const item = result[idR];
+                          let itemData = new Product();
+                          itemData = this.setProduct(supplier.slug, item);
+                          if (itemData.id !== undefined) {
+                            productos.push(itemData);
+                          }
+                        }
                       } else {
                         result.forEach(item => {
                           let itemData = new Product();
@@ -821,23 +877,49 @@ export class ImportarComponent implements OnInit {
   }
 
   getAlmacenCant(x): BranchOffices {
-    // tslint:disable-next-line: forin
-    for (const property in x) {
-      const almacen = new BranchOffices();
-      almacen.name = this.getCtAlmacenes(property);
-      // TO DO - Detectar cuando sea una promocion y guardarla
-      almacen.cantidad = x[property];
-      console.log('almacen: ',almacen);
-      return almacen;
-    }
+    const almacen = new BranchOffices();
+    Object.keys(x).forEach((branch, index) => {
+      const almacenEstado = this.getCtAlmacenes(branch);
+      almacen.id = almacenEstado.id;
+      almacen.name = almacenEstado.Sucursal;
+      almacen.estado = almacenEstado.Estado;
+      almacen.cp = almacenEstado.CP;
+      almacen.latitud = almacenEstado.latitud;
+      almacen.longitud = almacenEstado.longitud;
+      almacen.cantidad = x[branch];
+      // Si el dato es un objeto entonces viene una promocion.
+      if (typeof x[branch] === 'object') {
+        const promoBranch = x[branch];
+        const promocion = new PromocionBranchOffice();
+        // Divide la promocion en precio y vencia
+        Object.keys(promoBranch).forEach((promo, indexY) => {
+          if (indexY === 0) {
+            promocion.price = parseFloat(promoBranch[promo]);
+          } else if (indexY === 1) {
+            const vigencia = promoBranch[promo];
+            const vigente = new Vigente();
+            // Divide la vigencia en inicio y fin.
+            Object.keys(vigencia).forEach((vig, indexZ) => {
+              if (indexZ === 0) {
+                vigente.ini = vigencia[vig];
+              } else if (indexZ === 1) {
+                vigente.fin = vigencia[vig];
+              }
+            });
+            promocion.vigente = vigente;
+          }
+        });
+        almacen.promocionBranchOffice = promocion;
+      }
+    });
+    return almacen;
   }
 
-  getCtAlmacenes(id: string): string {
-    // return this.ctAlmacenes
+  getCtAlmacenes(id: string): any {
     // tslint:disable-next-line: no-shadowed-variable
     const almacen = this.ctAlmacenes.filter(almacen => almacen.id === id);
     if (almacen.length > 0) {
-      const sucursal = almacen.map(element => element.Sucursal);
+      const sucursal = almacen.map(element => element);
       return sucursal[0];
     }
     return '';
@@ -854,6 +936,262 @@ export class ImportarComponent implements OnInit {
     return year + '-' + monthS + '-' + dtS;
   }
 
+  setCvaAlmacenes(item: any): BranchOffices[] {
+    const branchOffices: BranchOffices[] = [];
+    this.cvaAlmacenes.forEach(almacen => {
+      let cantidad = 0;
+      const branchOffice = new BranchOffices();
+      branchOffice.id = almacen.clave;
+      branchOffice.name = almacen.nombre;
+      branchOffice.estado = almacen.nombre;
+      branchOffice.cp = almacen.cp;
+      branchOffice.latitud = '';
+      branchOffice.longitud = '';
+      switch (almacen.clave) {
+        case '1':
+          cantidad = parseInt(item.VENTAS_GUADALAJARA, 10);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '3':
+          cantidad = parseInt(item.VENTAS_MORELIA, 10);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '4':
+          cantidad = parseInt(item.VENTAS_LEON, 10);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '5':
+          cantidad = parseInt(item.VENTAS_CULIACAN, 10);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '6':
+          cantidad = parseInt(item.VENTAS_QUERETARO, 10);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '7':
+          cantidad = parseInt(item.VENTAS_TORREON, 10);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '8':
+          cantidad = parseInt(item.VENTAS_TEPIC, 10);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '9':
+          cantidad = parseInt(item.VENTAS_MONTERREY, 10);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '10':
+          cantidad = parseInt(item.VENTAS_PUEBLA, 10);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '11':
+          cantidad = parseInt(item.VENTAS_VERACRUZ, 10);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '12':
+          cantidad = parseInt(item.VENTAS_VILLAHERMOSA, 10);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '13':
+          cantidad = parseInt(item.VENTAS_TUXTLA, 10);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '14':
+          cantidad = parseInt(item.VENTAS_HERMOSILLO, 10);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '18':
+          cantidad = parseInt(item.VENTAS_MERIDA, 10);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '19':
+          cantidad = parseInt(item.VENTAS_CANCUN, 10);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '23':
+          cantidad = parseInt(item.VENTAS_AGUASCALIENTES, 10);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '24':
+          cantidad = parseInt(item.VENTAS_DF_TALLER, 10);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '26':
+          cantidad = parseInt(item.VENTAS_SAN_LUIS_POTOSI, 10);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '27':
+          cantidad = parseInt(item.VENTAS_CHIHUAHUA, 10);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '28':
+          cantidad = parseInt(item.VENTAS_DURANGO, 10);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '29':
+          cantidad = parseInt(item.VENTAS_TOLUCA, 10);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '31':
+          cantidad = parseInt(item.VENTAS_OAXACA, 10);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '32':
+          cantidad = parseInt(item.VENTAS_LAPAZ, 10);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '33':
+          cantidad = parseInt(item.VENTAS_TIJUANA, 10);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '35':
+          cantidad = parseInt(item.VENTAS_COLIMA, 10);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '36':
+          cantidad = parseInt(item.VENTAS_ZACATECAS, 10);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '38':
+          cantidad = parseInt(item.VENTAS_CAMPECHE, 10);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '39':
+          cantidad = parseInt(item.VENTAS_TAMPICO, 10);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '40':
+          cantidad = parseInt(item.VENTAS_PACHUCA, 10);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '43':
+          cantidad = parseInt(item.VENTAS_ACAPULCO, 10);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '46':
+          cantidad = parseInt(item.VENTAS_CEDISGUADALAJARA, 10);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '47':
+          cantidad = parseInt(item.VENTAS_CUERNAVACA, 10);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '51':
+          cantidad = parseInt(item.VENTAS_CEDISCDMX, 10);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+          break;
+        case '52':
+          cantidad = parseInt(item.VENTAS_ASPHALT, 10);
+          if (cantidad > 0) {
+            branchOffice.cantidad = cantidad;
+            branchOffices.push(branchOffice);
+          }
+
+          break;
+      }
+    });
+    return branchOffices;
+  }
+
   setProduct(proveedor: string, item: any, productJson: any = null, imagenes: any = null) {
     const itemData = new Product();
     const unidad = new UnidadDeMedida();
@@ -866,40 +1204,114 @@ export class ImportarComponent implements OnInit {
     const desc = new Descuentos();
     const promo = new Promociones();
     let disponible = 0;
+    let salePrice = 0;
 
     switch (proveedor) {
+      case 'ingram':
+        const stock = parseInt(item.field26, 10);
+        if (stock >= this.stockMinimo) {
+          salePrice = 0;
+          itemData.id = item.field2;
+          itemData.name = item.field5;
+          itemData.slug = slugify(item.field5, { lower: true });
+          itemData.short_desc = item.field5 + '. ' + item.field6;
+          itemData.price = parseFloat(item.field7);
+          itemData.sale_price = salePrice;
+          itemData.review = 0;
+          itemData.ratings = 0;
+          itemData.until = this.getFechas(new Date());
+          itemData.top = false;
+          itemData.featured = false;
+          itemData.new = false;
+          itemData.sold = null;
+          itemData.stock = stock;
+          itemData.sku = item.field2;
+          itemData.partnumber = item.field8;
+          itemData.upc = item.field10;
+          unidad.id = 'PZ';
+          unidad.name = 'Pieza';
+          unidad.slug = 'pieza';
+          itemData.unidadDeMedida = unidad;
+          // Categorias
+          itemData.category = [];
+          c.name = 'item.categoria';
+          c.slug = ''; // slugify(item.categoria, { lower: true });
+          itemData.category.push(c);
+          // Marcas
+          itemData.brand = item.field4.toUpperCase();
+          itemData.brands = [];
+          b.name = item.field4;
+          b.slug = slugify(item.field4, { lower: true });
+          itemData.brands.push(b);
+          // SupplierProd
+          s.idProveedor = proveedor;
+          s.codigo = item.field2;
+          s.price = parseFloat(item.field7);
+          s.moneda = 'MXN';
+          s.branchOffices = [];
+          // if (productJson.length > 0) {
+          //   productJson.forEach(almacen => {
+          //     const branchoffice = new BranchOffices();
+          //     branchoffice.name = almacen.localidad;
+          //     branchoffice.cantidad = parseInt(almacen.existencia, 10);
+          //     s.branchOffices.push(branchoffice);
+          //   });
+          // }
+          itemData.variants = [];
+          itemData.suppliersProd = s;
+          // Imagenes
+          // if (imagenes.length > 0) {
+          //   imagenes.forEach(image => {
+          //     itemData.pictures = [];
+          //     i.width = '600';
+          //     i.height = '600';
+          //     i.url = image.url;
+          //     itemData.pictures.push(i);
+          //     // Imagenes pequeñas
+          //     itemData.sm_pictures = [];
+          //     is.width = '300';
+          //     is.height = '300';
+          //     is.url = image.url;
+          //     itemData.sm_pictures.push(is);
+          //   });
+          // }
+        }
+        return itemData;
+
       case 'syscom':
+        salePrice = 0;
         if (item.total_existencia >= this.stockMinimo) {
           itemData.id = item.producto_id;
           itemData.name = item.titulo === '' ? item.modelo : item.titulo;
           itemData.slug = slugify(item.titulo === '' ? item.modelo : item.titulo, { lower: true });
           itemData.short_desc = item.titulo + '. Modelo: ' + item.modelo;
           itemData.price = parseFloat(item.precios.precio_lista);
-          itemData.sale_price = parseFloat(item.precios.precio_descuento);
           itemData.review = 0;
           itemData.ratings = 0;
           itemData.until = this.getFechas(new Date());
           const precioLista = parseFloat(item.precios.precio_lista);
           const precioDescuento = parseFloat(item.precios.precio_descuento);
           const precioEspecial = parseFloat(item.precios.precio_especial);
-          let top = null;
-          let featured = null;
+          let featured = false;
           if (precioEspecial < precioLista) {                   // Catalogar como producto feature
             featured = true;
             desc.total_descuento = precioEspecial;
             desc.moneda_descuento = 'MXN';
             desc.precio_descuento = precioEspecial;
+            salePrice = precioEspecial;
           }
           itemData.descuentos = desc;
           if (precioDescuento < precioEspecial) {               // Catalogar como producto TOP
-            top = true;
+            featured = true;
             promo.clave_promocion = '';
             promo.descripcion_promocion = 'Producto con Descuento';
             promo.vencimiento_promocion = 'Total Existencias: ' + item.total_existencia.toString();
             promo.disponible_en_promocion = precioDescuento;
+            salePrice = precioDescuento;
           }
+          itemData.sale_price = salePrice;
           itemData.promociones = promo;
-          itemData.top = top;
+          itemData.top = false;
           itemData.featured = featured;
           itemData.new = null;
           itemData.sold = null;
@@ -939,119 +1351,142 @@ export class ImportarComponent implements OnInit {
           itemData.pictures = [];
           i.width = '600';
           i.height = '600';
-          i.url = item.img_portada === '' ? item.marca_logo :  item.img_portada;
+          i.url = item.img_portada === '' ? item.marca_logo : item.img_portada;
           itemData.pictures.push(i);
           // Imagenes pequeñas
           itemData.sm_pictures = [];
           is.width = '300';
           is.height = '300';
-          is.url = item.img_portada === '' ? item.marca_logo :  item.img_portada;
+          is.url = item.img_portada === '' ? item.marca_logo : item.img_portada;
           itemData.variants = [];
           itemData.sm_pictures.push(is);
         }
         return itemData;
 
       case 'cva':
-        if (item.disponible >= this.stockMinimo) {
-          itemData.id = item.id;
-          itemData.name = item.descripcion;
-          itemData.slug = slugify(item.descripcion, { lower: true });
-          itemData.short_desc = item.clave + '. Grupo: ' + item.grupo;
-          itemData.price = parseFloat(item.precio);
-          itemData.sale_price = parseFloat(item.precio);
-          itemData.review = 0;
-          itemData.ratings = 0;
-          itemData.until = this.getFechas(new Date());
-          itemData.top = item.PrecioDescuento !== 'Sin Descuento' ? true : false;
-          if (item.PrecioDescuento !== 'Sin Descuento') {
-            desc.total_descuento = item.TotalDescuento === '' ? 0 : parseFloat(item.TotalDescuento);
-            desc.moneda_descuento = item.MonedaDescuento;
-            desc.precio_descuento = item.PrecioDescuento === '' ? 0 : parseFloat(item.PrecioDescuento);
+        salePrice = 0;
+        let branchOffices: BranchOffices[] = [];
+        let disponibilidadAlmacenes = 0;
+        if (item.ExsTotal >= this.stockMinimo) {                  // Si existencias totales.
+          branchOffices = this.setCvaAlmacenes(item);
+          if (branchOffices.length > 0) {
+            branchOffices.forEach(branchOffice => {
+              disponibilidadAlmacenes += branchOffice.cantidad;
+            });
           }
-          itemData.descuentos = desc;
-          itemData.featured = item.DisponibleEnPromocion !== 'Sin Descuento' ? true : false;
-          if (item.DisponibleEnPromocion !== 'Sin Descuento') {
-            promo.clave_promocion = item.ClavePromocion;
-            promo.descripcion_promocion = item.DescripcionPromocion;
-            promo.vencimiento_promocion = item.VencimientoPromocion;
-            promo.disponible_en_promocion = item.DisponibleEnPromocion === '' ? 0 : parseFloat(item.DisponibleEnPromocion);
+          if (disponibilidadAlmacenes >= this.stockMinimo) {      // Si la sumatoria de los almacenes.
+            itemData.id = item.id;
+            itemData.name = item.descripcion;
+            itemData.slug = slugify(item.descripcion, { lower: true });
+            itemData.short_desc = item.clave + '. Grupo: ' + item.grupo;
+            itemData.price = parseFloat(item.precio);
+            itemData.review = 0;
+            itemData.ratings = 0;
+            itemData.until = this.getFechas(new Date());
+            itemData.top = false;
+            if (item.PrecioDescuento !== 'Sin Descuento') {
+              desc.total_descuento = item.TotalDescuento === '' ? 0 : parseFloat(item.TotalDescuento);
+              desc.moneda_descuento = item.MonedaDescuento;
+              desc.precio_descuento = item.PrecioDescuento === '' ? 0 : parseFloat(item.PrecioDescuento);
+              salePrice = desc.precio_descuento;
+            }
+            itemData.descuentos = desc;
+            itemData.featured = item.DisponibleEnPromocion !== 'Sin Descuento' ? true : false;
+            if (item.DisponibleEnPromocion !== 'Sin Descuento') {
+              promo.clave_promocion = item.ClavePromocion;
+              promo.descripcion_promocion = item.DescripcionPromocion;
+              promo.vencimiento_promocion = item.VencimientoPromocion;
+              promo.disponible_en_promocion = item.DisponibleEnPromocion === '' ? 0 : parseFloat(item.DisponibleEnPromocion);
+            }
+            itemData.sale_price = salePrice;
+            itemData.promociones = promo;
+            itemData.new = false;
+            itemData.sold = null;
+            disponible = disponibilidadAlmacenes;
+            itemData.stock = disponible;
+            itemData.sku = item.clave;
+            itemData.partnumber = item.codigo_fabricante;
+            itemData.upc = item.codigo_fabricante;
+            unidad.id = 'PZ';
+            unidad.name = 'Pieza';
+            unidad.slug = 'pieza';
+            itemData.unidadDeMedida = unidad;
+            // Categorias
+            itemData.category = [];
+            c.name = item.grupo;
+            c.slug = slugify(item.grupo, { lower: true });
+            itemData.category.push(c);
+            // Marcas
+            itemData.brand = item.marca.toLowerCase();
+            itemData.brands = [];
+            b.name = item.marca;
+            b.slug = slugify(item.marca, { lower: true });
+            itemData.brands.push(b);
+            // SupplierProd
+            s.idProveedor = proveedor;
+            s.codigo = item.clave;
+            s.price = parseFloat(item.precio);
+            s.moneda = 'MXN';
+            s.branchOffices = branchOffices;
+            itemData.suppliersProd = s;
+            // Imagenes
+            itemData.pictures = [];
+            // const i = new Picture();
+            i.width = '600';
+            i.height = '600';
+            i.url = item.imagen;
+            itemData.pictures.push(i);
+            // Imagenes pequeñas
+            itemData.sm_pictures = [];
+            // const is = new Picture();
+            is.width = '300';
+            is.height = '300';
+            is.url = item.imagen;
+            itemData.variants = [];
+            itemData.sm_pictures.push(is);
           }
-          itemData.promociones = promo;
-          itemData.new = false;
-          itemData.sold = null;
-          itemData.stock = parseInt(item.disponible, 10);
-          itemData.sku = item.clave;
-          itemData.partnumber = item.codigo_fabricante;
-          itemData.upc = item.codigo_fabricante;
-          unidad.id = 'PZ';
-          unidad.name = 'Pieza';
-          unidad.slug = 'pieza';
-          itemData.unidadDeMedida = unidad;
-          // Categorias
-          itemData.category = [];
-          c.name = item.grupo;
-          c.slug = slugify(item.grupo, { lower: true });
-          itemData.category.push(c);
-          // Marcas
-          itemData.brand = item.marca.toLowerCase();
-          itemData.brands = [];
-          b.name = item.marca;
-          b.slug = slugify(item.marca, { lower: true });
-          itemData.brands.push(b);
-          // SupplierProd
-          s.idProveedor = proveedor;
-          s.codigo = item.clave;
-          s.price = parseFloat(item.precio);
-          s.moneda = 'MXN';
-          s.branchOffices = [];
-          bo.name = 'Villahermosa';
-          bo.cantidad = parseInt(item.disponible, 10);
-          s.branchOffices.push(bo);
-          itemData.suppliersProd = s;
-          // Imagenes
-          itemData.pictures = [];
-          // const i = new Picture();
-          i.width = '600';
-          i.height = '600';
-          i.url = item.imagen;
-          itemData.pictures.push(i);
-          // Imagenes pequeñas
-          itemData.sm_pictures = [];
-          // const is = new Picture();
-          is.width = '300';
-          is.height = '300';
-          is.url = item.imagen;
-          itemData.variants = [];
-          itemData.sm_pictures.push(is);
         }
         return itemData;
 
       case 'ct':
         disponible = 0;
+        salePrice = 0;
         if (item.almacenes.length > 0) {
-          const branchOffices: BranchOffices[] = [];
+          const branchOfficesCt: BranchOffices[] = [];
+          let featured = false;
           item.almacenes.forEach(element => {
             const almacen = this.getAlmacenCant(element);
             disponible += almacen.cantidad;
-            branchOffices.push(almacen);
+            branchOfficesCt.push(almacen);
           });
           if (disponible >= this.stockMinimo) {                         // Si hay mas de 10 elementos disponibles
+            // Si hay promociones en los almacenes ocupa el primero y asigna el total de disponibilidad
+            if (item.almacenes[0].promocion) {
+              featured = true;
+              promo.clave_promocion = '';
+              promo.descripcion_promocion = 'Producto con Descuento';
+              promo.inicio_promocion = item.almacenes[0].promocion.vigente.ini;
+              promo.vencimiento_promocion = item.almacenes[0].promocion.vigente.fin;
+              promo.disponible_en_promocion = item.almacenes[0].promocion.precio;
+              salePrice = item.almacenes[0].promocion.precio;
+              itemData.promociones = promo;
+            }
             itemData.id = productJson.clave;
             itemData.name = productJson.nombre;
             itemData.slug = slugify(productJson.nombre, { lower: true });
             itemData.short_desc = productJson.descripcion_corta;
-            if (item.moneda === 'USD') {
-              itemData.price = parseFloat((parseFloat(item.precio) * this.exchangeRate).toFixed(2));
-              itemData.sale_price = parseFloat((parseFloat(item.precio) * this.exchangeRate).toFixed(2));
-            } else {
-              itemData.price = parseFloat(item.precio);
-              itemData.sale_price = parseFloat(item.precio);
-            }
+            // if (item.moneda === 'USD') {
+            //   itemData.price = parseFloat((parseFloat(item.precio) * this.exchangeRate).toFixed(2));
+            //   itemData.sale_price = parseFloat((salePrice * this.exchangeRate).toFixed(2));
+            // } else {
+            itemData.price = parseFloat(item.precio);
+            itemData.sale_price = salePrice;
+            // }
             itemData.review = 0;
             itemData.ratings = 0;
             itemData.until = this.getFechas(new Date());
-            itemData.top = null;
-            itemData.featured = null;
+            itemData.top = false;
+            itemData.featured = featured;
             itemData.new = null;
             itemData.sold = null;
             itemData.stock = disponible;
@@ -1080,14 +1515,15 @@ export class ImportarComponent implements OnInit {
             // SupplierProd
             s.idProveedor = proveedor;
             s.codigo = productJson.numParte;
-            if (item.moneda === 'USD') {
-              s.price = parseFloat((parseFloat(item.precio) * this.exchangeRate).toFixed(2));
-            } else {
-              s.price = parseFloat(item.precio);
-            }
+            // if (item.moneda === 'USD') {
+            //   s.price = parseFloat((parseFloat(item.precio) * this.exchangeRate).toFixed(2));
+            // } else {
+            s.price = parseFloat(item.precio);
+            // }
             s.moneda = item.moneda;
-            s.branchOffices = branchOffices;
+            s.branchOffices = branchOfficesCt;
             itemData.suppliersProd = s;
+            itemData.model = productJson.modelo;
             // Imagenes
             itemData.pictures = [];
             // const i = new Picture();
@@ -1109,17 +1545,18 @@ export class ImportarComponent implements OnInit {
         return itemData;
 
       case 'exel':
+        salePrice = 0;
         itemData.id = item.id_producto;
         itemData.name = item.descripcion;
         itemData.slug = slugify(item.descripcion, { lower: true });
         itemData.short_desc = item.subcategoria + '. Codigo: ' + item.codigo_proveedor;
         itemData.price = item.precioLista;
-        itemData.sale_price = item.precioLista;
+        itemData.sale_price = salePrice;
         itemData.review = 0;
         itemData.ratings = 0;
         itemData.until = this.getFechas(new Date());
-        itemData.top = null;
-        itemData.featured = null;
+        itemData.top = false;
+        itemData.featured = false;
         itemData.new = item.nuevo = 1 ? true : false;
         itemData.sold = null;
         itemData.stock = item.stock;
@@ -1144,7 +1581,7 @@ export class ImportarComponent implements OnInit {
         // SupplierProd
         s.idProveedor = proveedor;
         s.codigo = item.id_producto;
-        s.price = item.precioLista;
+        s.price = parseFloat(item.precioLista);
         s.moneda = 'MXN';
         s.branchOffices = [];
         if (productJson.length > 0) {
