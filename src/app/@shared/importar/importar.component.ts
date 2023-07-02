@@ -1475,13 +1475,13 @@ export class ImportarComponent implements OnInit {
             itemData.name = productJson.nombre;
             itemData.slug = slugify(productJson.nombre, { lower: true });
             itemData.short_desc = productJson.descripcion_corta;
-            // if (item.moneda === 'USD') {
-            //   itemData.price = parseFloat((parseFloat(item.precio) * this.exchangeRate).toFixed(2));
-            //   itemData.sale_price = parseFloat((salePrice * this.exchangeRate).toFixed(2));
-            // } else {
-            itemData.price = parseFloat(item.precio);
-            itemData.sale_price = salePrice;
-            // }
+            if (item.moneda === 'USD') {
+              itemData.price = parseFloat((parseFloat(item.precio) * this.exchangeRate).toFixed(2));
+              itemData.sale_price = parseFloat((salePrice * this.exchangeRate).toFixed(2));
+            } else {
+              itemData.price = parseFloat(item.precio);
+              itemData.sale_price = salePrice;
+            }
             itemData.review = 0;
             itemData.ratings = 0;
             itemData.until = this.getFechas(new Date());
@@ -1515,11 +1515,11 @@ export class ImportarComponent implements OnInit {
             // SupplierProd
             s.idProveedor = proveedor;
             s.codigo = productJson.numParte;
-            // if (item.moneda === 'USD') {
-            //   s.price = parseFloat((parseFloat(item.precio) * this.exchangeRate).toFixed(2));
-            // } else {
-            s.price = parseFloat(item.precio);
-            // }
+            if (item.moneda === 'USD') {
+              s.price = parseFloat((parseFloat(item.precio) * this.exchangeRate).toFixed(2));
+            } else {
+              s.price = parseFloat(item.precio);
+            }
             s.moneda = item.moneda;
             s.branchOffices = branchOfficesCt;
             itemData.suppliersProd = s;
