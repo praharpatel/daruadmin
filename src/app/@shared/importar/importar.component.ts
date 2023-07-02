@@ -1515,11 +1515,7 @@ export class ImportarComponent implements OnInit {
             // SupplierProd
             s.idProveedor = proveedor;
             s.codigo = productJson.numParte;
-            if (item.moneda === 'USD') {
-              s.price = parseFloat((parseFloat(item.precio) * this.exchangeRate).toFixed(2));
-            } else {
-              s.price = parseFloat(item.precio);
-            }
+            s.price = parseFloat(item.precio);
             s.moneda = item.moneda;
             s.branchOffices = branchOfficesCt;
             itemData.suppliersProd = s;
