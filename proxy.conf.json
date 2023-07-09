@@ -1,27 +1,31 @@
 {
-  "/xl4.asmx" : {
+  "/xl4.asmx": {
     "target": "http://ws.exel.com.mx:8181",
     "secure": false,
     "changeOrigin": true
   },
-  "/oauth/oauth30/token" : {
+  "/oauth/oauth30/token": {
     "target": "https://api.ingrammicro.com:443/",
     "secure": false,
     "changeOrigin": true
   },
-  "/resellers/v6/catalog" : {
+  "/resellers/v6/catalog": {
     "target": "https://api.ingrammicro.com:443/sandbox/",
     "secure": false,
     "changeOrigin": true
   },
-  "/catalogo_clientes_xml/*" : {
+  "/catalogo_clientes_xml/*": {
     "target": "http://www.grupocva.com",
     "secure": false,
     "changeOrigin": true
   },
-  "/pedidos_web/*" : {
+  "/pedidos_web/*": {
     "target": "http://www.grupocva.com",
     "secure": false,
     "changeOrigin": true
+  },
+  "/graphql": {
+    "target": "http://189.253.186.95:8080",
+    "secure": false
   }
 }
