@@ -130,8 +130,8 @@ export class CategoriesComponent implements OnInit {
     this.catalog = {
       id: this.nextId,
       description: '',
-      order: 0,
       slug: '',
+      order: 1000,
       active: true
     };
   }
