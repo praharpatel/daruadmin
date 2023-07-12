@@ -307,9 +307,11 @@ export class ImportarComponent implements OnInit {
               let i = 0;
               item.suppliersCat.forEach(element => {
                 i += 1;
-                if (element.idProveedor === supplier) {
-                  element.id = i;
-                  dataSupplier.push(element);
+                if (element) {
+                  if (element.idProveedor === supplier) {
+                    element.id = i;
+                    dataSupplier.push(element);
+                  }
                 }
               });
             }
@@ -1379,15 +1381,15 @@ export class ImportarComponent implements OnInit {
             itemData.name = item.descripcion;
             itemData.slug = slugify(item.descripcion, { lower: true });
             itemData.short_desc = item.clave + '. Grupo: ' + item.grupo;
-            itemData.price = parseFloat(item.precio);
+            itemData.price = parseFloat(item.precio) * 1.50;
             itemData.review = 0;
             itemData.ratings = 0;
             itemData.until = this.getFechas(new Date());
             itemData.top = false;
             if (item.PrecioDescuento !== 'Sin Descuento') {
-              desc.total_descuento = item.TotalDescuento === '' ? 0 : parseFloat(item.TotalDescuento);
+              desc.total_descuento = item.TotalDescuento === '' ? 0 : parseFloat(item.TotalDescuento) * 1.50;
               desc.moneda_descuento = item.MonedaDescuento;
-              desc.precio_descuento = item.PrecioDescuento === '' ? 0 : parseFloat(item.PrecioDescuento);
+              desc.precio_descuento = item.PrecioDescuento === '' ? 0 : parseFloat(item.PrecioDescuento) * 1.50;
               salePrice = desc.precio_descuento;
             }
             itemData.descuentos = desc;
@@ -1396,7 +1398,7 @@ export class ImportarComponent implements OnInit {
               promo.clave_promocion = item.ClavePromocion;
               promo.descripcion_promocion = item.DescripcionPromocion;
               promo.vencimiento_promocion = item.VencimientoPromocion;
-              promo.disponible_en_promocion = item.DisponibleEnPromocion === '' ? 0 : parseFloat(item.DisponibleEnPromocion);
+              promo.disponible_en_promocion = item.DisponibleEnPromocion === '' ? 0 : parseFloat(item.DisponibleEnPromocion) * 1.50;
             }
             itemData.sale_price = salePrice;
             itemData.promociones = promo;
@@ -1425,7 +1427,7 @@ export class ImportarComponent implements OnInit {
             // SupplierProd
             s.idProveedor = proveedor;
             s.codigo = item.clave;
-            s.price = parseFloat(item.precio);
+            s.price = parseFloat(item.precio) * 1.50;
             s.moneda = 'MXN';
             s.branchOffices = branchOffices;
             itemData.suppliersProd = s;
@@ -1476,10 +1478,10 @@ export class ImportarComponent implements OnInit {
             itemData.slug = slugify(productJson.nombre, { lower: true });
             itemData.short_desc = productJson.descripcion_corta;
             if (item.moneda === 'USD') {
-              itemData.price = parseFloat((parseFloat(item.precio) * this.exchangeRate).toFixed(2));
-              itemData.sale_price = parseFloat((salePrice * this.exchangeRate).toFixed(2));
+              itemData.price = parseFloat((parseFloat(item.precio) * this.exchangeRate * 1.50).toFixed(2));
+              itemData.sale_price = parseFloat((salePrice * this.exchangeRate * 1.50).toFixed(2));
             } else {
-              itemData.price = parseFloat(item.precio);
+              itemData.price = parseFloat(item.precio) * 1.50;
               itemData.sale_price = salePrice;
             }
             itemData.review = 0;
@@ -1577,7 +1579,7 @@ export class ImportarComponent implements OnInit {
         // SupplierProd
         s.idProveedor = proveedor;
         s.codigo = item.id_producto;
-        s.price = parseFloat(item.precioLista);
+        s.price = parseFloat(item.precioLista) * 1.50;
         s.moneda = 'MXN';
         s.branchOffices = [];
         if (productJson.length > 0) {
