@@ -1,10 +1,10 @@
 export const environment = {
   production: true,
-  backend: 'https://services.daru.mx/graphql',
-  backendWs: 'wss://services.daru.mx/graphql',
+  backend: 'https://services.daru.mx:3000/graphql',
+  backendWs: 'wss://services.daru.mx:3000/graphql',
   stripePublicKey: 'pk_test_51JIL74J3AWJEzlXbrPLgiyb1RdjtNR4Raz49wGw3CsU8YMes5ZhSw6Z7Qx2TCabBD5gYcVyV4cJSwVJUXWTleF1O00XRREKbZk',
-  upload: 'https://services.daru.mx/upload',
-  uploadsUrl: 'https://services.daru.mx/uploads',
+  upload: 'https://services.daru.mx:3000/upload',
+  uploadsUrl: 'https://services.daru.mx:3000/uploads',
 
   defaultauth: 'fackbackend',
   firebaseConfig: {
