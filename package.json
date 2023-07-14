@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "scripts": {
     "ng": "ng",
-    "startLoc": "ng serve --proxy-config proxy.conf.json --open --port 4203",
+    "startdev": "ng serve --proxy-config proxy.conf.json --open --port 4203",
     "start": "ng serve --open --port 4203",
     "build": "ng build --configuration production",
     "test": "ng test",
