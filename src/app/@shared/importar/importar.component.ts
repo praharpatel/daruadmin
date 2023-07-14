@@ -143,9 +143,6 @@ export class ImportarComponent implements OnInit {
             if (!item.suppliersCat) {
               item.suppliersCat = [];
               const supplierCat = new SupplierCat();
-              supplierCat.idProveedor = '';
-              supplierCat.name = '';
-              supplierCat.slug = '';
               item.suppliersCat.push(supplierCat);
             }
           });
@@ -159,9 +156,6 @@ export class ImportarComponent implements OnInit {
             if (!item.suppliersCat) {
               item.suppliersCat = [];
               const supplierCat = new SupplierCat();
-              supplierCat.idProveedor = '';
-              supplierCat.name = '';
-              supplierCat.slug = '';
               item.suppliersCat.push(supplierCat);
             }
           });
@@ -175,9 +169,6 @@ export class ImportarComponent implements OnInit {
             if (!item.suppliersCat) {
               item.suppliersCat = [];
               const supplierCat = new SupplierCat();
-              supplierCat.idProveedor = '';
-              supplierCat.name = '';
-              supplierCat.slug = '';
               item.suppliersCat.push(supplierCat);
             }
           });
@@ -298,9 +289,6 @@ export class ImportarComponent implements OnInit {
           if (!item.suppliersCat) {
             item.suppliersCat = [];
             const supplierCat = new SupplierCat();
-            supplierCat.idProveedor = '';
-            supplierCat.name = '';
-            supplierCat.slug = '';
             item.suppliersCat.push(supplierCat);
           } else {
             if (item.suppliersCat.length > 0) {
@@ -433,23 +421,29 @@ export class ImportarComponent implements OnInit {
                     supplierCat.slug = itemSlug;
                     // Si ya existe un proveedor en el elemento.
                     if (item.suppliersCat.length > 0) {
-                      if (item.suppliersCat[0].idProveedor !== '') {
-                        item.suppliersCat.forEach(supplier => {
-                          // Si el proveedor actual existe en catalogo de datos.
-                          if (supplier.idProveedor === this.supplier.slug) {
-                            supplier.name = supplierCat.name;
-                            supplier.slug = supplierCat.slug;
-                          } else {
-                            // Si el proveedor no existe, lo agrega.
-                            item.suppliersCat = [];
-                            item.suppliersCat.push(supplierCat);
-                          }
-                        });
-                      } else {
-                        // Si el proveedor no existe, lo agrega.
-                        item.suppliersCat = [];
-                        item.suppliersCat.push(supplierCat);
+                      if (item.suppliersCat[0]) {
+                        if (item.suppliersCat[0].idProveedor !== '') {
+                          item.suppliersCat.forEach(supplier => {
+                            // Si el proveedor actual existe en catalogo de datos.
+                            if (supplier.idProveedor === this.supplier.slug) {
+                              supplier.name = supplierCat.name;
+                              supplier.slug = supplierCat.slug;
+                            } else {
+                              // Si el proveedor no existe, lo agrega.
+                              item.suppliersCat = [];
+                              item.suppliersCat.push(supplierCat);
+                            }
+                          });
+                        } else {
+                          // Si el proveedor no existe, lo agrega.
+                          item.suppliersCat = [];
+                          item.suppliersCat.push(supplierCat);
+                        }
                       }
+                    } else {
+                      // Si el proveedor no existe, lo agrega.
+                      item.suppliersCat = [];
+                      item.suppliersCat.push(supplierCat);
                     }
                   }
                 });
