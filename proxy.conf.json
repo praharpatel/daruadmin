@@ -23,5 +23,25 @@
     "target": "http://www.grupocva.com",
     "secure": true,
     "changeOrigin": true
+  },
+  "/cliente/*" : {
+    "target": "http://connect.ctonline.mx:3001/",
+    "secure": true,
+    "changeOrigin": true
+  },
+  "/existencia/*" : {
+    "target": "http://connect.ctonline.mx:3001/",
+    "secure": true,
+    "changeOrigin": true
+  },
+  "/paqueteria/*" : {
+    "target": "http://connect.ctonline.mx:3001/",
+    "secure": true,
+    "changeOrigin": true
+  },
+  "/pedido/*" : {
+    "target": "http://connect.ctonline.mx:3001/",
+    "secure": true,
+    "changeOrigin": true
   }
 }

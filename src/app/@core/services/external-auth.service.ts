@@ -50,7 +50,7 @@ export class ExternalAuthService {
             rfc: 'DIN2206222D3'
           })
         };
-        return await fetch('http://connect.ctonline.mx:3001/cliente/token', optionsCT)
+        return await fetch('cliente/token', optionsCT)
           .then(response => response.json())
           .then(async response => {
             return await response;
@@ -324,7 +324,6 @@ export class ExternalAuthService {
           params = params.set(param.name, param.value || search);
         });
       }
-
       return this.http.get(
         supplier.url_base_api + apiSelect.operation,
         {
