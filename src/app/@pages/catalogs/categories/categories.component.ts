@@ -13,6 +13,7 @@ import { TablePaginationService } from 'src/app/@shared/table-pagination/table-p
 import { ImportarComponent } from '@shared/importar/importar.component';
 import { ISupplier } from '@core/interfaces/supplier.interface';
 import { Catalog } from '@core/models/catalog.models';
+import { ICatalog } from '@core/interfaces/catalog.interface';
 
 @Component({
   selector: 'app-categories',
@@ -33,7 +34,7 @@ export class CategoriesComponent implements OnInit {
   nextId: string;
   title = 'Catálogo de Categorías';
   mostrarImport = true;
-  importados: [Catalog];
+  importados: [ICatalog];
 
   @ViewChild('mdCaptureCat') modal: CaptureCatComponent;
   @ViewChild('mdImportCat') modalImport: ImportarComponent;
@@ -162,7 +163,7 @@ export class CategoriesComponent implements OnInit {
     }
   }
 
-  private addCatalog(catalog: Catalog) {
+  private addCatalog(catalog: ICatalog) {
     this.categoriesService.add(catalog).subscribe(
       (res: any) => {
         if (res.status) {
@@ -185,7 +186,7 @@ export class CategoriesComponent implements OnInit {
     }
   }
 
-  private addListCatalog(categories: [Catalog], supplier: ISupplier) {
+  private addListCatalog(categories: [ICatalog], supplier: ISupplier) {
     this.categoriesService.addList(categories, supplier).subscribe(
       (res: any) => {
         if (res.status) {
@@ -201,7 +202,7 @@ export class CategoriesComponent implements OnInit {
     );
   }
 
-  private updateCatalog(catalog: Catalog) {
+  private updateCatalog(catalog: ICatalog) {
     if (catalog.description !== '') {
       this.categoriesService.update(catalog).subscribe(
         (res: any) => {
