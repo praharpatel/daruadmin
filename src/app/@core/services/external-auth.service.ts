@@ -1,11 +1,14 @@
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { ICatalog } from '@core/interfaces/catalog.interface';
 import { ILoginCTForm, ILoginSyscomForm } from '@core/interfaces/extern-login.interface';
 import { IApis, ISupplier } from '@core/interfaces/supplier.interface';
 import { Product } from '@core/models/product.models';
 import { map } from 'rxjs/operators';
-import axios, { isCancel, AxiosError } from 'axios';
+import axios, {  } from 'axios';
+import { Apollo } from 'apollo-angular';
+import { ApiService } from '@graphql/services/api.service';
+import { BRANDSCVA_LIST_QUERY, GROUPSCVA_LIST_QUERY, PAQUETERIASCVA_LIST_QUERY, PRODUCTOSCVA_LIST_QUERY, SOLUCIONESCVA_LIST_QUERY, SUCURSALESCVA_LIST_QUERY } from '@graphql/operations/query/suppliers/cva';
+import { Catalog } from '@core/models/catalog.models';
 
 declare const require;
 const xml2js = require('xml2js');
@@ -13,7 +16,7 @@ const xml2js = require('xml2js');
 @Injectable({
   providedIn: 'root'
 })
-export class ExternalAuthService {
+export class ExternalAuthService extends ApiService {
   loginCTForm: ILoginCTForm = {
     email: '',
     cliente: '',
@@ -26,8 +29,10 @@ export class ExternalAuthService {
   };
 
   constructor(
-    public http: HttpClient
+    public http: HttpClient,
+    apollo: Apollo
   ) {
+    super(apollo);
   }
 
   //#region Token
@@ -143,7 +148,7 @@ export class ExternalAuthService {
     }
   }
 
-  async getSyscomCatalogAllBrands(supplier: ISupplier, apiSelect: IApis, token: string, catalogValues: ICatalog[]): Promise<any> {
+  async getSyscomCatalogAllBrands(supplier: ISupplier, apiSelect: IApis, token: string, catalogValues: Catalog[]): Promise<any> {
     if (apiSelect.parameters) {
       switch (supplier.slug) {
         case 'syscom':
@@ -226,7 +231,7 @@ export class ExternalAuthService {
     }
   }
 
-  async getCatalogXMLAllBrands(supplier: ISupplier, apiSelect: IApis, search: string = '', catalogValues: ICatalog[]): Promise<any> {
+  async getCatalogXMLAllBrands(supplier: ISupplier, apiSelect: IApis, search: string = '', catalogValues: Catalog[]): Promise<any> {
     if (apiSelect.parameters) {
       switch (supplier.slug) {
         case 'cva':
@@ -503,5 +508,79 @@ export class ExternalAuthService {
     });
     return await cleanedData;
   }
+
+  //#region CVA
+  async getBrandsCva(): Promise<any> {
+    return new Promise<any>((resolve, reject) => {
+      this.get(BRANDSCVA_LIST_QUERY, {}, {}).subscribe(
+        (result: any) => {
+          resolve(result.listBrandsCva);
+        },
+        (error: any) => {
+          reject(error);
+        });
+    });
+  }
+
+  async getGroupsCva(): Promise<any> {
+    return new Promise<any>((resolve, reject) => {
+      this.get(GROUPSCVA_LIST_QUERY, {}, {}).subscribe(
+        (result: any) => {
+          resolve(result.listGroupsCva);
+        },
+        (error: any) => {
+          reject(error);
+        });
+    });
+  }
+
+  async getSolucionesCva(): Promise<any> {
+    return new Promise<any>((resolve, reject) => {
+      this.get(SOLUCIONESCVA_LIST_QUERY, {}, {}).subscribe(
+        (result: any) => {
+          resolve(result.listSolucionesCva);
+        },
+        (error: any) => {
+          reject(error);
+        });
+    });
+  }
+
+  async getSucursalesCva(): Promise<any> {
+    return new Promise<any>((resolve, reject) => {
+      this.get(SUCURSALESCVA_LIST_QUERY, {}, {}).subscribe(
+        (result: any) => {
+          resolve(result.listSucursalesCva);
+        },
+        (error: any) => {
+          reject(error);
+        });
+    });
+  }
+
+  async getPaqueteriasCva(): Promise<any> {
+    return new Promise<any>((resolve, reject) => {
+      this.get(PAQUETERIASCVA_LIST_QUERY, {}, {}).subscribe(
+        (result: any) => {
+          resolve(result.listPaqueteriasCva);
+        },
+        (error: any) => {
+          reject(error);
+        });
+    });
+  }
+
+  async getPricesCva(): Promise<any> {
+    return new Promise<any>((resolve, reject) => {
+      this.get(PRODUCTOSCVA_LIST_QUERY, {}, {}).subscribe(
+        (result: any) => {
+          resolve(result.listPricesCva);
+        },
+        (error: any) => {
+          reject(error);
+        });
+    });
+  }
+  //#endregion
 
 }

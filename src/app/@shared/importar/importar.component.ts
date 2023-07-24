@@ -243,7 +243,7 @@ export class ImportarComponent implements OnInit {
   async getCvaAlmacenes(supplier: ISupplier): Promise<any> {
     const ApiSelect = this.apis.filter(api => api.return === 'sucursales');
     if (ApiSelect.length > 0) {
-      return await this.getCatalogo(supplier, ApiSelect[0])
+      return await this.getCatalogoX(supplier, ApiSelect[0])
         .then(
           async (result) => {
             return await result;
@@ -393,7 +393,111 @@ export class ImportarComponent implements OnInit {
   async onEjecutarAPI() {
     if (this.apiSelect.type !== 'products') {
       loadData('Importando el catalogo', 'Esperar la carga del catalogo.');
-      return await this.getCatalogo(this.supplier, this.apiCatalog)
+      const brandsSupplier = await this.getCatalogSupplier(this.supplier.slug, this.apiCatalog);
+      if (brandsSupplier) {
+        this.dataSupplier = brandsSupplier;
+        this.habilitaGuardar = true;
+        // Revisar en todos los elementos del proveedor
+        this.dataSupplier.forEach(itemSupplier => {
+          // Revisar en todos los elementos del catalogo interno
+          this.data.forEach(item => {
+            // Si el elemento es igual al del proveedor
+            let itemName = '';
+            let itemSlug = '';
+            switch (this.supplier.slug) {
+              case 'cva':
+                itemName = itemSupplier.description.toUpperCase();
+                itemSlug = slugify(itemSupplier.description, { lower: true });
+                break;
+              case 'syscom':
+                if (typeof itemSupplier.id === 'string') {
+                  itemName = itemSupplier.id.toUpperCase();
+                  itemSlug = slugify(itemSupplier.id, { lower: true });
+                }
+                break;
+              case 'exel':
+                itemName = itemSupplier.descripcion.toUpperCase();
+                itemSlug = slugify(itemSupplier.descripcion, { lower: true });
+                break;
+              default:
+                break;
+            }
+            if (item.slug.toUpperCase() === itemName) {
+              const supplierCat = new SupplierCat();
+              // Inicializar el nombre del proveedor.
+              supplierCat.idProveedor = this.supplier.slug;
+              supplierCat.name = itemName;
+              supplierCat.slug = itemSlug;
+              // Si ya existe un proveedor en el elemento.
+              if (item.suppliersCat.length > 0) {
+                if (item.suppliersCat[0].idProveedor !== '') {
+                  item.suppliersCat.forEach(supplier => {
+                    // Si el proveedor actual existe en catalogo de datos.
+                    if (supplier.idProveedor === this.supplier.slug) {
+                      supplier.name = supplierCat.name;
+                      supplier.slug = supplierCat.slug;
+                    } else {
+                      // Si el proveedor no existe, lo agrega.
+                      item.suppliersCat = [];
+                      item.suppliersCat.push(supplierCat);
+                    }
+                  });
+                } else {
+                  // Si el proveedor no existe, lo agrega.
+                  item.suppliersCat = [];
+                  item.suppliersCat.push(supplierCat);
+                }
+              }
+            }
+          });
+        });
+        closeAlert();
+      } else {
+        infoEventAlert('No es posible importar el catalogo.', TYPE_ALERT.ERROR);
+        closeAlert();
+      }
+    } else {
+      if (this.catalogValues.length > 0 || this.supplier.slug === 'ct' ||
+        this.supplier.slug === 'ingram' || this.supplier.slug === 'exel') {
+        loadData('Importando los productos', 'Esperar la carga de los productos.');
+        return await this.getCatalogoAllBrands(this.supplier, this.apiSelect, this.catalogValues)
+          .then(
+            async (result) => {
+              this.dataSupplier = result;
+              if (this.dataSupplier) {
+                if (this.dataSupplier.length > 0) {
+                  this.habilitaGuardar = true;
+                  this.dataExport = [];
+                  // Setear dataExport
+                  this.dataSupplier.forEach(item => {
+                    const newItemExport = new ProductExport();
+                    newItemExport.slug = item.slug;
+                    newItemExport.brand = item.brand;
+                    newItemExport.partnumber = item.partnumber;
+                    newItemExport.sku = item.sku;
+                    newItemExport.upc = item.upc;
+                    this.dataExport.push(newItemExport);
+                  });
+                } else {
+                  basicAlert(TYPE_ALERT.WARNING, 'No se encontraron productos.');
+                }
+              }
+              closeAlert();
+            }
+          )
+          .catch((error: Error) => {
+            infoEventAlert(error.message, '', TYPE_ALERT.ERROR);
+          });
+      } else {
+        basicAlert(TYPE_ALERT.WARNING, 'No existen elementos para buscar.');
+      }
+    }
+  }
+
+  async onEjecutarAPIx() {
+    if (this.apiSelect.type !== 'products') {
+      loadData('Importando el catalogo', 'Esperar la carga del catalogo.');
+      return await this.getCatalogoX(this.supplier, this.apiCatalog)
         .then(
           async (result) => {
             this.dataSupplier = result;
@@ -498,9 +602,113 @@ export class ImportarComponent implements OnInit {
       }
     }
   }
+
   //#endregion
 
-  async getCatalogo(supplier: ISupplier, apiSelect: IApis, forCatalog: boolean = false): Promise<any> {
+  async getCatalogSupplier(supplier: string, apiSelect: IApis, forCatalog: boolean = false): Promise<Catalog[]> {
+    const data: Catalog[] = [];
+
+    switch (supplier) {
+      case 'cva':
+        try {
+          if (apiSelect.operation === 'grupos.xml') {
+            const catalogo = await this.externalAuthService.getGroupsCva();
+            let i = 1;
+            for (const item of catalogo.listGroupsCva) {
+              data.push({ id: i.toString(), description: item.grupo, slug: item.grupo });
+              i += 1;
+            }
+            return data;
+          } else if (apiSelect.operation === 'soluciones.xml') {
+            const catalogo = await this.externalAuthService.getSolucionesCva();
+            return catalogo.listSolucionesCva;
+          } else if (apiSelect.operation === 'sucursales.xml') {
+            const catalogo = await this.externalAuthService.getSucursalesCva();
+            return catalogo.listSucursalesCva;
+          } else if (apiSelect.operation === 'marcas2.xml') {
+            const catalogo = await this.externalAuthService.getBrandsCva();
+            const catalogValues: Catalog[] = catalogo.listBrandsCva.map(item => ({
+              id: item.clave,
+              description: item.descripcion
+            }));
+            if (forCatalog) {
+              this.catalogValues.push(...catalogValues);
+            } else {
+              data.push(...catalogValues);
+            }
+            return data;
+          }
+        } catch (error) {
+          throw new Error(error.message);
+        }
+        break;
+      case 'exel':
+      case 'syscom':
+      default:
+        break;
+    }
+
+    return data;
+  }
+
+  async getCatalogSupplierX(supplier: string, apiSelect: IApis, forCatalog: boolean = false): Promise<any> {
+    // Cuando la consulta externa no requiere token
+    const catalogValues: Catalog[] = [];
+    const data = [];
+    switch (supplier) {
+      case 'cva':
+        let catalogo = [];
+        try {
+          // Hay una demora en el catálogo de grupos2.xml y se eusará grupos.xml
+          if (apiSelect.operation === 'grupos.xml') {
+            catalogo = await this.externalAuthService.getGroupsCva().then(async result => {
+              return await result.listGroupsCva;
+            });
+            for (const idR in catalogo) {
+              const item = catalogo[idR];
+              let itemData = new Catalog();
+              itemData.id = item.grupo;
+              itemData.description = item.grupo;
+              data.push(itemData);
+            }
+            return await data;
+          } else if (apiSelect.operation === 'soluciones.xml') {
+            catalogo = await this.externalAuthService.getSolucionesCva().then(async result => {
+              return await result.listSolucionesCva;
+            });
+            return await catalogo;
+          } else if (apiSelect.operation === 'sucursales.xml') {
+            catalogo = await this.externalAuthService.getSucursalesCva().then(async result => {
+              return await result.listSucursalesCva;
+            });
+            return await catalogo;
+          } else if (apiSelect.operation === 'marcas2.xml') {
+            catalogo = await this.externalAuthService.getBrandsCva().then(async result => {
+              return await result.listBrandsCva;
+            });
+            catalogo.forEach(async item => {
+              const itemData = new Catalog();
+              itemData.id = item.clave;
+              itemData.description = item.descripcion;
+              if (forCatalog) {
+                this.catalogValues.push(itemData);
+              } else {
+                data.push(itemData);
+              }
+            });
+            return await data;
+          }
+        } catch (error) {
+          throw await new Error(error.message);
+        }
+      case 'exel':
+      case 'syscom':
+      default:
+        break;
+    }
+  }
+
+  async getCatalogoX(supplier: ISupplier, apiSelect: IApis, forCatalog: boolean = false): Promise<any> {
     // Cuando la consulta externa no requiere token
     const catalogValues: Catalog[] = [];
     const data = [];
@@ -644,7 +852,10 @@ export class ImportarComponent implements OnInit {
       switch (supplier.slug) {
         case 'cva':
           // Carga de Productos
+          // this.cvaAlmacenes = await this.getCvaAlmacenes(supplier);
           this.cvaAlmacenes = await this.getCvaAlmacenes(supplier);
+          console.log('this.cvaAlmacenes: ', this.cvaAlmacenes);
+          return await this.cvaAlmacenes;
           resultados = await this.externalAuthService.getCatalogXMLAllBrands(supplier, apiSelect, this.valorSearch.id, catalogValues)
             .then(async result => {
               if (result.length > 0) {
