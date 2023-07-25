@@ -67,11 +67,11 @@ export const PAQUETERIASCVA_LIST_QUERY = gql`
 `;
 
 export const PRODUCTOSCVA_LIST_QUERY = gql`
-  query listPricesCva {
-    listPricesCva {
+  query listProductsCva {
+    listProductsCva {
       status
       message
-      listPricesCva {
+      listProductsCva {
         ...ProductosCvaObject
       }
     }

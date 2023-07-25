@@ -570,11 +570,11 @@ export class ExternalAuthService extends ApiService {
     });
   }
 
-  async getPricesCva(): Promise<any> {
+  async getProductsCva(): Promise<any> {
     return new Promise<any>((resolve, reject) => {
       this.get(PRODUCTOSCVA_LIST_QUERY, {}, {}).subscribe(
         (result: any) => {
-          resolve(result.listPricesCva);
+          resolve(result.listProductsCva);
         },
         (error: any) => {
           reject(error);

@@ -36,7 +36,7 @@ export const PAQUETERIASCVA_FRAGMENT = gql`
 `;
 
 export const PRODUCTOSCVA_FRAGMENT = gql`
-  fragment ProductosCvaObject on ResponsePaqueteriasCva {
+  fragment ProductosCvaObject on ResponseProductCva {
     clave
     codigo_fabricante
     descripcion
