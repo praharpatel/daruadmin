@@ -52,5 +52,46 @@ export const PRODUCTOSCVA_FRAGMENT = gql`
     ficha_comercial
     imagen
     disponibleCD
+    tipocambio
+    fechaactualizatipoc
+    TotalDescuento
+    MonedaDescuento
+    PrecioDescuento
+    MonedaPrecioDescuento
+    ClavePromocion
+    DescripcionPromocion
+    VencimientoPromocion
+    DisponibleEnPromocion
+    CEDIS_PROYECTO_IPN
+    TALLER_PROYECTO_IPN
+    VENTAS_ACAPULCO
+    VENTAS_AGUASCALIENTES
+    VENTAS_CAMPECHE
+    VENTAS_CANCUN
+    VENTAS_CHIHUAHUA
+    VENTAS_COLIMA
+    VENTAS_CUERNAVACA
+    VENTAS_CULIACAN
+    VENTAS_DF_TALLER
+    VENTAS_DURANGO
+    VENTAS_GUADALAJARA
+    VENTAS_HERMOSILLO
+    VENTAS_LEON
+    VENTAS_MERIDA
+    VENTAS_MONTERREY
+    VENTAS_MORELIA
+    VENTAS_OAXACA
+    VENTAS_PACHUCA
+    VENTAS_PUEBLA
+    VENTAS_QUERETARO
+    VENTAS_SAN_LUIS_POTOSI
+    VENTAS_TAMPICO
+    VENTAS_TEPIC
+    VENTAS_TOLUCA
+    VENTAS_TORREON
+    VENTAS_TUXTLA
+    VENTAS_VERACRUZ
+    VENTAS_ZACATECAS
+    ExsTotal
   }
 `;

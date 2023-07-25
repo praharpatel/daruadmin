@@ -463,40 +463,30 @@ export class ImportarComponent implements OnInit {
       if (this.catalogValues.length > 0 || this.supplier.slug === 'ct' ||
         this.supplier.slug === 'ingram' || this.supplier.slug === 'exel') {
         loadData('Importando los productos', 'Esperar la carga de los productos.');
-        console.log('this.catalogValues: ', this.catalogValues);
         const productos = await this.getProducts(this.supplier, this.apiSelect, this.catalogValues);
-        console.log('productos: ', productos);
-        return productos;
 
-        return await this.getProducts(this.supplier, this.apiSelect, this.catalogValues)
-          .then(
-            async (result) => {
-              console.log('result: ', result);
-              this.dataSupplier = result;
-              if (this.dataSupplier) {
-                if (this.dataSupplier.length > 0) {
-                  this.habilitaGuardar = true;
-                  this.dataExport = [];
-                  // Setear dataExport
-                  this.dataSupplier.forEach(item => {
-                    const newItemExport = new ProductExport();
-                    newItemExport.slug = item.slug;
-                    newItemExport.brand = item.brand;
-                    newItemExport.partnumber = item.partnumber;
-                    newItemExport.sku = item.sku;
-                    newItemExport.upc = item.upc;
-                    this.dataExport.push(newItemExport);
-                  });
-                } else {
-                  basicAlert(TYPE_ALERT.WARNING, 'No se encontraron productos.');
-                }
-              }
-              closeAlert();
-            }
-          )
-          .catch((error: Error) => {
-            infoEventAlert(error.message, '', TYPE_ALERT.ERROR);
-          });
+        if (productos) {
+          if (productos.length > 0) {
+            this.habilitaGuardar = true;
+            this.dataExport = [];
+            // Setear dataExport
+            productos.forEach(item => {
+              const newItemExport = new ProductExport();
+              newItemExport.slug = item.slug;
+              newItemExport.brand = item.brand;
+              newItemExport.partnumber = item.partnumber;
+              newItemExport.sku = item.sku;
+              newItemExport.upc = item.upc;
+              this.dataExport.push(newItemExport);
+            });
+          } else {
+            basicAlert(TYPE_ALERT.WARNING, 'No se encontraron productos.');
+          }
+        }
+        this.dataSupplier = productos;
+        closeAlert();
+        return this.dataSupplier;
+
       } else {
         basicAlert(TYPE_ALERT.WARNING, 'No existen elementos para buscar.');
       }
@@ -562,13 +552,12 @@ export class ImportarComponent implements OnInit {
           const almacenes = await this.externalAuthService.getSucursalesCva();
           if (almacenes.status && almacenes.listSucursalesCva.length > 0) {
             this.cvaAlmacenes = almacenes.listSucursalesCva;
-            console.log('this.cvaAlmacenes: ', this.cvaAlmacenes);
             const productosCva = await this.externalAuthService.getProductsCva();
-            console.log('productosCva.listProductsCva: ', productosCva.listProductsCva);
             let i = 1;
-            for (const iProd of productosCva.listProductsCva) {
-              const product: IProductCva = productosCva[iProd];
+            for (const product of productosCva.listProductsCva) {
+              // Aquí, 'product' es el elemento del array, no necesitas buscarlo usando 'iProd'
               let itemData = new Product();
+              product.id = i;
               itemData = this.setProduct(supplier.slug, product);
               if (itemData.id !== undefined) {
                 productos.push(itemData);
@@ -578,7 +567,6 @@ export class ImportarComponent implements OnInit {
           } else {
             return await [];
           }
-          console.log('productos: ', productos);
           return await productos;
         case 'exel':
           // Carga de todos los Productos

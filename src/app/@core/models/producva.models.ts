@@ -1,4 +1,4 @@
-export interface IProductCva {
+export class ProductCva {
   clave: string;
   codigo_fabricante: string;
   descripcion: string;
