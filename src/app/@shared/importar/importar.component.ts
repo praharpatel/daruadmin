@@ -241,22 +241,6 @@ export class ImportarComponent implements OnInit {
     return almacenesCt;
   }
 
-  async getCvaAlmacenes(supplier: ISupplier): Promise<any> {
-    return [];
-    // const ApiSelect = this.apis.filter(api => api.return === 'sucursales');
-    // if (ApiSelect.length > 0) {
-    //   return await this.getCatalogoX(supplier, ApiSelect[0])
-    //     .then(
-    //       async (result) => {
-    //         return await result;
-    //       }
-    //     )
-    //     .catch((error: Error) => {
-    //       infoEventAlert('No es posible importar el catalogo.', error.message, TYPE_ALERT.ERROR);
-    //     });
-    // }
-  }
-
   async onOpenModalProduct(products: [Product]) {
     this.apiName = '';
     this.stockMinimo = 10;
@@ -1197,14 +1181,14 @@ export class ImportarComponent implements OnInit {
           }
           if (disponible >= this.stockMinimo) {                         // Si hay mas de 10 elementos disponibles
             // Si hay promociones en los almacenes ocupa el primero y asigna el total de disponibilidad
-            if (item.almacenes[0].promocion) {
+            if (item.almacenes[0].promociones[0]) {
               featured = true;
               promo.clave_promocion = '';
               promo.descripcion_promocion = 'Producto con Descuento';
-              promo.inicio_promocion = item.almacenes[0].promocion.vigente.ini;
-              promo.vencimiento_promocion = item.almacenes[0].promocion.vigente.fin;
-              promo.disponible_en_promocion = item.almacenes[0].promocion.precio;
-              salePrice = item.almacenes[0].promocion.precio;
+              promo.inicio_promocion = item.almacenes[0].promociones[0].vigente.ini;
+              promo.vencimiento_promocion = item.almacenes[0].promociones[0].vigente.fin;
+              promo.disponible_en_promocion = item.almacenes[0].promociones[0].precio;
+              salePrice = item.almacenes[0].promociones[0].precio;
               itemData.promociones = promo;
             }
             itemData.id = productJson.clave;
