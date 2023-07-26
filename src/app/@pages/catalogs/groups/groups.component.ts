@@ -13,6 +13,7 @@ import { TablePaginationService } from 'src/app/@shared/table-pagination/table-p
 import { ImportarComponent } from '@shared/importar/importar.component';
 import { ISupplier } from '@core/interfaces/supplier.interface';
 import { Catalog } from '@core/models/catalog.models';
+import { ICatalog } from '@core/interfaces/catalog.interface';
 
 @Component({
   selector: 'app-groups',
@@ -33,7 +34,7 @@ export class GroupsComponent implements OnInit {
   nextId: string;
   title = 'Catálogo de Grupos';
   mostrarImport = true;
-  importados: [Catalog];
+  importados: [ICatalog];
 
   @ViewChild('mdCaptureCat') modal: CaptureCatComponent;
   @ViewChild('mdImportCat') modalImport: ImportarComponent;
@@ -164,7 +165,7 @@ export class GroupsComponent implements OnInit {
     }
   }
 
-  private addCatalog(catalog: Catalog) {
+  private addCatalog(catalog: ICatalog) {
     this.groupsService.add(catalog).subscribe(
       (res: any) => {
         if (res.status) {
@@ -187,7 +188,7 @@ export class GroupsComponent implements OnInit {
     }
   }
 
-  private addListCatalog(groups: [Catalog], supplier: ISupplier) {
+  private addListCatalog(groups: [ICatalog], supplier: ISupplier) {
     this.groupsService.addList(groups, supplier).subscribe(
       (res: any) => {
         if (res.status) {
@@ -203,7 +204,7 @@ export class GroupsComponent implements OnInit {
     );
   }
 
-  private updateCatalog(catalog: Catalog) {
+  private updateCatalog(catalog: ICatalog) {
     if (catalog.description !== '') {
       this.groupsService.update(catalog).subscribe(
         (res: any) => {

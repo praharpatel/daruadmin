@@ -3,6 +3,7 @@ import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angu
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { IResultData } from '@core/interfaces/result-data.interface';
 import { IApis, IParameters, ISupplier } from '@core/interfaces/supplier.interface';
+import { IAlmacen, IAlmacenes, IProductoCt, IPromocion } from '@core/interfaces/suppliers/ct.interface';
 import { AddCatalog, Catalog, SupplierCat } from '@core/models/catalog.models';
 import {
   AddProduct, Brands, Categorys, Picture, Product, UnidadDeMedida, BranchOffices,
@@ -202,7 +203,7 @@ export class ImportarComponent implements OnInit {
   }
 
 
-  async getProducts() {
+  async getProductsCt() {
     const productsCt = await this.getProd()
       .then(
         async (result) => {
@@ -241,18 +242,19 @@ export class ImportarComponent implements OnInit {
   }
 
   async getCvaAlmacenes(supplier: ISupplier): Promise<any> {
-    const ApiSelect = this.apis.filter(api => api.return === 'sucursales');
-    if (ApiSelect.length > 0) {
-      return await this.getCatalogo(supplier, ApiSelect[0])
-        .then(
-          async (result) => {
-            return await result;
-          }
-        )
-        .catch((error: Error) => {
-          infoEventAlert('No es posible importar el catalogo.', error.message, TYPE_ALERT.ERROR);
-        });
-    }
+    return [];
+    // const ApiSelect = this.apis.filter(api => api.return === 'sucursales');
+    // if (ApiSelect.length > 0) {
+    //   return await this.getCatalogoX(supplier, ApiSelect[0])
+    //     .then(
+    //       async (result) => {
+    //         return await result;
+    //       }
+    //     )
+    //     .catch((error: Error) => {
+    //       infoEventAlert('No es posible importar el catalogo.', error.message, TYPE_ALERT.ERROR);
+    //     });
+    // }
   }
 
   async onOpenModalProduct(products: [Product]) {
@@ -307,9 +309,11 @@ export class ImportarComponent implements OnInit {
               let i = 0;
               item.suppliersCat.forEach(element => {
                 i += 1;
-                if (element.idProveedor === supplier) {
-                  element.id = i;
-                  dataSupplier.push(element);
+                if (element) {
+                  if (element.idProveedor === supplier) {
+                    element.id = i;
+                    dataSupplier.push(element);
+                  }
                 }
               });
             }
@@ -391,532 +395,264 @@ export class ImportarComponent implements OnInit {
   async onEjecutarAPI() {
     if (this.apiSelect.type !== 'products') {
       loadData('Importando el catalogo', 'Esperar la carga del catalogo.');
-      return await this.getCatalogo(this.supplier, this.apiCatalog)
-        .then(
-          async (result) => {
-            this.dataSupplier = result;
-            // Si hay elementos del proveedor.
-            if (this.dataSupplier.length > 0) {
-              this.habilitaGuardar = true;
-              // Revisar en todos los elementos del proveedor
-              this.dataSupplier.forEach(itemSupplier => {
-                // Revisar en todos los elementos del catalogo interno
-                this.data.forEach(item => {
-                  // Si el elemento es igual al del proveedor
-                  let itemName = '';
-                  let itemSlug = '';
-                  switch (this.supplier.slug) {
-                    case 'cva':
-                      itemName = itemSupplier.description.toUpperCase();
-                      itemSlug = slugify(itemSupplier.description, { lower: true });
-                      break;
-                    case 'syscom':
-                      if (typeof itemSupplier.id === 'string') {
-                        itemName = itemSupplier.id.toUpperCase();
-                        itemSlug = slugify(itemSupplier.id, { lower: true });
-                      }
-                      break;
-                    case 'exel':
-                      itemName = itemSupplier.descripcion.toUpperCase();
-                      itemSlug = slugify(itemSupplier.descripcion, { lower: true });
-                      break;
-                    default:
-                      break;
-                  }
-                  if (item.slug.toUpperCase() === itemName) {
-                    const supplierCat = new SupplierCat();
-                    // Inicializar el nombre del proveedor.
-                    supplierCat.idProveedor = this.supplier.slug;
-                    supplierCat.name = itemName;
-                    supplierCat.slug = itemSlug;
-                    // Si ya existe un proveedor en el elemento.
-                    if (item.suppliersCat.length > 0) {
-                      if (item.suppliersCat[0].idProveedor !== '') {
-                        item.suppliersCat.forEach(supplier => {
-                          // Si el proveedor actual existe en catalogo de datos.
-                          if (supplier.idProveedor === this.supplier.slug) {
-                            supplier.name = supplierCat.name;
-                            supplier.slug = supplierCat.slug;
-                          } else {
-                            // Si el proveedor no existe, lo agrega.
-                            item.suppliersCat = [];
-                            item.suppliersCat.push(supplierCat);
-                          }
-                        });
-                      } else {
-                        // Si el proveedor no existe, lo agrega.
-                        item.suppliersCat = [];
-                        item.suppliersCat.push(supplierCat);
-                      }
-                    }
-                  }
-                });
-              });
+      const brandsSupplier = await this.getCatalogSupplier(this.supplier.slug, this.apiCatalog);
+      if (brandsSupplier) {
+        this.dataSupplier = brandsSupplier;
+        this.habilitaGuardar = true;
+        // Revisar en todos los elementos del proveedor
+        this.dataSupplier.forEach(itemSupplier => {
+          // Revisar en todos los elementos del catalogo interno
+          this.data.forEach(item => {
+            // Si el elemento es igual al del proveedor
+            let itemName = '';
+            let itemSlug = '';
+            switch (this.supplier.slug) {
+              case 'cva':
+                itemName = itemSupplier.description.toUpperCase();
+                itemSlug = slugify(itemSupplier.description, { lower: true });
+                break;
+              case 'syscom':
+                if (typeof itemSupplier.id === 'string') {
+                  itemName = itemSupplier.id.toUpperCase();
+                  itemSlug = slugify(itemSupplier.id, { lower: true });
+                }
+                break;
+              case 'exel':
+                itemName = itemSupplier.descripcion.toUpperCase();
+                itemSlug = slugify(itemSupplier.descripcion, { lower: true });
+                break;
+              default:
+                break;
             }
-            closeAlert();
-          }
-        )
-        .catch((error: Error) => {
-          infoEventAlert('No es posible importar el catalogo.', error.message, TYPE_ALERT.ERROR);
+            if (item.slug.toUpperCase() === itemName) {
+              const supplierCat = new SupplierCat();
+              // Inicializar el nombre del proveedor.
+              supplierCat.idProveedor = this.supplier.slug;
+              supplierCat.name = itemName;
+              supplierCat.slug = itemSlug;
+              // Si ya existe un proveedor en el elemento.
+              if (item.suppliersCat.length > 0) {
+                if (item.suppliersCat[0].idProveedor !== '') {
+                  item.suppliersCat.forEach(supplier => {
+                    // Si el proveedor actual existe en catalogo de datos.
+                    if (supplier.idProveedor === this.supplier.slug) {
+                      supplier.name = supplierCat.name;
+                      supplier.slug = supplierCat.slug;
+                    } else {
+                      // Si el proveedor no existe, lo agrega.
+                      item.suppliersCat = [];
+                      item.suppliersCat.push(supplierCat);
+                    }
+                  });
+                } else {
+                  // Si el proveedor no existe, lo agrega.
+                  item.suppliersCat = [];
+                  item.suppliersCat.push(supplierCat);
+                }
+              }
+            }
+          });
         });
+        closeAlert();
+      } else {
+        infoEventAlert('No es posible importar el catalogo.', TYPE_ALERT.ERROR);
+        closeAlert();
+      }
     } else {
       if (this.catalogValues.length > 0 || this.supplier.slug === 'ct' ||
         this.supplier.slug === 'ingram' || this.supplier.slug === 'exel') {
         loadData('Importando los productos', 'Esperar la carga de los productos.');
-        return await this.getCatalogoAllBrands(this.supplier, this.apiSelect, this.catalogValues)
-          .then(
-            async (result) => {
-              this.dataSupplier = result;
-              if (this.dataSupplier) {
-                if (this.dataSupplier.length > 0) {
-                  this.habilitaGuardar = true;
-                  this.dataExport = [];
-                  // Setear dataExport
-                  this.dataSupplier.forEach(item => {
-                    const newItemExport = new ProductExport();
-                    newItemExport.slug = item.slug;
-                    newItemExport.brand = item.brand;
-                    newItemExport.partnumber = item.partnumber;
-                    newItemExport.sku = item.sku;
-                    newItemExport.upc = item.upc;
-                    this.dataExport.push(newItemExport);
-                  });
-                } else {
-                  basicAlert(TYPE_ALERT.WARNING, 'No se encontraron productos.');
-                }
-              }
-              closeAlert();
-            }
-          )
-          .catch((error: Error) => {
-            infoEventAlert(error.message, '', TYPE_ALERT.ERROR);
-          });
+        const productos = await this.getProducts(this.supplier, this.apiSelect, this.catalogValues);
+        if (productos) {
+          if (productos.length > 0) {
+            this.habilitaGuardar = true;
+            this.dataExport = [];
+            // Setear dataExport
+            productos.forEach(item => {
+              const newItemExport = new ProductExport();
+              newItemExport.slug = item.slug;
+              newItemExport.brand = item.brand;
+              newItemExport.partnumber = item.partnumber;
+              newItemExport.sku = item.sku;
+              newItemExport.upc = item.upc;
+              this.dataExport.push(newItemExport);
+            });
+          } else {
+            basicAlert(TYPE_ALERT.WARNING, 'No se encontraron productos.');
+          }
+        }
+        this.dataSupplier = productos;
+        closeAlert();
+        return this.dataSupplier;
+
       } else {
         basicAlert(TYPE_ALERT.WARNING, 'No existen elementos para buscar.');
       }
     }
   }
+
   //#endregion
 
-  async getCatalogo(supplier: ISupplier, apiSelect: IApis, forCatalog: boolean = false): Promise<any> {
-    // Cuando la consulta externa no requiere token
-    const catalogValues: Catalog[] = [];
-    const data = [];
-    if (!supplier.token) {
-      switch (supplier.slug) {
-        case 'cva':
-          return await this.externalAuthService.getCatalogXML(supplier, apiSelect, this.valorSearch.id)
-            .then(
-              async result => {
-                try {
-                  if (result) {
-                    if (result[0].message) {                                        // Verifica si hay un error en la respuesta.
-                      const errorArray = result[0].message.split('.');
-                      if (errorArray[0] === 'Non-whitespace before first tag') {
-                        throw new Error('El servicio no se encuentra disponible por favor intentalo mas tarde');
-                      }
-                    }
-                    // Hay una demora en el catálogo de grupos2.xml y se eusará grupos.xml
-                    if (apiSelect.operation === 'grupos.xml') {
-                      result.forEach(async item => {
-                        const itemData = new Catalog();
-                        if (forCatalog) {
-                          itemData.id = item.clave;
-                          itemData.description = item.descripcion;
-                          this.catalogValues.push(itemData);
-                        } else {
-                          itemData.id = item;
-                          itemData.description = item;
-                          data.push(itemData);
-                        }
-                      });
-                      return await data;
-                    } else if (apiSelect.operation === 'sucursales.xml') {
-                      return await result;
-                    } else {
-                      result.forEach(async item => {
-                        const itemData = new Catalog();
-                        itemData.id = item.clave;
-                        itemData.description = item.descripcion;
-                        if (forCatalog) {
-                          this.catalogValues.push(itemData);
-                        } else {
-                          data.push(itemData);
-                        }
-                      });
-                      return await data;
-                    }
-                  }
-                } catch (error) {
-                  throw await new Error(error.message);
-                }
-              }, error => {
-                basicAlert(TYPE_ALERT.ERROR, error.message);
-              }
-            );
-        case 'exel':
-          return await this.externalAuthService.getCatalogSOAP(supplier, apiSelect, this.valorSearch.id)
-            .then(
-              async result => {
-                try {
-                  if (result) {
-                    return await result;
-                  }
-                } catch (error) {
-                  throw await new Error(error.message);
-                }
-              }
-            );
-        default:
-          break;
-      }
-    } else {
-      switch (supplier.slug) {
-        case 'syscom':
-          return this.externalAuthService.getToken(supplier)
-            .then(
-              async result => {
-                this.token = result.access_token;
-                if (this.token) {
-                  let productos: Product[] = [];
-                  const catalogos: Catalog[] = [];
-                  const resultado = await this.externalAuthService.getSyscomCatalog(supplier, apiSelect, this.token, this.valorSearch.id)
-                    .then(
-                      // tslint:disable-next-line: no-shadowed-variable
-                      async result => {
-                        switch (apiSelect.operation) {
-                          case 'productos':                                 // Syscom
-                            result.productos.forEach(item => {
-                              let itemData = new Product();
-                              itemData = this.setProduct(supplier.slug, item);
-                              productos.push(itemData);
-                            });
-                            return await productos;
-                          case 'existencia/promociones':                    // CT
-                            result.forEach(item => {
-                              const itemData = new Catalog();
-                              itemData.id = item.codigo;
-                              itemData.description = item.codigo;
-                              catalogos.push(itemData);
-                            });
-                            return await catalogos;
-                          default:
-                            if (forCatalog) {
-                              let i = 0;
-                              result.forEach(res => {
-                                i += 1;
-                                res.description = res.nombre;
-                                catalogos.push(res);
-                              });
-                              return await catalogos;
-                            } else {
-                              productos = result;
-                              return await productos;
-                            }
-                        }
-                      },
-                      error => {
-                        basicAlert(TYPE_ALERT.ERROR, 'Error al obtener los productos: (' + error.message + ')');
-                      }
-                    );
-                  return await resultado;
-                } else {
-                  basicAlert(TYPE_ALERT.WARNING, 'No se encontró el Token de Autorización.');
-                }
-              },
-              error => {
-                basicAlert(TYPE_ALERT.ERROR, error.message);
-              }
-            );
-        default:
-          break;
-      }
-    }
-  }
+  async getCatalogSupplier(supplier: string, apiSelect: IApis, forCatalog: boolean = false): Promise<Catalog[]> {
+    const data: Catalog[] = [];
 
-  async getCatalogoAllBrands(supplier: ISupplier, apiSelect: IApis, catalogValues: Catalog[]): Promise<any> {
-    // Cuando la consulta externa no requiere token
-    if (!supplier.token) {
-      const productos: Product[] = [];
-      let resultados;
-      switch (supplier.slug) {
-        case 'cva':
-          // Carga de Productos
-          this.cvaAlmacenes = await this.getCvaAlmacenes(supplier);
-          resultados = await this.externalAuthService.getCatalogXMLAllBrands(supplier, apiSelect, this.valorSearch.id, catalogValues)
-            .then(async result => {
-              if (result.length > 0) {
-                try {
-                  let i = 0;
-                  if (result[0].message) {
-                    const errorArray = result[0].message.split('.');
-                    if (errorArray[0] === 'Non-whitespace before first tag') {
-                      throw new Error('El servicio no se encuentra disponible por favor intentalo mas tarde');
-                    }
-                  }
-                  result.forEach(item => {
-                    i += 1;
-                    if (!item.id) {
-                      item.id = i;
-                    }
-                    let itemData = new Product();
-                    itemData = this.setProduct(supplier.slug, item);
-                    if (itemData.id !== undefined) {
-                      productos.push(itemData);
-                    }
-                  });
-                  return await productos;
-                } catch (error) {
-                  throw await new Error(error.message);
-                }
-              }
-              return await [];
-            })
-            .catch(async (error: Error) => {
-              throw await new Error(error.message);
-            });
-          return await resultados;
-        case 'exel':
-          // Carga de todos los Productos
-          resultados = await this.externalAuthService.getCatalogSOAP(supplier, apiSelect, this.valorSearch.id)
-            .then(async result => {
-              if (result.length === undefined) {
-                if (result.message === 'Expected property name or \'}\' in JSON at position 1') {
-                  throw await new Error('Bloqueado acceso al WS por exceder cantidad de Accesos');
-                } else {
-                  throw await new Error('Error de Conexion.');
-                }
-              }
-              if (result.length > 0) {
-                try {
-                  // Api para Cargar Precios y Disponibilidad
-                  let apiPrecio: IApis;
-                  supplier.apis.forEach(api => {
-                    if (api.type === 'precios') {
-                      apiPrecio = api;
-                    }
-                  });
-                  // Api para Cargar Imagenes
-                  let apiImagenes: IApis;
-                  supplier.apis.forEach(api => {
-                    if (api.type === 'imagenes') {
-                      apiImagenes = api;
-                    }
-                  });
-                  // Cargar todas las imagenes de los productos.
-                  const imagenes = await this.externalAuthService.getCatalogSOAP(supplier, apiImagenes, this.valorSearch.id)
-                    // tslint:disable-next-line: no-shadowed-variable
-                    .then(async result => {
-                      try {
-                        return await result;
-                      } catch (error) {
-                        throw await new Error(error.message);
-                      }
-                    })
-                    .catch(async (error: Error) => {
-                      throw await new Error(error.message);
-                    });
-                  let i = 0;
-                  // Obtener el codigo, existencia y precios de los productos de 80 en 80
-                  let codigos = '';
-                  const arrayCodigos = [];
-                  for (const item of result) {
-                    i += 1;
-                    if (i <= 100) {
-                      codigos += '<string>' + item.codigo_proveedor.trimRight() + '</string>';
-                    } else {
-                      await arrayCodigos.push(codigos);
-                      i = 0;
-                      codigos = '';
-                    }
-                  }
-                  // Crear un arreglo general de todos los precios
-                  const preciosExistencias = [];
-                  let k = 0;
-                  // tslint:disable-next-line: no-shadowed-variable
-                  for (const codigos of arrayCodigos) {
-                    k += 1;
-                    if (k <= 20) {            // -80/2665 Ok
-                      const codigoProveedor = '<Codigos>' + codigos.trimRight() + '</Codigos>';
-                      await this.externalAuthService.getCatalogSOAP(
-                        supplier, apiPrecio, this.valorSearch.id, codigoProveedor)
-                        .then(async resultPricEx => {
-                          if (resultPricEx.length > 0) {
-                            resultPricEx.forEach(element => {
-                              // Solo ocupa los productos que tengan existencia.
-                              if (parseInt(element.existencia, 10) > 0) {
-                                preciosExistencias.push(element);
-                              }
-                            });
-                          }
-                        })
-                        .catch(async (error: Error) => {
-                          throw new Error(error.message);
-                        });
-                    }
-                  }
-                  // Iniciar para cada producto de 100 en 100
-                  result.forEach(item => {
-                    // Recupera las imagenes del producto
-                    const imagenesProd = imagenes.filter(image =>
-                      image.id_producto === item.id_producto);
-                    // Recupera los precios y disponibles del producto
-                    const preciosExistenciasProd = preciosExistencias.filter(precio =>
-                      precio.id_producto === item.id_producto);
-                    if (preciosExistenciasProd.length > 0) {
-                      let precioMax = 0;
-                      let existencia = 0;
-                      // Calcula el precio maximo y las existencias
-                      preciosExistenciasProd.forEach(element => {
-                        existencia += parseInt(element.existencia, 0);
-                        if (precioMax <= parseFloat(element.precio)) {
-                          precioMax = parseFloat(element.precio);
-                        }
-                      });
-                      if (existencia >= this.stockMinimo) {
-                        let itemData = new Product();
-                        item.stock = existencia;
-                        item.precioLista = precioMax;
-                        itemData = this.setProduct(supplier.slug, item, preciosExistenciasProd, imagenesProd);
-                        productos.push(itemData);
-                      }
-                    }
-                  });
-                  return await productos;
-                } catch (error) {
-                  throw await new Error(error.message);
-                }
-              }
-              return await [];
-            })
-            .catch(async (error: Error) => {
-              throw await new Error(error.message);
-            });
-          return await resultados;
-        default:
-          break;
-      }
-    } else {                                                                  // Syscom, CT, Ingram
-      return await this.externalAuthService.getToken(supplier)
-        .then(
-          async result => {
-            switch (supplier.slug) {
-              case 'ct':
-                this.token = result.token;
-                break;
-              case 'syscom':
-                this.token = result.access_token;
-                break;
-              case 'ingram':
-                this.token = result.access_token;
-                break;
-              default:
-                break;
+    switch (supplier) {
+      case 'cva':
+        try {
+          if (apiSelect.operation === 'grupos.xml') {
+            const catalogo = await this.externalAuthService.getGroupsCva();
+            let i = 1;
+            for (const item of catalogo.listGroupsCva) {
+              data.push({ id: i.toString(), description: item.grupo, slug: item.grupo });
+              i += 1;
             }
-            if (this.token) {
-              const productos: Product[] = [];
-              if (supplier.slug === 'ct') {
-                this.ctAlmacenes = await this.getAlmacenes();
-              }
-              // Carga de Productos
-              const resultados = await this.externalAuthService.getSyscomCatalogAllBrands(supplier, apiSelect, this.token, catalogValues)
-                // tslint:disable-next-line: no-shadowed-variable
-                .then(async result => {
-                  try {
-                    if (result.length > 0) {
-                      if (supplier.slug === 'ct') {
-                        // Carga de Precios y Disponibilidad
-                        const productsJson = await this.getProducts();
-                        result.forEach(item => {
-                          productsJson.forEach(productJson => {
-                            if (item.codigo === productJson.clave) {
-                              let itemData = new Product();
-                              itemData = this.setProduct(supplier.slug, item, productJson);
-                              if (itemData.id !== undefined) {
-                                productos.push(itemData);
-                              }
-                            }
-                          });
-                        });
-                      } else if (supplier.slug === 'ingram') {
-                        const rows = Object.values(result).slice(0, -1);
-                        // tslint:disable-next-line: forin
-                        for (const idR in rows) {
-                          const item = result[idR];
-                          let itemData = new Product();
-                          itemData = this.setProduct(supplier.slug, item);
-                          if (itemData.id !== undefined) {
-                            productos.push(itemData);
-                          }
-                        }
-                      } else {
-                        result.forEach(item => {
-                          let itemData = new Product();
-                          itemData = this.setProduct(supplier.slug, item);
-                          if (itemData.id !== undefined) {
-                            productos.push(itemData);
-                          }
-                        });
-                      }
-                    }
-                    return await productos;
-                  } catch (error) {
-                    throw await new Error(error.message);
-                  }
-                });
-              return await resultados;
+            return data;
+          } else if (apiSelect.operation === 'soluciones.xml') {
+            const catalogo = await this.externalAuthService.getSolucionesCva();
+            return catalogo.listSolucionesCva;
+          } else if (apiSelect.operation === 'sucursales.xml') {
+            const catalogo = await this.externalAuthService.getSucursalesCva();
+            return catalogo.listSucursalesCva;
+          } else if (apiSelect.operation === 'marcas2.xml') {
+            const catalogo = await this.externalAuthService.getBrandsCva();
+            const catalogValues: Catalog[] = catalogo.listBrandsCva.map(item => ({
+              id: item.clave,
+              description: item.descripcion
+            }));
+            if (forCatalog) {
+              this.catalogValues.push(...catalogValues);
             } else {
-              basicAlert(TYPE_ALERT.WARNING, 'No se encontró el Token de Autorización.');
+              data.push(...catalogValues);
             }
-          },
-          error => {
-            basicAlert(TYPE_ALERT.ERROR, error.message);
+            return data;
           }
-        );
+        } catch (error) {
+          throw new Error(error.message);
+        }
+        break;
+      case 'exel':
+      case 'syscom':
+      default:
+        break;
+    }
+
+    return data;
+  }
+
+  async getProducts(supplier: ISupplier, apiSelect: IApis, catalogValues: Catalog[]): Promise<any> {
+    const productos: Product[] = [];
+    let resultados;
+    switch (supplier.slug) {
+      case 'cva':
+        // Carga de Productos
+        const almacenes = await this.externalAuthService.getSucursalesCva();
+        if (almacenes.status && almacenes.listSucursalesCva.length > 0) {
+          this.cvaAlmacenes = almacenes.listSucursalesCva;
+          const productosCva = await this.externalAuthService.getProductsCva();
+          let i = 1;
+          for (const product of productosCva.listProductsCva) {
+            let itemData = new Product();
+            product.id = i;
+            itemData = this.setProduct(supplier.slug, product);
+            if (itemData.id !== undefined) {
+              productos.push(itemData);
+            }
+            i += 1;
+          }
+        } else {
+          return await [];
+        }
+        return await productos;
+      case 'ct':
+        if (supplier.slug === 'ct') {
+          this.ctAlmacenes = await this.getAlmacenes();
+          const productosCt = await this.externalAuthService.getProductsCt();
+          if (productosCt.status) {
+            const productsJson = await this.getProductsCt();
+            let i = 1;
+            for (const product of productosCt.stockProductsCt) {
+              productsJson.forEach(productJson => {
+                if (product.codigo === productJson.clave) {
+                  const productTmp: IProductoCt = this.convertirPromocion(product);
+                  const itemData: Product = this.setProduct(supplier.slug, productTmp, productJson);
+                  if (itemData.id !== undefined) {
+                    productos.push(itemData);
+                  }
+                }
+              });
+            }
+          }
+        } else {
+          return await [];
+        }
+        return await productos;
+      default:
+        break;
     }
   }
 
-  getAlmacenCant(x): BranchOffices {
-    const almacen = new BranchOffices();
-    Object.keys(x).forEach((branch, index) => {
-      const almacenEstado = this.getCtAlmacenes(branch);
-      almacen.id = almacenEstado.id;
-      almacen.name = almacenEstado.Sucursal;
-      almacen.estado = almacenEstado.Estado;
-      almacen.cp = almacenEstado.CP;
-      almacen.latitud = almacenEstado.latitud;
-      almacen.longitud = almacenEstado.longitud;
-      almacen.cantidad = x[branch];
-      // Si el dato es un objeto entonces viene una promocion.
-      if (typeof x[branch] === 'object') {
-        const promoBranch = x[branch];
-        const promocion = new PromocionBranchOffice();
-        // Divide la promocion en precio y vencia
-        Object.keys(promoBranch).forEach((promo, indexY) => {
-          if (indexY === 0) {
-            promocion.price = parseFloat(promoBranch[promo]);
-          } else if (indexY === 1) {
-            const vigencia = promoBranch[promo];
-            const vigente = new Vigente();
-            // Divide la vigencia en inicio y fin.
-            Object.keys(vigencia).forEach((vig, indexZ) => {
-              if (indexZ === 0) {
-                vigente.ini = vigencia[vig];
-              } else if (indexZ === 1) {
-                vigente.fin = vigencia[vig];
-              }
-            });
-            promocion.vigente = vigente;
+  convertirPromocion(product: IProductoCt): IProductoCt {
+    try {
+      const data = product;
+
+      const almacenes: IAlmacenes[] = data.almacenes.map((almacenData: any) => {
+        const almacenPromocion = almacenData.almacenPromocion[0];
+
+        const promocionString = almacenPromocion ? almacenPromocion.promocionString : null;
+
+        let promocionObj: IPromocion = null;
+        if (promocionString) {
+          const promocionData = JSON.parse(promocionString).promocion;
+          if (promocionData) {
+            promocionObj = {
+              precio: promocionData.precio || 0,
+              vigente: {
+                ini: promocionData.vigente ? promocionData.vigente.ini : '',
+                fin: promocionData.vigente ? promocionData.vigente.fin : '',
+              },
+            };
           }
-        });
-        almacen.promocionBranchOffice = promocion;
-      }
-    });
+        }
+
+        const almacenObj: IAlmacen = {
+          key: almacenPromocion ? almacenPromocion.key : '',
+          value: almacenPromocion ? almacenPromocion.value : 0,
+        };
+
+        return {
+          promociones: promocionObj ? [promocionObj] : [],
+          almacen: almacenObj,
+        };
+      });
+
+      const producto: IProductoCt = {
+        precio: data.precio,
+        moneda: data.moneda,
+        almacenes,
+        codigo: data.codigo,
+      };
+
+      return producto;
+    } catch (error) {
+      console.error('Error al convertir el objeto JSON:', error);
+      return null;
+    }
+  }
+
+  getAlmacenCant(branch): BranchOffices {
+    const almacen = new BranchOffices();
+    const almacenEstado = this.getCtAlmacenes(branch.almacen.key);
+    almacen.id = almacenEstado.id;
+    almacen.name = almacenEstado.Sucursal;
+    almacen.estado = almacenEstado.Estado;
+    almacen.cp = almacenEstado.CP;
+    almacen.latitud = almacenEstado.latitud;
+    almacen.longitud = almacenEstado.longitud;
+    almacen.cantidad = branch.almacen.value;
     return almacen;
   }
 
   getCtAlmacenes(id: string): any {
-    // tslint:disable-next-line: no-shadowed-variable
     const almacen = this.ctAlmacenes.filter(almacen => almacen.id === id);
     if (almacen.length > 0) {
       const sucursal = almacen.map(element => element);
@@ -1379,15 +1115,15 @@ export class ImportarComponent implements OnInit {
             itemData.name = item.descripcion;
             itemData.slug = slugify(item.descripcion, { lower: true });
             itemData.short_desc = item.clave + '. Grupo: ' + item.grupo;
-            itemData.price = parseFloat(item.precio);
+            itemData.price = parseFloat(item.precio) * 1.50;
             itemData.review = 0;
             itemData.ratings = 0;
             itemData.until = this.getFechas(new Date());
             itemData.top = false;
             if (item.PrecioDescuento !== 'Sin Descuento') {
-              desc.total_descuento = item.TotalDescuento === '' ? 0 : parseFloat(item.TotalDescuento);
+              desc.total_descuento = item.TotalDescuento === '' ? 0 : parseFloat(item.TotalDescuento) * 1.50;
               desc.moneda_descuento = item.MonedaDescuento;
-              desc.precio_descuento = item.PrecioDescuento === '' ? 0 : parseFloat(item.PrecioDescuento);
+              desc.precio_descuento = item.PrecioDescuento === '' ? 0 : parseFloat(item.PrecioDescuento) * 1.50;
               salePrice = desc.precio_descuento;
             }
             itemData.descuentos = desc;
@@ -1396,7 +1132,7 @@ export class ImportarComponent implements OnInit {
               promo.clave_promocion = item.ClavePromocion;
               promo.descripcion_promocion = item.DescripcionPromocion;
               promo.vencimiento_promocion = item.VencimientoPromocion;
-              promo.disponible_en_promocion = item.DisponibleEnPromocion === '' ? 0 : parseFloat(item.DisponibleEnPromocion);
+              promo.disponible_en_promocion = item.DisponibleEnPromocion === '' ? 0 : parseFloat(item.DisponibleEnPromocion) * 1.50;
             }
             itemData.sale_price = salePrice;
             itemData.promociones = promo;
@@ -1425,7 +1161,7 @@ export class ImportarComponent implements OnInit {
             // SupplierProd
             s.idProveedor = proveedor;
             s.codigo = item.clave;
-            s.price = parseFloat(item.precio);
+            s.price = parseFloat(item.precio) * 1.50;
             s.moneda = 'MXN';
             s.branchOffices = branchOffices;
             itemData.suppliersProd = s;
@@ -1454,11 +1190,11 @@ export class ImportarComponent implements OnInit {
         if (item.almacenes.length > 0) {
           const branchOfficesCt: BranchOffices[] = [];
           let featured = false;
-          item.almacenes.forEach(element => {
+          for (const element of item.almacenes) {
             const almacen = this.getAlmacenCant(element);
             disponible += almacen.cantidad;
             branchOfficesCt.push(almacen);
-          });
+          }
           if (disponible >= this.stockMinimo) {                         // Si hay mas de 10 elementos disponibles
             // Si hay promociones en los almacenes ocupa el primero y asigna el total de disponibilidad
             if (item.almacenes[0].promocion) {
@@ -1476,10 +1212,10 @@ export class ImportarComponent implements OnInit {
             itemData.slug = slugify(productJson.nombre, { lower: true });
             itemData.short_desc = productJson.descripcion_corta;
             if (item.moneda === 'USD') {
-              itemData.price = parseFloat((parseFloat(item.precio) * this.exchangeRate).toFixed(2));
-              itemData.sale_price = parseFloat((salePrice * this.exchangeRate).toFixed(2));
+              itemData.price = parseFloat((parseFloat(item.precio) * this.exchangeRate * 1.50).toFixed(2));
+              itemData.sale_price = parseFloat((salePrice * this.exchangeRate * 1.50).toFixed(2));
             } else {
-              itemData.price = parseFloat(item.precio);
+              itemData.price = parseFloat(item.precio) * 1.50;
               itemData.sale_price = salePrice;
             }
             itemData.review = 0;
@@ -1577,7 +1313,7 @@ export class ImportarComponent implements OnInit {
         // SupplierProd
         s.idProveedor = proveedor;
         s.codigo = item.id_producto;
-        s.price = parseFloat(item.precioLista);
+        s.price = parseFloat(item.precioLista) * 1.50;
         s.moneda = 'MXN';
         s.branchOffices = [];
         if (productJson.length > 0) {

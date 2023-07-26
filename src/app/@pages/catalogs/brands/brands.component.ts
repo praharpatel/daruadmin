@@ -13,6 +13,7 @@ import { TYPE_ALERT } from 'src/app/@shared/alert/values.config';
 import { optionsWithDetails } from 'src/app/@shared/alert/alerts';
 import { ISupplier } from '@core/interfaces/supplier.interface';
 import { Catalog } from '@core/models/catalog.models';
+import { ICatalog } from '@core/interfaces/catalog.interface';
 
 @Component({
   selector: 'app-brands',
@@ -33,7 +34,7 @@ export class BrandsComponent implements OnInit {
   nextId: string;
   title = 'Catálogo de Marcas';
   mostrarImport = true;
-  importados: [Catalog];
+  importados: [ICatalog];
 
   @ViewChild('mdCaptureCat') modal: CaptureCatComponent;
   @ViewChild('mdImportCat') modalImport: ImportarComponent;
@@ -162,7 +163,7 @@ export class BrandsComponent implements OnInit {
     }
   }
 
-  private addCatalog(catalog: Catalog) {
+  private addCatalog(catalog: ICatalog) {
     this.brandsService.add(catalog).subscribe(
       (res: any) => {
         if (res.status) {
@@ -185,7 +186,7 @@ export class BrandsComponent implements OnInit {
     }
   }
 
-  private addListCatalog(brands: [Catalog], supplier: ISupplier) {
+  private addListCatalog(brands: [ICatalog], supplier: ISupplier) {
     this.brandsService.addList(brands, supplier).subscribe(
       (res: any) => {
         if (res.status) {
@@ -201,7 +202,7 @@ export class BrandsComponent implements OnInit {
     );
   }
 
-  private updateCatalog(catalog: Catalog) {
+  private updateCatalog(catalog: ICatalog) {
     if (catalog.description !== '') {
       this.brandsService.update(catalog).subscribe(
         (res: any) => {

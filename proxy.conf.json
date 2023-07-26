@@ -1,27 +1,51 @@
 {
-  "/xl4.asmx" : {
+  "/xl4.asmx": {
     "target": "http://ws.exel.com.mx:8181",
-    "secure": false,
+    "secure": true,
     "changeOrigin": true
   },
-  "/oauth/oauth30/token" : {
+  "/oauth/oauth30/token": {
     "target": "https://api.ingrammicro.com:443/",
-    "secure": false,
+    "secure": true,
     "changeOrigin": true
   },
-  "/resellers/v6/catalog" : {
+  "/resellers/v6/catalog": {
     "target": "https://api.ingrammicro.com:443/sandbox/",
-    "secure": false,
+    "secure": true,
     "changeOrigin": true
   },
-  "/catalogo_clientes_xml/*" : {
+  "/catalogo_clientes_xml/*": {
     "target": "http://www.grupocva.com",
-    "secure": false,
+    "secure": true,
     "changeOrigin": true
   },
-  "/pedidos_web/*" : {
+  "/pedidos_web/*": {
     "target": "http://www.grupocva.com",
-    "secure": false,
+    "secure": true,
     "changeOrigin": true
+  },
+  "/cliente/*" : {
+    "target": "http://connect.ctonline.mx:3001/",
+    "secure": true,
+    "changeOrigin": true
+  },
+  "/existencia/*" : {
+    "target": "http://connect.ctonline.mx:3001/",
+    "secure": true,
+    "changeOrigin": true
+  },
+  "/paqueteria/*" : {
+    "target": "http://connect.ctonline.mx:3001/",
+    "secure": true,
+    "changeOrigin": true
+  },
+  "/pedido/*" : {
+    "target": "http://connect.ctonline.mx:3001/",
+    "secure": true,
+    "changeOrigin": true
+  },
+  "/graphql": {
+    "target": "http://189.253.186.95:8080",
+    "secure": false
   }
 }

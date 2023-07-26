@@ -11,6 +11,7 @@ import { TYPE_ALERT } from 'src/app/@shared/alert/values.config';
 import { CaptureCatComponent } from 'src/app/@shared/capture-cat/capture-cat.component';
 import { TablePaginationService } from 'src/app/@shared/table-pagination/table-pagination.service';
 import { Catalog } from '@core/models/catalog.models';
+import { ICatalog } from '@core/interfaces/catalog.interface';
 
 @Component({
   selector: 'app-models',
@@ -142,7 +143,7 @@ export class ModelsComponent implements OnInit {
     }
   }
 
-  private addCatalog(catalog: Catalog) {
+  private addCatalog(catalog: ICatalog) {
     this.modelsService.add(catalog).subscribe(
       (res: any) => {
         if (res.status) {
@@ -158,7 +159,7 @@ export class ModelsComponent implements OnInit {
     );
   }
 
-  private updateCatalog(catalog: Catalog) {
+  private updateCatalog(catalog: ICatalog) {
     if (catalog.description !== '') {
       this.modelsService.update(catalog).subscribe(
         (res: any) => {

@@ -1,14 +1,14 @@
 {
   "name": "skote-angular-vertical",
   "version": "0.1.0",
+  "homepage": "https://admin.daru.mx/",
   "scripts": {
     "ng": "ng",
     "start": "ng serve --proxy-config proxy.conf.json --open --port 4203",
     "build": "ng build --configuration production",
     "test": "ng test",
     "lint": "ng lint",
-    "e2e": "ng e2e",
-    "build-prod": "node --max_old_space_size=8000 ./node_modules/@angular/cli/bin/ng build --prod"
+    "e2e": "ng e2e"
   },
   "private": true,
   "dependencies": {
