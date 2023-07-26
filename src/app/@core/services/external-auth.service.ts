@@ -9,6 +9,8 @@ import { Apollo } from 'apollo-angular';
 import { ApiService } from '@graphql/services/api.service';
 import { BRANDSCVA_LIST_QUERY, GROUPSCVA_LIST_QUERY, PAQUETERIASCVA_LIST_QUERY, PRODUCTOSCVA_LIST_QUERY, SOLUCIONESCVA_LIST_QUERY, SUCURSALESCVA_LIST_QUERY } from '@graphql/operations/query/suppliers/cva';
 import { Catalog } from '@core/models/catalog.models';
+import { PRODUCTOSCT_LIST_QUERY } from '@graphql/operations/query/suppliers/ct';
+import { TOKENCT_FRAGMENT } from '@graphql/operations/fragment/suppliers/ct';
 
 declare const require;
 const xml2js = require('xml2js');
@@ -575,6 +577,20 @@ export class ExternalAuthService extends ApiService {
       this.get(PRODUCTOSCVA_LIST_QUERY, {}, {}).subscribe(
         (result: any) => {
           resolve(result.listProductsCva);
+        },
+        (error: any) => {
+          reject(error);
+        });
+    });
+  }
+  //#endregion
+
+  //#region CT
+  async getProductsCt(): Promise<any> {
+    return new Promise<any>((resolve, reject) => {
+      this.get(PRODUCTOSCT_LIST_QUERY, {}, {}).subscribe(
+        (result: any) => {
+          resolve(result.stockProductsCt);
         },
         (error: any) => {
           reject(error);
