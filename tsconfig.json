@@ -21,6 +21,9 @@
       "@shared/*": [
         "src/app/@shared/*"
       ],
+      "@pages/*": [
+        "src/app/pages/*"
+      ],
       "@uploads/*": [
         "src/assets/uploads/*"
       ]
