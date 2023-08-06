@@ -62,12 +62,12 @@ export const MENU: MenuItem[] = [
       {
         id: 1,
         label: 'Openpay',
-        link: '/openpay',
+        link: '/charges/openpay/list',
         parentId: 5
       },{
         id: 2,
         label: 'Stripe',
-        link: '/stripe',
+        link: '/charges/stripe/list',
         parentId: 5
       },
     ]

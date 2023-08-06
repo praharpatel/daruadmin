@@ -1,8 +1,9 @@
 <div class="container-fluid">
 
   <!-- start page title -->
-  <!-- <app-page-title title="Invoice List" [breadcrumbItems]="breadCrumbItems"></app-page-title> -->
+  <app-page-title title="Ventas" [breadcrumbItems]="breadCrumbItems"></app-page-title>
   <!-- end page title -->
+  <h2>Lista de Ventas</h2>
 
   <div class="row">
     <div class="card">
@@ -10,11 +11,11 @@
         <div class="row">
           <div class="col-lg-4">
             <div class="text-lg-center">
+              <a routerLink="/sales/detail" class="d-block text-primary text-decoration-underline mb-2">Venta Link</a>
             </div>
           </div>
           <div class="col-lg-8">
             <div>
-              <a routerLink="/sales/detail" class="d-block text-primary text-decoration-underline mb-2">Venta</a>
             </div>
           </div>
         </div>
