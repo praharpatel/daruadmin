@@ -59,6 +59,19 @@ const routes: Routes = [
     path: 'config', component: ConfigComponent,
     canActivate: [AuthGuard]
   },
+  {
+    path: 'sales',
+    loadChildren: () => import('./sales/sales.module').then(m => m.SalesModule)
+  },
+  {
+    path: 'orders',
+    loadChildren: () => import('./orders/orders.module').then(m => m.OrdersModule)
+  },
+  {
+    path: 'charges',
+    loadChildren: () => import('./charges/charges.module').then(m => m.ChargesModule)
+  },
+
 
   { path: 'calendar', component: CalendarComponent },
   { path: 'chat', component: ChatComponent },
