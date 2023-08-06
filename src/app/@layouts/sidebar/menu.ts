@@ -8,7 +8,7 @@ export const MENU: MenuItem[] = [
   },
   {
     id: 2,
-    label: 'Tablero', // 'MENUITEMS.DASHBOARDS.TEXT',
+    label: 'Tablero',
     icon: 'bx-home-circle',
     // badge: {
     //   variant: 'info',
@@ -17,7 +17,7 @@ export const MENU: MenuItem[] = [
     subItems: [
       {
         id: 1,
-        label: 'Tablero', // 'MENUITEMS.DASHBOARDS.LIST.DEFAULT',
+        label: 'Tablero',
         link: '/',
         parentId: 2
       },
@@ -25,48 +25,93 @@ export const MENU: MenuItem[] = [
   },
   {
     id: 3,
-    label: 'Catálogos', // 'MENUITEMS.CATALOGS.TEXT',
-    icon: 'bx-collection',
-    // badge: {
-    //   variant: 'info',
-    //   text: 'MENUITEMS.CATALOGS.BADGE',
-    // },
+    label: 'Ventas',
+    icon: 'bx-dollar-circle',
     subItems: [
       {
         id: 1,
-        label: 'Marcas', // 'MENUITEMS.BRANDS.LIST.BRANDLIST',
-        link: '/brands',
+        label: 'Ventas',
+        link: '/sales/list',
         parentId: 3
+      }
+    ]
+  },
+  {
+    id: 4,
+    label: 'Ordenes',
+    icon: 'bx-note',
+    subItems: [
+      {
+        id: 1,
+        label: 'CVA',
+        link: '/orderscva',
+        parentId: 4
+      },{
+        id: 2,
+        label: 'CT',
+        link: '/ordersct',
+        parentId: 4
+      },
+    ]
+  },
+  {
+    id: 5,
+    label: 'Cobros',
+    icon: 'bx-credit-card',
+    subItems: [
+      {
+        id: 1,
+        label: 'Openpay',
+        link: '/openpay',
+        parentId: 5
+      },{
+        id: 2,
+        label: 'Stripe',
+        link: '/stripe',
+        parentId: 5
+      },
+    ]
+  },
+  {
+    id: 6,
+    label: 'Catálogos',
+    icon: 'bx-collection',
+    subItems: [
+      {
+        id: 1,
+        label: 'Marcas',
+        link: '/brands',
+        parentId: 6
       },
       {
         id: 2,
-        label: 'Grupos', // 'MENUITEMS.GROUPS.LIST.GROUPLIST',
+        label: 'Grupos',
         link: '/groups',
-        parentId: 3
+        parentId: 6
       },
       {
         id: 3,
-        label: 'Categorías', // 'MENUITEMS.CATEGORIES.LIST.CATEGORIELIST',
+        label: 'Categorías',
         link: '/categories',
-        parentId: 3
+        parentId: 6
       },
       {
         id: 4,
-        label: 'Productos', // 'MENUITEMS.PRODUCTS.LIST.PRODUCTLIST',
+        label: 'Productos',
         link: '/products',
-        parentId: 3
+        parentId: 6
       },
       {
         id: 5,
-        label: 'Usuarios', // 'MENUITEMS.USERS.LIST.USERLIST',
+        label: 'Usuarios',
         link: '/users',
-        parentId: 3
+        parentId: 6
       },
       {
         id: 6,
         label: 'Configuraciones',
         link: '/config',
-        parentId: 3
+        parentId: 6
       },
     ]
   },
