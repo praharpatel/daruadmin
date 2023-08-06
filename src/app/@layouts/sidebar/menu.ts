@@ -44,12 +44,12 @@ export const MENU: MenuItem[] = [
       {
         id: 1,
         label: 'CVA',
-        link: '/orderscva',
+        link: '/orders/cva/list',
         parentId: 4
       },{
         id: 2,
         label: 'CT',
-        link: '/ordersct',
+        link: '/orders/ct/list',
         parentId: 4
       },
     ]
