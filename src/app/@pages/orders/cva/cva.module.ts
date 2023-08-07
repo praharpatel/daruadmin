@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { CvaRoutingModule } from './cva-routing.module';
 import { ListOrdersCvaComponent } from './list-orders-cva/list-orders-cva.component';
 import { DetailOrderCvaComponent } from './detail-order-cva/detail-order-cva.component';
+import { TablePaginationModule } from '@shared/table-pagination/table-pagination.module';
 
 
 @NgModule({
@@ -13,7 +14,8 @@ import { DetailOrderCvaComponent } from './detail-order-cva/detail-order-cva.com
   ],
   imports: [
     CommonModule,
-    CvaRoutingModule
+    CvaRoutingModule,
+    TablePaginationModule
   ]
 })
 export class CvaModule { }

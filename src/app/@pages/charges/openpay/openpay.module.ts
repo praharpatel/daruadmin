@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { OpenpayRoutingModule } from './openpay-routing.module';
 import { ListChargesOpenpayComponent } from './list-charges-openpay/list-charges-openpay.component';
 import { DetailChargeOpenpayComponent } from './detail-charge-openpay/detail-charge-openpay.component';
+import { TablePaginationModule } from '@shared/table-pagination/table-pagination.module';
 
 
 @NgModule({
@@ -13,7 +14,8 @@ import { DetailChargeOpenpayComponent } from './detail-charge-openpay/detail-cha
   ],
   imports: [
     CommonModule,
-    OpenpayRoutingModule
+    OpenpayRoutingModule,
+    TablePaginationModule
   ]
 })
 export class OpenpayModule { }
