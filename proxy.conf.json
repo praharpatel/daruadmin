@@ -43,5 +43,9 @@
     "target": "http://connect.ctonline.mx:3001/",
     "secure": true,
     "changeOrigin": true
+  },
+  "/graphql": {
+    "target": "https://apidev.daru.mx:3001/graphql",
+    "secure": true
   }
 }
