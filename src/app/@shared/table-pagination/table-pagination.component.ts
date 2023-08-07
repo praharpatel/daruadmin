@@ -87,9 +87,16 @@ export class TablePaginationComponent implements OnInit {
       this.data$ = this.service.getCollectionData(this.query, variables, {}).pipe(
         map((result: any) => {
           const data = result[this.resultData.definitionKey];
-          this.infoPage.pages = data.info.pages;
-          this.infoPage.total = data.info.total;
-          this.totalData = data.info.total;
+          if (!data) {
+            this.loading = false;
+            closeAlert();
+            return result;
+          }
+          if (data.info) {
+            this.infoPage.pages = data.info.pages;
+            this.infoPage.total = data.info.total;
+            this.totalData = data.info.total;
+          }
           this.loading = false;
           closeAlert();
           return data[this.resultData.listKey];
