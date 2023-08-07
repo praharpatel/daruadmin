@@ -69,7 +69,7 @@ export class CategoriesComponent implements OnInit {
       },
       {
         property: 'description',
-        label: 'Marca',
+        label: 'Categoria',
         class: 'descriptionShort'
       },
       {
