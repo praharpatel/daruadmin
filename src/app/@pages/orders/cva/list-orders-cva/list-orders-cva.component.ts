@@ -4,7 +4,6 @@ import { ICatalog } from '@core/interfaces/catalog.interface';
 import { IResultData } from '@core/interfaces/result-data.interface';
 import { ITableColumns } from '@core/interfaces/table-columns.interface';
 import { Catalog } from '@core/models/catalog.models';
-import { ExternalAuthService } from '@core/services/external-auth.service';
 import { ORDERSCVA_LIST_QUERY } from '@graphql/operations/query/suppliers/cva';
 import { TablePaginationService } from '@shared/table-pagination/table-pagination.service';
 import { DocumentNode } from 'graphql';
@@ -34,13 +33,12 @@ export class ListOrdersCvaComponent implements OnInit {
   importados: [ICatalog];
 
   constructor(
-    private externalAuthService: ExternalAuthService,
     private tablePaginationService: TablePaginationService
   ) { }
 
   ngOnInit(): void {
     this.context = {};
-    this.itemsPage = 10;
+    this.itemsPage = -1;
     this.resultData = {
       listKey: 'listOrdersCva',
       definitionKey: 'listOrdersCva',

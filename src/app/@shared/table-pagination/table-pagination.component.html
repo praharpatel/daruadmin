@@ -101,6 +101,9 @@
                               <span *ngIf="val.property=='respuestaCT.fecha'">
                                 {{data.respuestaCT.fecha | date:'dd/MM/yyyy'}}
                               </span>
+                              <span *ngIf="val.property=='creation_date'">
+                                {{data.creation_date | date:'dd/MM/yyyy'}}
+                              </span>
                               <span *ngIf="val.property=='respuestaCT.estatus'">
                                 {{data.respuestaCT.estatus}}
                               </span>

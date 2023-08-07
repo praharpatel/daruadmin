@@ -583,18 +583,6 @@ export class ExternalAuthService extends ApiService {
         });
     });
   }
-
-  async getOrdersCva(): Promise<any> {
-    return new Promise<any>((resolve, reject) => {
-      this.get(ORDERSCVA_LIST_QUERY, {}, {}).subscribe(
-        (result: any) => {
-          resolve(result.listOrdersCva);
-        },
-        (error: any) => {
-          reject(error);
-        });
-    });
-  }
   //#endregion
 
   //#region CT
@@ -609,6 +597,10 @@ export class ExternalAuthService extends ApiService {
         });
     });
   }
+  //#endregion
+
+  //#region Openpay
+
   //#endregion
 
 }
