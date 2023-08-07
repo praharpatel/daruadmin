@@ -69,7 +69,7 @@ export class GroupsComponent implements OnInit {
       },
       {
         property: 'description',
-        label: 'Marca',
+        label: 'Grupo',
         class: 'descriptionShort'
       },
       {
