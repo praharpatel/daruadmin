@@ -95,3 +95,15 @@ export const PRODUCTOSCVA_FRAGMENT = gql`
     ExsTotal
   }
 `;
+
+export const ORDERSCVA_FRAGMENT = gql`
+  fragment OrdersCvaObject on ResponseCvaListsOrders {
+    Numero
+    Total
+    Moneda
+    NumOC
+    Almacen
+    Asignado
+    FechaAsignado
+  }
+`;

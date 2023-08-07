@@ -1,5 +1,5 @@
 import gql from 'graphql-tag';
-import { BRANDSCVA_FRAGMENT, GROUPSCVA_FRAGMENT, PAQUETERIASCVA_FRAGMENT, PRODUCTOSCVA_FRAGMENT, SOLUCIONESCVA_FRAGMENT, SUCURSALESCVA_FRAGMENT } from '../../fragment/suppliers/cva';
+import { BRANDSCVA_FRAGMENT, GROUPSCVA_FRAGMENT, ORDERSCVA_FRAGMENT, PAQUETERIASCVA_FRAGMENT, PRODUCTOSCVA_FRAGMENT, SOLUCIONESCVA_FRAGMENT, SUCURSALESCVA_FRAGMENT } from '../../fragment/suppliers/cva';
 
 export const BRANDSCVA_LIST_QUERY = gql`
   query listBrandsCva {
@@ -77,4 +77,18 @@ export const PRODUCTOSCVA_LIST_QUERY = gql`
     }
   }
   ${PRODUCTOSCVA_FRAGMENT}
+`;
+
+
+export const ORDERSCVA_LIST_QUERY = gql`
+  query listOrdersCva {
+    listOrdersCva {
+      status
+      message
+      listOrdersCva {
+        ...OrdersCvaObject
+      }
+    }
+  }
+  ${ORDERSCVA_FRAGMENT}
 `;
