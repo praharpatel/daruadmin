@@ -1235,7 +1235,7 @@ export class ImportarComponent implements OnInit {
             // SupplierProd                                                         TO-DO
             s.idProveedor = proveedor;
             s.codigo = productJson.numParte;
-            if (itemData.promociones.disponible_en_promocion > 0) {
+            if (itemData.promociones && itemData.promociones.disponible_en_promocion > 0) {
               s.price = itemData.promociones.disponible_en_promocion;
             } else {
               s.price = parseFloat(item.precio);
