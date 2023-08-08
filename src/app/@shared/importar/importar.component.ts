@@ -1200,7 +1200,7 @@ export class ImportarComponent implements OnInit {
               itemData.sale_price = parseFloat((salePrice * this.exchangeRate * 1.50).toFixed(2));
             } else {
               itemData.price = parseFloat(item.precio) * 1.50;
-              itemData.sale_price = salePrice;
+              itemData.sale_price = salePrice * 1.50;
             }
             itemData.review = 0;
             itemData.ratings = 0;
@@ -1232,10 +1232,14 @@ export class ImportarComponent implements OnInit {
             b.name = productJson.marca;
             b.slug = slugify(productJson.marca, { lower: true });
             itemData.brands.push(b);
-            // SupplierProd
+            // SupplierProd                                                         TO-DO
             s.idProveedor = proveedor;
             s.codigo = productJson.numParte;
-            s.price = parseFloat(item.precio);
+            if (itemData.promociones && itemData.promociones.disponible_en_promocion > 0) {
+              s.price = itemData.promociones.disponible_en_promocion;
+            } else {
+              s.price = parseFloat(item.precio);
+            }
             s.moneda = item.moneda;
             s.branchOffices = branchOfficesCt;
             itemData.suppliersProd = s;
