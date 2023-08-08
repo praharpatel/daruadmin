@@ -31,7 +31,7 @@ export const ORDERSCT_FRAGMENT = gql`
       generarGuia
       paqueteria
     }
-    producto {
+    productoCt {
       cantidad
       clave
       precio
