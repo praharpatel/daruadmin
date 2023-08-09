@@ -8,6 +8,7 @@ import { Observable } from 'rxjs';
 import { closeAlert, loadData } from 'src/app/@shared/alert/alerts';
 import { map } from 'rxjs/operators';
 import { ImportarService } from '@shared/importar/importar.service';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-table-pagination',
@@ -41,25 +42,34 @@ export class TablePaginationComponent implements OnInit {
   queryBranch: DocumentNode;
   totalData: number;
   tagFilter: string;
+  private tiposPagos: any[] = [];
 
   constructor(
+    private httpClient: HttpClient,
     private service: TablePaginationService,
     private importarService: ImportarService,
   ) {
     service.$emitter.subscribe(() => {
       this.loadData();
     });
+    // Obtener los tipos de pagos en el constructor
+    this.getTiposPagosCt().then(tiposPagos => {
+      this.tiposPagos = tiposPagos;
+    });
   }
+
+  // Define requests
+  private tiposPagosCt$: Observable<any> = this.httpClient.get('assets/uploads/json/ct_tipos_pago.json');
 
   ngOnInit(): void {
     if (this.query === undefined) {
-      throw new Error('Query is undefined, please add.');
+      throw new Error('Query indefinida, agregar por favor.');
     }
     if (this.resultData === undefined) {
-      throw new Error('ResultData is undefined, please add.');
+      throw new Error('ResultData indefinida, agregar por favor.');
     }
     if (this.tableColumns === undefined) {
-      throw new Error('Table Columns is undefined, please add.');
+      throw new Error('Table Columns indefinida, agregar por favor.');
     }
     this.infoPage = {
       page: 1,
@@ -138,4 +148,12 @@ export class TablePaginationComponent implements OnInit {
     this.loadData();
   }
 
+  getTipoPagoName(tipoPagoId: string): string | undefined {
+    const tipoPago = this.tiposPagos.find(tipo => tipo.id === tipoPagoId.toString());
+    return tipoPago.tipo_pago ? tipoPago.tipo_pago : 'NA';
+  }
+
+  async getTiposPagosCt(): Promise<any> {
+    return await this.tiposPagosCt$.toPromise();
+  }
 }

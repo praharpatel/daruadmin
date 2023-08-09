@@ -50,12 +50,7 @@ export class ListOrdersCtComponent implements OnInit {
     this.columns = [
       {
         property: 'idPedido',
-        label: 'Pedido',
-        class: 'clave'
-      },
-      {
-        property: 'almacen',
-        label: 'Almacen',
+        label: 'Pedido DARU',
         class: 'clave'
       },
       {
@@ -65,7 +60,7 @@ export class ListOrdersCtComponent implements OnInit {
       },
       {
         property: 'respuestaCT.pedidoWeb',
-        label: 'Pedido Web',
+        label: 'Pedido CT',
         class: 'clave'
       },
       {

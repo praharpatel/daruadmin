@@ -107,6 +107,9 @@
                               <span *ngIf="val.property=='respuestaCT.estatus'">
                                 {{data.respuestaCT.estatus}}
                               </span>
+                              <span *ngIf="val.property === 'tipoPago'">
+                                {{ getTipoPagoName(data.tipoPago) }}
+                              </span>
                               <span *ngIf="val.property!='product.description' && val.property!='product.description'">
                                 {{ data[val.property]}}
                               </span>
