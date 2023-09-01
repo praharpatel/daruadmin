@@ -191,7 +191,15 @@ export class ImportarComponent implements OnInit {
   }
 
   async getProd(): Promise<any> {
-    return await this.httpReq1$.toPromise();
+    try {
+      const result = await this.httpReq1$.toPromise();
+      console.log('Respuesta del servidor:', result);
+      return result;
+    } catch (error) {
+      // Manejar el error aquí
+      console.error('Error en la solicitud HTTP:', error);
+      throw error; // Puedes volver a lanzar el error o manejarlo de otra manera
+    }
   }
 
   async getAlma(): Promise<any> {
@@ -202,7 +210,6 @@ export class ImportarComponent implements OnInit {
     return await this.httpReq3$.toPromise();
   }
 
-
   async getProductsCt() {
     const productsCt = await this.getProd()
       .then(
@@ -211,10 +218,11 @@ export class ImportarComponent implements OnInit {
         }
       )
       .catch((error: Error) => {
-        infoEventAlert('No es posible importar el catalogo.', error.message, TYPE_ALERT.ERROR);
+        infoEventAlert('No es posible importar el catalogo de productos.', error.message, TYPE_ALERT.ERROR);
       });
     return productsCt;
   }
+
   async getProductsIngram() {
     const productsCt = await this.getProductosIngram()
       .then(
@@ -223,7 +231,7 @@ export class ImportarComponent implements OnInit {
         }
       )
       .catch((error: Error) => {
-        infoEventAlert('No es posible importar el catalogo.', error.message, TYPE_ALERT.ERROR);
+        infoEventAlert('No es posible importar el catalogo Ingram.', error.message, TYPE_ALERT.ERROR);
       });
     return productsCt;
   }
@@ -236,7 +244,7 @@ export class ImportarComponent implements OnInit {
         }
       )
       .catch((error: Error) => {
-        infoEventAlert('No es posible importar el catalogo.', error.message, TYPE_ALERT.ERROR);
+        infoEventAlert('No es posible importar el catalogo de almacenes.', error.message, TYPE_ALERT.ERROR);
       });
     return almacenesCt;
   }
@@ -439,7 +447,7 @@ export class ImportarComponent implements OnInit {
         });
         closeAlert();
       } else {
-        infoEventAlert('No es posible importar el catalogo.', TYPE_ALERT.ERROR);
+        infoEventAlert('No es posible importar el catalogo.', this.supplier.slug, TYPE_ALERT.ERROR);
         closeAlert();
       }
     } else {
