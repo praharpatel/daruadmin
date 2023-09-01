@@ -447,6 +447,7 @@ export class ImportarComponent implements OnInit {
         this.supplier.slug === 'ingram' || this.supplier.slug === 'exel') {
         loadData('Importando los productos', 'Esperar la carga de los productos.');
         const productos = await this.getProducts(this.supplier, this.apiSelect, this.catalogValues);
+        console.log('productos: ', productos);
         if (productos) {
           if (productos.length > 0) {
             this.habilitaGuardar = true;
@@ -537,6 +538,7 @@ export class ImportarComponent implements OnInit {
           for (const product of productosCva.listProductsCva) {
             let itemData = new Product();
             product.id = i;
+            console.log('product: ', product);
             itemData = this.setProduct(supplier.slug, product);
             if (itemData.id !== undefined) {
               productos.push(itemData);
@@ -558,6 +560,7 @@ export class ImportarComponent implements OnInit {
               productsJson.forEach(productJson => {
                 if (product.codigo === productJson.clave) {
                   const productTmp: IProductoCt = this.convertirPromocion(product);
+                  console.log('productTmp: ', productTmp);
                   const itemData: Product = this.setProduct(supplier.slug, productTmp, productJson);
                   if (itemData.id !== undefined) {
                     productos.push(itemData);
@@ -670,238 +673,238 @@ export class ImportarComponent implements OnInit {
       switch (almacen.clave) {
         case '1':
           cantidad = parseInt(item.VENTAS_GUADALAJARA, 10);
-          if (cantidad > 0) {
+          if (cantidad >= this.stockMinimo) {
             branchOffice.cantidad = cantidad;
             branchOffices.push(branchOffice);
           }
           break;
         case '3':
           cantidad = parseInt(item.VENTAS_MORELIA, 10);
-          if (cantidad > 0) {
+          if (cantidad >= this.stockMinimo) {
             branchOffice.cantidad = cantidad;
             branchOffices.push(branchOffice);
           }
           break;
         case '4':
           cantidad = parseInt(item.VENTAS_LEON, 10);
-          if (cantidad > 0) {
+          if (cantidad >= this.stockMinimo) {
             branchOffice.cantidad = cantidad;
             branchOffices.push(branchOffice);
           }
           break;
         case '5':
           cantidad = parseInt(item.VENTAS_CULIACAN, 10);
-          if (cantidad > 0) {
+          if (cantidad >= this.stockMinimo) {
             branchOffice.cantidad = cantidad;
             branchOffices.push(branchOffice);
           }
           break;
         case '6':
           cantidad = parseInt(item.VENTAS_QUERETARO, 10);
-          if (cantidad > 0) {
+          if (cantidad >= this.stockMinimo) {
             branchOffice.cantidad = cantidad;
             branchOffices.push(branchOffice);
           }
           break;
         case '7':
           cantidad = parseInt(item.VENTAS_TORREON, 10);
-          if (cantidad > 0) {
+          if (cantidad >= this.stockMinimo) {
             branchOffice.cantidad = cantidad;
             branchOffices.push(branchOffice);
           }
           break;
         case '8':
           cantidad = parseInt(item.VENTAS_TEPIC, 10);
-          if (cantidad > 0) {
+          if (cantidad >= this.stockMinimo) {
             branchOffice.cantidad = cantidad;
             branchOffices.push(branchOffice);
           }
           break;
         case '9':
           cantidad = parseInt(item.VENTAS_MONTERREY, 10);
-          if (cantidad > 0) {
+          if (cantidad >= this.stockMinimo) {
             branchOffice.cantidad = cantidad;
             branchOffices.push(branchOffice);
           }
           break;
         case '10':
           cantidad = parseInt(item.VENTAS_PUEBLA, 10);
-          if (cantidad > 0) {
+          if (cantidad >= this.stockMinimo) {
             branchOffice.cantidad = cantidad;
             branchOffices.push(branchOffice);
           }
           break;
         case '11':
           cantidad = parseInt(item.VENTAS_VERACRUZ, 10);
-          if (cantidad > 0) {
+          if (cantidad >= this.stockMinimo) {
             branchOffice.cantidad = cantidad;
             branchOffices.push(branchOffice);
           }
           break;
         case '12':
           cantidad = parseInt(item.VENTAS_VILLAHERMOSA, 10);
-          if (cantidad > 0) {
+          if (cantidad >= this.stockMinimo) {
             branchOffice.cantidad = cantidad;
             branchOffices.push(branchOffice);
           }
           break;
         case '13':
           cantidad = parseInt(item.VENTAS_TUXTLA, 10);
-          if (cantidad > 0) {
+          if (cantidad >= this.stockMinimo) {
             branchOffice.cantidad = cantidad;
             branchOffices.push(branchOffice);
           }
           break;
         case '14':
           cantidad = parseInt(item.VENTAS_HERMOSILLO, 10);
-          if (cantidad > 0) {
+          if (cantidad >= this.stockMinimo) {
             branchOffice.cantidad = cantidad;
             branchOffices.push(branchOffice);
           }
           break;
         case '18':
           cantidad = parseInt(item.VENTAS_MERIDA, 10);
-          if (cantidad > 0) {
+          if (cantidad >= this.stockMinimo) {
             branchOffice.cantidad = cantidad;
             branchOffices.push(branchOffice);
           }
           break;
         case '19':
           cantidad = parseInt(item.VENTAS_CANCUN, 10);
-          if (cantidad > 0) {
+          if (cantidad >= this.stockMinimo) {
             branchOffice.cantidad = cantidad;
             branchOffices.push(branchOffice);
           }
           break;
         case '23':
           cantidad = parseInt(item.VENTAS_AGUASCALIENTES, 10);
-          if (cantidad > 0) {
+          if (cantidad >= this.stockMinimo) {
             branchOffice.cantidad = cantidad;
             branchOffices.push(branchOffice);
           }
           break;
         case '24':
           cantidad = parseInt(item.VENTAS_DF_TALLER, 10);
-          if (cantidad > 0) {
+          if (cantidad >= this.stockMinimo) {
             branchOffice.cantidad = cantidad;
             branchOffices.push(branchOffice);
           }
           break;
         case '26':
           cantidad = parseInt(item.VENTAS_SAN_LUIS_POTOSI, 10);
-          if (cantidad > 0) {
+          if (cantidad >= this.stockMinimo) {
             branchOffice.cantidad = cantidad;
             branchOffices.push(branchOffice);
           }
           break;
         case '27':
           cantidad = parseInt(item.VENTAS_CHIHUAHUA, 10);
-          if (cantidad > 0) {
+          if (cantidad >= this.stockMinimo) {
             branchOffice.cantidad = cantidad;
             branchOffices.push(branchOffice);
           }
           break;
         case '28':
           cantidad = parseInt(item.VENTAS_DURANGO, 10);
-          if (cantidad > 0) {
+          if (cantidad >= this.stockMinimo) {
             branchOffice.cantidad = cantidad;
             branchOffices.push(branchOffice);
           }
           break;
         case '29':
           cantidad = parseInt(item.VENTAS_TOLUCA, 10);
-          if (cantidad > 0) {
+          if (cantidad >= this.stockMinimo) {
             branchOffice.cantidad = cantidad;
             branchOffices.push(branchOffice);
           }
           break;
         case '31':
           cantidad = parseInt(item.VENTAS_OAXACA, 10);
-          if (cantidad > 0) {
+          if (cantidad >= this.stockMinimo) {
             branchOffice.cantidad = cantidad;
             branchOffices.push(branchOffice);
           }
           break;
         case '32':
           cantidad = parseInt(item.VENTAS_LAPAZ, 10);
-          if (cantidad > 0) {
+          if (cantidad >= this.stockMinimo) {
             branchOffice.cantidad = cantidad;
             branchOffices.push(branchOffice);
           }
           break;
         case '33':
           cantidad = parseInt(item.VENTAS_TIJUANA, 10);
-          if (cantidad > 0) {
+          if (cantidad >= this.stockMinimo) {
             branchOffice.cantidad = cantidad;
             branchOffices.push(branchOffice);
           }
           break;
         case '35':
           cantidad = parseInt(item.VENTAS_COLIMA, 10);
-          if (cantidad > 0) {
+          if (cantidad >= this.stockMinimo) {
             branchOffice.cantidad = cantidad;
             branchOffices.push(branchOffice);
           }
           break;
         case '36':
           cantidad = parseInt(item.VENTAS_ZACATECAS, 10);
-          if (cantidad > 0) {
+          if (cantidad >= this.stockMinimo) {
             branchOffice.cantidad = cantidad;
             branchOffices.push(branchOffice);
           }
           break;
         case '38':
           cantidad = parseInt(item.VENTAS_CAMPECHE, 10);
-          if (cantidad > 0) {
+          if (cantidad >= this.stockMinimo) {
             branchOffice.cantidad = cantidad;
             branchOffices.push(branchOffice);
           }
           break;
         case '39':
           cantidad = parseInt(item.VENTAS_TAMPICO, 10);
-          if (cantidad > 0) {
+          if (cantidad >= this.stockMinimo) {
             branchOffice.cantidad = cantidad;
             branchOffices.push(branchOffice);
           }
           break;
         case '40':
           cantidad = parseInt(item.VENTAS_PACHUCA, 10);
-          if (cantidad > 0) {
+          if (cantidad >= this.stockMinimo) {
             branchOffice.cantidad = cantidad;
             branchOffices.push(branchOffice);
           }
           break;
         case '43':
           cantidad = parseInt(item.VENTAS_ACAPULCO, 10);
-          if (cantidad > 0) {
+          if (cantidad >= this.stockMinimo) {
             branchOffice.cantidad = cantidad;
             branchOffices.push(branchOffice);
           }
           break;
         case '46':
           cantidad = parseInt(item.VENTAS_CEDISGUADALAJARA, 10);
-          if (cantidad > 0) {
+          if (cantidad >= this.stockMinimo) {
             branchOffice.cantidad = cantidad;
             branchOffices.push(branchOffice);
           }
           break;
         case '47':
           cantidad = parseInt(item.VENTAS_CUERNAVACA, 10);
-          if (cantidad > 0) {
+          if (cantidad >= this.stockMinimo) {
             branchOffice.cantidad = cantidad;
             branchOffices.push(branchOffice);
           }
           break;
         case '51':
           cantidad = parseInt(item.VENTAS_CEDISCDMX, 10);
-          if (cantidad > 0) {
+          if (cantidad >= this.stockMinimo) {
             branchOffice.cantidad = cantidad;
             branchOffices.push(branchOffice);
           }
           break;
         case '52':
           cantidad = parseInt(item.VENTAS_ASPHALT, 10);
-          if (cantidad > 0) {
+          if (cantidad >= this.stockMinimo) {
             branchOffice.cantidad = cantidad;
             branchOffices.push(branchOffice);
           }
@@ -1090,11 +1093,12 @@ export class ImportarComponent implements OnInit {
         if (item.ExsTotal >= this.stockMinimo) {                  // Si existencias totales.
           branchOffices = this.setCvaAlmacenes(item);
           if (branchOffices.length > 0) {
-            branchOffices.forEach(branchOffice => {
-              disponibilidadAlmacenes += branchOffice.cantidad;
-            });
-          }
-          if (disponibilidadAlmacenes >= this.stockMinimo) {      // Si la sumatoria de los almacenes.
+            //   branchOffices.forEach(branchOffice => {
+            //     disponibilidadAlmacenes += branchOffice.cantidad;
+            //   });
+            // }
+            // if (disponibilidadAlmacenes >= this.stockMinimo) {      // Si la sumatoria de los almacenes.
+            console.log('branchOffices: ', branchOffices);
             itemData.id = item.id;
             itemData.name = item.descripcion;
             itemData.slug = slugify(item.descripcion, { lower: true });
@@ -1176,10 +1180,14 @@ export class ImportarComponent implements OnInit {
           let featured = false;
           for (const element of item.almacenes) {
             const almacen = this.getAlmacenCant(element);
-            disponible += almacen.cantidad;
-            branchOfficesCt.push(almacen);
+            // disponible += almacen.cantidad;
+            if (almacen.cantidad >= this.stockMinimo) {
+              branchOfficesCt.push(almacen);
+            }
           }
-          if (disponible >= this.stockMinimo) {                         // Si hay mas de 10 elementos disponibles
+          console.log('branchOffices: ', branchOffices);
+          // if (disponible >= this.stockMinimo) {                         // Si hay mas de 10 elementos disponibles
+          if (branchOfficesCt.length > 0) {                         // Si hay mas de 10 elementos disponibles
             // Si hay promociones en los almacenes ocupa el primero y asigna el total de disponibilidad
             if (item.almacenes[0].promociones[0]) {
               featured = true;
