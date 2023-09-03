@@ -1190,8 +1190,12 @@ export class ImportarComponent implements OnInit {
           const branchOfficesCt: BranchOffices[] = [];
           let featured = false;
           for (const element of item.almacenes) {
+            console.log('element: ', element);
             const almacen = this.getAlmacenCant(element);
+            console.log('almacen: ', almacen);
             // disponible += almacen.cantidad;
+            console.log('this.stockMinimo: ', this.stockMinimo);
+            console.log('almacen.cantidad: ', almacen.cantidad);
             if (almacen.cantidad >= this.stockMinimo) {
               branchOfficesCt.push(almacen);
             }
