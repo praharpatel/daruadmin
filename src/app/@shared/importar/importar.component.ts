@@ -193,11 +193,9 @@ export class ImportarComponent implements OnInit {
   async getProd(): Promise<any> {
     try {
       const result = await this.httpReq1$.toPromise();
-      console.log('Respuesta del servidor:', result);
       return result;
     } catch (error) {
       // Manejar el error aquí
-      console.error('Error en la solicitud HTTP:', error);
       return [];
       // throw error; // Puedes volver a lanzar el error o manejarlo de otra manera
     }
@@ -215,7 +213,6 @@ export class ImportarComponent implements OnInit {
     const productsCt = await this.getProd()
       .then(
         async (result) => {
-          console.log('getProductsCt/result: ', result);
           return await result;
         }
       )
@@ -457,7 +454,6 @@ export class ImportarComponent implements OnInit {
         this.supplier.slug === 'ingram' || this.supplier.slug === 'exel') {
         loadData('Importando los productos', 'Esperar la carga de los productos.');
         const productos = await this.getProducts(this.supplier, this.apiSelect, this.catalogValues);
-        console.log('productos: ', productos);
         if (productos) {
           if (productos.length > 0) {
             this.habilitaGuardar = true;
@@ -548,7 +544,6 @@ export class ImportarComponent implements OnInit {
           for (const product of productosCva.listProductsCva) {
             let itemData = new Product();
             product.id = i;
-            console.log('product: ', product);
             itemData = this.setProduct(supplier.slug, product);
             if (itemData.id !== undefined) {
               productos.push(itemData);
@@ -562,20 +557,15 @@ export class ImportarComponent implements OnInit {
       case 'ct':
         if (supplier.slug === 'ct') {
           this.ctAlmacenes = await this.getAlmacenes();
-          console.log('this.ctAlmacenes: ', this.ctAlmacenes);
           const productosCt = await this.externalAuthService.getProductsCt();
-          console.log('productosCt: ', productosCt);
           if (productosCt.status) {
             const productsJson = await this.getProductsCt();
-            console.log('productsJson: ', productsJson);
             let i = 1;
             for (const product of productosCt.stockProductsCt) {
               productsJson.forEach(productJson => {
                 if (product.codigo === productJson.clave) {
                   const productTmp: IProductoCt = this.convertirPromocion(product);
-                  console.log('productTmp: ', productTmp);
                   const itemData: Product = this.setProduct(supplier.slug, productTmp, productJson);
-                  console.log('itemData: ', itemData);
                   if (itemData.id !== undefined) {
                     productos.push(itemData);
                   }
@@ -1112,7 +1102,6 @@ export class ImportarComponent implements OnInit {
             //   });
             // }
             // if (disponibilidadAlmacenes >= this.stockMinimo) {      // Si la sumatoria de los almacenes.
-            console.log('branchOffices: ', branchOffices);
             itemData.id = item.id;
             itemData.name = item.descripcion;
             itemData.slug = slugify(item.descripcion, { lower: true });
