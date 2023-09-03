@@ -1206,7 +1206,7 @@ export class ImportarComponent implements OnInit {
               console.log('almacen.cantidad menor que this.stockMinimo');
             }
           }
-          console.log('branchOffices: ', branchOffices);
+          console.log('branchOfficesCt: ', branchOfficesCt);
           // if (disponible >= this.stockMinimo) {                         // Si hay mas de 10 elementos disponibles
           if (branchOfficesCt.length > 0) {                         // Si hay mas de 10 elementos disponibles
             // Si hay promociones en los almacenes ocupa el primero y asigna el total de disponibilidad
