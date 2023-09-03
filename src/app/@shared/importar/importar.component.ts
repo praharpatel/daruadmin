@@ -198,7 +198,8 @@ export class ImportarComponent implements OnInit {
     } catch (error) {
       // Manejar el error aquí
       console.error('Error en la solicitud HTTP:', error);
-      throw error; // Puedes volver a lanzar el error o manejarlo de otra manera
+      return [];
+      // throw error; // Puedes volver a lanzar el error o manejarlo de otra manera
     }
   }
 
@@ -214,6 +215,7 @@ export class ImportarComponent implements OnInit {
     const productsCt = await this.getProd()
       .then(
         async (result) => {
+          console.log('getProductsCt/result: ', result);
           return await result;
         }
       )
@@ -573,6 +575,7 @@ export class ImportarComponent implements OnInit {
                   const productTmp: IProductoCt = this.convertirPromocion(product);
                   console.log('productTmp: ', productTmp);
                   const itemData: Product = this.setProduct(supplier.slug, productTmp, productJson);
+                  console.log('itemData: ', itemData);
                   if (itemData.id !== undefined) {
                     productos.push(itemData);
                   }
@@ -1197,7 +1200,10 @@ export class ImportarComponent implements OnInit {
             console.log('this.stockMinimo: ', this.stockMinimo);
             console.log('almacen.cantidad: ', almacen.cantidad);
             if (almacen.cantidad >= this.stockMinimo) {
+              console.log('almacen.cantidad mayor o igual que this.stockMinimo');
               branchOfficesCt.push(almacen);
+            } else {
+              console.log('almacen.cantidad menor que this.stockMinimo');
             }
           }
           console.log('branchOffices: ', branchOffices);
