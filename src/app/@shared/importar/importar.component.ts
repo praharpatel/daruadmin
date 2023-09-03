@@ -1097,11 +1097,7 @@ export class ImportarComponent implements OnInit {
         if (item.ExsTotal >= this.stockMinimo) {                  // Si existencias totales.
           branchOffices = this.setCvaAlmacenes(item);
           if (branchOffices.length > 0) {
-            //   branchOffices.forEach(branchOffice => {
-            //     disponibilidadAlmacenes += branchOffice.cantidad;
-            //   });
-            // }
-            // if (disponibilidadAlmacenes >= this.stockMinimo) {      // Si la sumatoria de los almacenes.
+            disponibilidadAlmacenes = branchOffices[0].cantidad;
             itemData.id = item.id;
             itemData.name = item.descripcion;
             itemData.slug = slugify(item.descripcion, { lower: true });
