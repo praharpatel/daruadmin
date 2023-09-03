@@ -1193,20 +1193,12 @@ export class ImportarComponent implements OnInit {
           const branchOfficesCt: BranchOffices[] = [];
           let featured = false;
           for (const element of item.almacenes) {
-            console.log('element: ', element);
             const almacen = this.getAlmacenCant(element);
-            console.log('almacen: ', almacen);
-            // disponible += almacen.cantidad;
-            console.log('this.stockMinimo: ', this.stockMinimo);
-            console.log('almacen.cantidad: ', almacen.cantidad);
             if (almacen.cantidad >= this.stockMinimo) {
-              console.log('almacen.cantidad mayor o igual que this.stockMinimo');
+              disponible = almacen.cantidad;
               branchOfficesCt.push(almacen);
-            } else {
-              console.log('almacen.cantidad menor que this.stockMinimo');
             }
           }
-          console.log('branchOfficesCt: ', branchOfficesCt);
           // if (disponible >= this.stockMinimo) {                         // Si hay mas de 10 elementos disponibles
           if (branchOfficesCt.length > 0) {                         // Si hay mas de 10 elementos disponibles
             // Si hay promociones en los almacenes ocupa el primero y asigna el total de disponibilidad
