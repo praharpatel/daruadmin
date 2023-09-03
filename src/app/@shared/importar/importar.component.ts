@@ -560,9 +560,12 @@ export class ImportarComponent implements OnInit {
       case 'ct':
         if (supplier.slug === 'ct') {
           this.ctAlmacenes = await this.getAlmacenes();
+          console.log('this.ctAlmacenes: ', this.ctAlmacenes);
           const productosCt = await this.externalAuthService.getProductsCt();
+          console.log('productosCt: ', productosCt);
           if (productosCt.status) {
             const productsJson = await this.getProductsCt();
+            console.log('productsJson: ', productsJson);
             let i = 1;
             for (const product of productosCt.stockProductsCt) {
               productsJson.forEach(productJson => {
