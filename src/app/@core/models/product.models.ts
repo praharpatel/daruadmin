@@ -118,7 +118,7 @@ export class BranchOffices {
   cp: string;
   latitud: string;
   longitud: string;
-  promocionBranchOffice: PromocionBranchOffice;
+  promocionBranchOffice?: PromocionBranchOffice;
 }
 
 export class PromocionBranchOffice {

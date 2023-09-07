@@ -631,21 +631,32 @@ export class ImportarComponent implements OnInit {
   }
 
   getAlmacenCant(branch): BranchOffices {
-    const almacen = new BranchOffices();
     const almacenEstado = this.getCtAlmacenes(branch.almacen.key);
     if (almacenEstado) {
-      const { id, name, estado, cp, latitud, longitud } = almacenEstado;
-      Object.assign(almacen, { id, name, estado, cp, latitud, longitud, cantidad: branch.almacen.value });
+      return {
+        id: almacenEstado.id,
+        name: almacenEstado.Sucursal,
+        estado: almacenEstado.Estado,
+        cp: almacenEstado.CP,
+        latitud: almacenEstado.latitud,
+        longitud: almacenEstado.longitud,
+        cantidad: branch.almacen.value
+      };
     }
-    return almacen;
+    return {
+      id: '',
+      name: '',
+      estado: '',
+      cp: '',
+      latitud: '',
+      longitud: '',
+      cantidad: 0
+    };
   }
 
-  getCtAlmacenes(id: string): BranchOffices | null {
+  getCtAlmacenes(id: string): any {
     const almacenEstado = this.ctAlmacenes.find(almacen => almacen.id === id);
-    if (almacenEstado) {
-      return almacenEstado;
-    }
-    return null;
+    return almacenEstado || null; // Cambiamos el tipo de retorno a null cuando no se encuentra.
   }
 
   getFechas(fecha: Date) {
@@ -1172,9 +1183,11 @@ export class ImportarComponent implements OnInit {
         salePrice = 0;
         if (item.almacenes.length > 0) {
           let featured = false;
-          const branchOfficesCt = item.almacenes
+          const branchOfficesCt: BranchOffices[] = item.almacenes
             .map(element => this.getAlmacenCant(element))
-            .filter(almacen => almacen.cantidad >= this.stockMinimo && almacen.name !== '');
+            .filter(almacen => almacen.cantidad >= this.stockMinimo);
+
+          // if (disponible >= this.stockMinimo) {                         // Si hay mas de 10 elementos disponibles
           if (branchOfficesCt.length > 0) {                         // Si hay mas de 10 elementos disponibles
             // Si hay promociones en los almacenes ocupa el primero y asigna el total de disponibilidad
             if (item.almacenes[0].promociones[0]) {
