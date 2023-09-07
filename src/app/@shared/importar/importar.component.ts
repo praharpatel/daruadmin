@@ -631,32 +631,25 @@ export class ImportarComponent implements OnInit {
   }
 
   getAlmacenCant(branch): BranchOffices {
+    const almacen = new BranchOffices();
     const almacenEstado = this.getCtAlmacenes(branch.almacen.key);
-    if (almacenEstado) {
-      return {
-        id: almacenEstado.id,
-        name: almacenEstado.Sucursal,
-        estado: almacenEstado.Estado,
-        cp: almacenEstado.CP,
-        latitud: almacenEstado.latitud,
-        longitud: almacenEstado.longitud,
-        cantidad: branch.almacen.value
-      };
-    }
-    return {
-      id: '',
-      name: '',
-      estado: '',
-      cp: '',
-      latitud: '',
-      longitud: '',
-      cantidad: 0
-    };
+    almacen.id = almacenEstado.id;
+    almacen.name = almacenEstado.Sucursal;
+    almacen.estado = almacenEstado.Estado;
+    almacen.cp = almacenEstado.CP;
+    almacen.latitud = almacenEstado.latitud;
+    almacen.longitud = almacenEstado.longitud;
+    almacen.cantidad = branch.almacen.value;
+    return almacen;
   }
 
   getCtAlmacenes(id: string): any {
-    const almacenEstado = this.ctAlmacenes.find(almacen => almacen.id === id);
-    return almacenEstado || null; // Cambiamos el tipo de retorno a null cuando no se encuentra.
+    const almacen = this.ctAlmacenes.filter(almacen => almacen.id === id);
+    if (almacen.length > 0) {
+      const sucursal = almacen.map(element => element);
+      return sucursal[0];
+    }
+    return '';
   }
 
   getFechas(fecha: Date) {
@@ -1182,11 +1175,15 @@ export class ImportarComponent implements OnInit {
         disponible = 0;
         salePrice = 0;
         if (item.almacenes.length > 0) {
+          const branchOfficesCt: BranchOffices[] = [];
           let featured = false;
-          const branchOfficesCt: BranchOffices[] = item.almacenes
-            .map(element => this.getAlmacenCant(element))
-            .filter(almacen => almacen.cantidad >= this.stockMinimo);
-
+          for (const element of item.almacenes) {
+            const almacen = this.getAlmacenCant(element);
+            if (almacen.cantidad >= this.stockMinimo) {
+              disponible = almacen.cantidad;
+              branchOfficesCt.push(almacen);
+            }
+          }
           // if (disponible >= this.stockMinimo) {                         // Si hay mas de 10 elementos disponibles
           if (branchOfficesCt.length > 0) {                         // Si hay mas de 10 elementos disponibles
             // Si hay promociones en los almacenes ocupa el primero y asigna el total de disponibilidad
