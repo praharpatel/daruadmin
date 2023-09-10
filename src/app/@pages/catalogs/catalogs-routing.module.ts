@@ -8,6 +8,11 @@ const routes: Routes = [
     data: { pageTitle: 'Configuraciones' }
   },
   {
+    path: 'cupons',
+    loadChildren: () => import('./cupons/cupons.module').then(m => m.CuponsModule),
+    data: { pageTitle: 'Cupones' }
+  },
+  {
     path: 'brands',
     loadChildren: () => import('./brands/brands.module').then(m => m.BrandsModule),
     data: { pageTitle: 'Marcas' }
