@@ -32,7 +32,7 @@ export class CaptureCatComponent implements OnInit {
   constructor(
     private formBuilder: FormBuilder,
     public modal: NgbModal
-  ) {}
+  ) { }
 
   // convenience getter for easy access to form fields
   get f() { return this.captureForm.controls; }
@@ -161,5 +161,20 @@ export class CaptureCatComponent implements OnInit {
   onRemove(event) {
     this.files.splice(this.files.indexOf(event), 1);
     this.pictures.splice(this.pictures.indexOf(event), 1);
+  }
+
+  convertToUppercase(event: any) {
+    let inputValue = event.target.value.toUpperCase();
+    // Eliminar caracteres no válidos
+    inputValue = inputValue.replace(/[^A-Z0-9]/g, '');
+    // Limitar a 11 caracteres alfanuméricos
+    if (inputValue.length > 11) {
+      inputValue = inputValue.slice(0, 11);
+    }
+    // Formatear como "DARU-XXXXXX"
+    if (inputValue.length >= 5) {
+      inputValue = "DARU-" + inputValue.slice(4); // Mantener solo los últimos 6 caracteres
+    }
+    event.target.value = inputValue;
   }
 }

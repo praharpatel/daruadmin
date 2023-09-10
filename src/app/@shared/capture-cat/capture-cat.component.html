@@ -64,10 +64,16 @@
           </div>
         </div>
         <div class="row">
-          <div class="col-12">
+          <div *ngIf="!onlyCupons" class="col-12">
             <label for="description">Descripcion</label>
             <input type="text" class="form-control" id="description" formControlName="description"
               placeholder="Teclea la descripción" [attr.disabled]="onlyView ? true : null">
+          </div>
+          <div *ngIf="onlyCupons" class="col-12">
+            <label for="description">Descripcion</label>
+            <input type="text" class="form-control" id="description" formControlName="description"
+              placeholder="Teclea la descripción" [attr.disabled]="onlyView ? true : null"
+              (input)="convertToUppercase($event)">
           </div>
         </div>
       </div>
