@@ -53,9 +53,14 @@
             <input type="text" class="form-control" id="clave" formControlName="clave" placeholder="Teclea la clave"
               [attr.disabled]="true">
           </div>
-          <div class="col-4">
+          <div *ngIf="!onlyCupons" class="col-4">
             <label for="order">Orden</label>
             <input type="text" class="form-control" id="order" formControlName="order" placeholder="Teclea el orden"
+              [attr.disabled]="onlyView ? true : null">
+          </div>
+          <div *ngIf="onlyCupons" class="col-4">
+            <label for="order">% de Descuento</label>
+            <input type="text" class="form-control" id="order" formControlName="order" placeholder="Teclea el descuento"
               [attr.disabled]="onlyView ? true : null">
           </div>
           <div class="col-4">
