@@ -24,6 +24,7 @@ export class TablePaginationComponent implements OnInit {
   // @Input() filterBranch = '0';
   // @Input() filtroProduct = false;
   @Input() onlySearch = false;
+  @Input() onlyCupons = false;
   @Input() mostrarBoton = true;
   @Input() mostrarImport = false;
   @Input() mostrarAgregar = true;
@@ -107,6 +108,16 @@ export class TablePaginationComponent implements OnInit {
             this.infoPage.total = data.info.total;
             this.totalData = data.info.total;
           }
+
+          // Ordenar la lista por el campo 'id' en orden ascendente cuando es tabla de cupones.
+          if (this.onlyCupons) {
+            if (data[this.resultData.listKey]) {
+              data[this.resultData.listKey] = data[this.resultData.listKey].sort((a, b) => {
+                return a.id - b.id;
+              });
+            }
+          }
+
           this.loading = false;
           closeAlert();
           return data[this.resultData.listKey];

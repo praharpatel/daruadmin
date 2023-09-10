@@ -99,7 +99,7 @@ export class ImportarComponent implements OnInit {
 
   //#region Iniciando Formulario
   ngOnInit(): void {
-    console.clear();
+    // console.clear();
     this.onlySearch = false;
     this.valorSearch = new Catalog();
     this.importForm = this.formBuilder.group({

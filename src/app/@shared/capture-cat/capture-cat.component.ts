@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { IPicture } from '@core/interfaces/product.interface';
 import { AddCatalog, Catalog } from '@core/models/catalog.models';
@@ -23,6 +23,7 @@ export class CaptureCatComponent implements OnInit {
   pictures: IPicture[];
 
   // @Input() catalog: ICatalog;
+  @Input() onlyCupons: boolean = false;
   @Input() catalog: Catalog;
   @Output() datosEnviar: FormData = new FormData();
   @Output() catalogChange = new EventEmitter<AddCatalog>();
@@ -31,16 +32,27 @@ export class CaptureCatComponent implements OnInit {
   constructor(
     private formBuilder: FormBuilder,
     public modal: NgbModal
-  ) { }
+  ) {}
 
   // convenience getter for easy access to form fields
   get f() { return this.captureForm.controls; }
 
   ngOnInit(): void {
+    this.updateCaptureForm();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    // Verifica si 'onlyCupons' cambió y actualiza el formulario en consecuencia
+    if (changes.onlyCupons) {
+      this.updateCaptureForm();
+    }
+  }
+
+  updateCaptureForm() {
     this.captureForm = this.formBuilder.group({
       clave: ['1', [Validators.required]],
       estatus: ['Activos'],
-      order: [1000],
+      order: [this.onlyCupons ? 0 : 1000],
       active: [true],
       description: ['', [Validators.required]]
     });
@@ -88,7 +100,7 @@ export class CaptureCatComponent implements OnInit {
     this.captureForm.controls.clave.setValue(this.catalog.id);
     this.captureForm.controls.estatus.setValue(valorEditar);
     this.captureForm.controls.description.setValue(this.catalog.description);
-    this.captureForm.controls.order.setValue(this.catalog.order);
+    // this.captureForm.controls.order.setValue(1);
     this.modal.open(this.content, { size: 'lg' });
   }
 

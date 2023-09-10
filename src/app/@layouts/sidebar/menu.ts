@@ -109,9 +109,15 @@ export const MENU: MenuItem[] = [
       },
       {
         id: 6,
+        label: 'Cupones',
+        link: '/cupons',
+        parentId: 6
+      },
+      {
+        id: 7,
         label: 'Configuraciones',
         link: '/config',
-        parentId: 6
+        parentId: 7
       },
     ]
   },
