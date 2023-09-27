@@ -164,6 +164,7 @@ export const DELIVERY_FRAGMENT = gql`
             inicio_promocion
             vencimiento_promocion
             disponible_en_promocion
+            porciento
           }
         }
         productShipments {

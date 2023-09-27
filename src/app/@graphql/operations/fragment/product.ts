@@ -103,6 +103,7 @@ export const PRODUCT_FRAGMENT = gql`
       descripcion_promocion
       vencimiento_promocion
       disponible_en_promocion
+      porciento
     }
   }
 `;
