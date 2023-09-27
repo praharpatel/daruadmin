@@ -123,6 +123,7 @@ export class BranchOffices {
 
 export class PromocionBranchOffice {
   price: number;
+  porciento: number;
   vigente: Vigente;
 }
 
@@ -143,6 +144,7 @@ export class Promociones {
   inicio_promocion: string;
   vencimiento_promocion: string;
   disponible_en_promocion: number;
+  porciento: number;
 }
 
 export class AddProduct {

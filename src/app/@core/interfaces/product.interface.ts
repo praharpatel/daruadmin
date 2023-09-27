@@ -127,4 +127,5 @@ export interface IPromociones {
   descripcion_promocion: string;
   vencimiento_promocion: string;
   disponible_en_promocion: number;
+  porciento: number;
 }

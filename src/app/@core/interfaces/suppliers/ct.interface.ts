@@ -17,6 +17,7 @@ export class IAlmacen {
 
 export class IPromocion {
   precio: number;
+  porciento: number;
   vigente: IVigencia;
 }
 
