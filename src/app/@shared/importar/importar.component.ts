@@ -597,6 +597,7 @@ export class ImportarComponent implements OnInit {
           if (promocionData) {
             promocionObj = {
               precio: promocionData.precio || 0,
+              porciento: promocionData.porciento || 0,
               vigente: {
                 ini: promocionData.vigente ? promocionData.vigente.ini : '',
                 fin: promocionData.vigente ? promocionData.vigente.fin : '',
@@ -1034,6 +1035,7 @@ export class ImportarComponent implements OnInit {
             promo.descripcion_promocion = 'Producto con Descuento';
             promo.vencimiento_promocion = 'Total Existencias: ' + item.total_existencia.toString();
             promo.disponible_en_promocion = precioDescuento;
+            promo.porciento = 0;
             salePrice = precioDescuento;
           }
           itemData.sale_price = salePrice;
@@ -1120,6 +1122,7 @@ export class ImportarComponent implements OnInit {
               promo.descripcion_promocion = item.DescripcionPromocion;
               promo.vencimiento_promocion = item.VencimientoPromocion;
               promo.disponible_en_promocion = item.DisponibleEnPromocion === '' ? 0 : parseFloat(item.DisponibleEnPromocion) * 1.50;
+              promo.porciento = 0;
             }
             itemData.sale_price = salePrice;
             itemData.promociones = promo;
@@ -1194,8 +1197,11 @@ export class ImportarComponent implements OnInit {
               promo.inicio_promocion = item.almacenes[0].promociones[0].vigente.ini;
               promo.vencimiento_promocion = item.almacenes[0].promociones[0].vigente.fin;
               promo.disponible_en_promocion = item.almacenes[0].promociones[0].precio;
+              promo.porciento = item.almacenes[0].promociones[0].porciento;
               salePrice = item.almacenes[0].promociones[0].precio;
               itemData.promociones = promo;
+              console.log('item: ', item);
+              console.log('itemData: ', itemData);
             }
             itemData.id = productJson.clave;
             itemData.name = productJson.nombre;
@@ -1241,8 +1247,10 @@ export class ImportarComponent implements OnInit {
             // SupplierProd                                                         TO-DO
             s.idProveedor = proveedor;
             s.codigo = productJson.numParte;
-            if (itemData.promociones && itemData.promociones.disponible_en_promocion > 0) {
-              s.price = itemData.promociones.disponible_en_promocion;
+            if (itemData.promociones && (
+              itemData.promociones.disponible_en_promocion > 0 || itemData.promociones.porciento > 0)) {
+              const precioPromocion = (parseFloat(item.precio) - (parseFloat(item.precio) * itemData.promociones.porciento / 100)).toFixed(2);
+              s.price = parseFloat(precioPromocion);
             } else {
               s.price = parseFloat(item.precio);
             }
