@@ -1242,13 +1242,18 @@ export class ImportarComponent implements OnInit {
             itemData.unidadDeMedida = unidad;
             // Categorias
             itemData.category = [];
-            c.name = productJson.subcategoria;
-            c.slug = slugify(productJson.subcategoria, { lower: true });
-            itemData.category.push(c);
-            const c1 = new Categorys();
-            c.name = productJson.categoria;
-            c.slug = slugify(productJson.categoria, { lower: true });
-            itemData.category.push(c1);
+            if (productJson.subcategoria) {
+              const c = new Categorys();
+              c.name = productJson.subcategoria;
+              c.slug = slugify(productJson.subcategoria, { lower: true });
+              itemData.category.push(c);
+            }
+            if (productJson.categoria) {
+              const c1 = new Categorys();
+              c1.name = productJson.categoria;
+              c1.slug = slugify(productJson.categoria, { lower: true });
+              itemData.category.push(c1);
+            }
             // Marcas
             itemData.brand = productJson.marca.toLowerCase();
             itemData.brands = [];
@@ -1287,7 +1292,6 @@ export class ImportarComponent implements OnInit {
             return itemData;
           }
         }
-        console.log('itemData: ', itemData);
         return itemData;
 
       case 'exel':
