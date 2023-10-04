@@ -79,6 +79,18 @@ export const PRODUCTOSCVA_LIST_QUERY = gql`
   ${PRODUCTOSCVA_FRAGMENT}
 `;
 
+export const PRODUCTSPRICECVA_LIST_QUERY = gql`
+  query listPricesCva($brandName: String) {
+    listPricesCva(brandName: $brandName) {
+      status
+      message
+      listPricesCva {
+        ...ProductosCvaObject
+      }
+    }
+  }
+  ${PRODUCTOSCVA_FRAGMENT}
+`;
 
 export const ORDERSCVA_LIST_QUERY = gql`
   query listOrdersCva {
