@@ -4,10 +4,10 @@ import { ILoginCTForm, ILoginSyscomForm } from '@core/interfaces/extern-login.in
 import { IApis, ISupplier } from '@core/interfaces/supplier.interface';
 import { Product } from '@core/models/product.models';
 import { map } from 'rxjs/operators';
-import axios, {  } from 'axios';
+import axios, { } from 'axios';
 import { Apollo } from 'apollo-angular';
 import { ApiService } from '@graphql/services/api.service';
-import { BRANDSCVA_LIST_QUERY, GROUPSCVA_LIST_QUERY, ORDERSCVA_LIST_QUERY, PAQUETERIASCVA_LIST_QUERY, PRODUCTOSCVA_LIST_QUERY, SOLUCIONESCVA_LIST_QUERY, SUCURSALESCVA_LIST_QUERY } from '@graphql/operations/query/suppliers/cva';
+import { BRANDSCVA_LIST_QUERY, GROUPSCVA_LIST_QUERY, ORDERSCVA_LIST_QUERY, PAQUETERIASCVA_LIST_QUERY, PRODUCTOSCVA_LIST_QUERY, PRODUCTSPRICECVA_LIST_QUERY, SOLUCIONESCVA_LIST_QUERY, SUCURSALESCVA_LIST_QUERY } from '@graphql/operations/query/suppliers/cva';
 import { Catalog } from '@core/models/catalog.models';
 import { PRODUCTOSCT_LIST_QUERY } from '@graphql/operations/query/suppliers/ct';
 import { TOKENCT_FRAGMENT } from '@graphql/operations/fragment/suppliers/ct';
@@ -577,6 +577,20 @@ export class ExternalAuthService extends ApiService {
       this.get(PRODUCTOSCVA_LIST_QUERY, {}, {}).subscribe(
         (result: any) => {
           resolve(result.listProductsCva);
+        },
+        (error: any) => {
+          reject(error);
+        });
+    });
+  }
+
+  async getProductsPricesCva(brandName: string): Promise<any> {
+    return new Promise<any>((resolve, reject) => {
+      this.get(PRODUCTSPRICECVA_LIST_QUERY, {
+        brandName
+      }, {}).subscribe(
+        (result: any) => {
+          resolve(result.listPricesCva);
         },
         (error: any) => {
           reject(error);
