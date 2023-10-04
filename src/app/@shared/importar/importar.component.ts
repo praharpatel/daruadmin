@@ -474,6 +474,7 @@ export class ImportarComponent implements OnInit {
         }
         this.dataSupplier = productos;
         closeAlert();
+        console.log('this.dataSupplier: ', this.dataSupplier);
         return this.dataSupplier;
 
       } else {
@@ -538,17 +539,28 @@ export class ImportarComponent implements OnInit {
         // Carga de Productos
         const almacenes = await this.externalAuthService.getSucursalesCva();
         if (almacenes.status && almacenes.listSucursalesCva.length > 0) {
-          this.cvaAlmacenes = almacenes.listSucursalesCva;
-          const productosCva = await this.externalAuthService.getProductsCva();
-          let i = 1;
-          for (const product of productosCva.listProductsCva) {
-            let itemData = new Product();
-            product.id = i;
-            itemData = this.setProduct(supplier.slug, product);
-            if (itemData.id !== undefined) {
-              productos.push(itemData);
+          const brandsCva = await this.externalAuthService.getBrandsCva();
+          let productosCva: Product[] = [];
+          for (const brand of brandsCva.listBrandsCva) {
+            const productosCvaTmp = await this.externalAuthService.getProductsPricesCva(brand.descripcion);
+            if (productosCvaTmp && productosCvaTmp.listPricesCva !== null && productosCvaTmp.listPricesCva.length > 0) {
+              productosCva.push(...productosCvaTmp.listPricesCva);
             }
-            i += 1;
+          }
+          this.cvaAlmacenes = almacenes.listSucursalesCva;
+          if (productosCva.length > 0) {
+            let i = 1;
+            for (const product of productosCva) {
+              let itemData = new Product();
+              product.id = i;
+              itemData = this.setProduct(supplier.slug, product);
+              if (itemData.id !== undefined) {
+                productos.push(itemData);
+              }
+              i += 1;
+            }
+          } else {
+            return await [];
           }
         } else {
           return await [];
@@ -1177,6 +1189,7 @@ export class ImportarComponent implements OnInit {
       case 'ct':
         disponible = 0;
         salePrice = 0;
+        console.log('item: ', item);
         if (item.almacenes.length > 0) {
           const branchOfficesCt: BranchOffices[] = [];
           let featured = false;
@@ -1200,8 +1213,6 @@ export class ImportarComponent implements OnInit {
               promo.porciento = item.almacenes[0].promociones[0].porciento;
               salePrice = item.almacenes[0].promociones[0].precio;
               itemData.promociones = promo;
-              console.log('item: ', item);
-              console.log('itemData: ', itemData);
             }
             itemData.id = productJson.clave;
             itemData.name = productJson.nombre;
@@ -1276,6 +1287,7 @@ export class ImportarComponent implements OnInit {
             return itemData;
           }
         }
+        console.log('itemData: ', itemData);
         return itemData;
 
       case 'exel':
