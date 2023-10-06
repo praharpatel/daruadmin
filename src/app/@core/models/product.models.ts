@@ -108,6 +108,8 @@ export class SupplierProd {
   price: number;
   moneda: string;
   branchOffices: BranchOffices[];
+  category: Categorys;
+  subCategory: Categorys;
 }
 
 export class BranchOffices {
