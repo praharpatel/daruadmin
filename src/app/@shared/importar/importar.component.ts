@@ -1166,6 +1166,12 @@ export class ImportarComponent implements OnInit {
             s.price = parseFloat(item.precio) * 1.50;
             s.moneda = 'MXN';
             s.branchOffices = branchOffices;
+            s.category = new Categorys();
+            s.subCategory = new Categorys();
+            s.category.slug = slugify(item.solucion, { lower: true });;
+            s.category.name = item.solucion;
+            s.subCategory.slug = slugify(item.grupo, { lower: true });;
+            s.subCategory.name = item.grupo;
             itemData.suppliersProd = s;
             // Imagenes
             itemData.pictures = [];
@@ -1189,7 +1195,6 @@ export class ImportarComponent implements OnInit {
       case 'ct':
         disponible = 0;
         salePrice = 0;
-        console.log('item: ', item);
         if (item.almacenes.length > 0) {
           const branchOfficesCt: BranchOffices[] = [];
           let featured = false;
@@ -1272,6 +1277,12 @@ export class ImportarComponent implements OnInit {
             }
             s.moneda = item.moneda;
             s.branchOffices = branchOfficesCt;
+            s.category = new Categorys();
+            s.subCategory = new Categorys();
+            s.category.slug = slugify(productJson.categoria, { lower: true });;
+            s.category.name = productJson.categoria;
+            s.subCategory.slug = slugify(productJson.subcategoria, { lower: true });;
+            s.subCategory.name = productJson.subcategoria;
             itemData.suppliersProd = s;
             itemData.model = productJson.modelo;
             // Imagenes
