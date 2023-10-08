@@ -25,6 +25,7 @@ export class CaptureProdComponent implements OnInit {
   category: Categorys[];
   subCategory: Categorys[];
   categorySelected: string[];
+  subCategorySelected: string[];
   captureGeneral: FormGroup;
   captureVariants: FormGroup;
   titulo = 'Capturando producto';
@@ -191,6 +192,7 @@ export class CaptureProdComponent implements OnInit {
       this.captureGeneral.controls.active.setValue(product.active);
       this.brandsSelected = product.brand;
       this.categorySelected = [];
+      this.subCategorySelected = [];
       if (product.category) {
         product.category.forEach(cat => {
           this.categorySelected.push(cat.slug);
