@@ -1151,9 +1151,20 @@ export class ImportarComponent implements OnInit {
             itemData.unidadDeMedida = unidad;
             // Categorias
             itemData.category = [];
-            c.name = item.grupo;
-            c.slug = slugify(item.grupo, { lower: true });
-            itemData.category.push(c);
+            if (item.grupo) {
+              const c = new Categorys();
+              c.name = item.solucion;
+              c.slug = slugify(item.solucion, { lower: true });
+              itemData.category.push(c);
+            }
+            // SubCategorias
+            itemData.subCategory = [];
+            if (item.solucion) {
+              const c1 = new Categorys();
+              c1.name = item.grupo;
+              c1.slug = slugify(item.grupo, { lower: true });
+              itemData.subCategory.push(c1);
+            }
             // Marcas
             itemData.brand = item.marca.toLowerCase();
             itemData.brands = [];
@@ -1247,17 +1258,19 @@ export class ImportarComponent implements OnInit {
             itemData.unidadDeMedida = unidad;
             // Categorias
             itemData.category = [];
-            if (productJson.subcategoria) {
+            if (productJson.categoria) {
               const c = new Categorys();
-              c.name = productJson.subcategoria;
-              c.slug = slugify(productJson.subcategoria, { lower: true });
+              c.name = productJson.categoria;
+              c.slug = slugify(productJson.categoria, { lower: true });
               itemData.category.push(c);
             }
-            if (productJson.categoria) {
+            //Subcategorias
+            itemData.subCategory = [];
+            if (productJson.subcategoria) {
               const c1 = new Categorys();
-              c1.name = productJson.categoria;
-              c1.slug = slugify(productJson.categoria, { lower: true });
-              itemData.category.push(c1);
+              c1.name = productJson.subcategoria;
+              c1.slug = slugify(productJson.subcategoria, { lower: true });
+              itemData.subCategory.push(c1);
             }
             // Marcas
             itemData.brand = productJson.marca.toLowerCase();

@@ -23,6 +23,7 @@ export class CaptureProdComponent implements OnInit {
   brands: Catalog[];
   brandsSelected: string;
   category: Categorys[];
+  subCategory: Categorys[];
   categorySelected: string[];
   captureGeneral: FormGroup;
   captureVariants: FormGroup;
@@ -65,6 +66,7 @@ export class CaptureProdComponent implements OnInit {
       author: [''],
       sold: [''],
       category: [null, [Validators.required]],
+      subCategory: [null],
       brands: [null, [Validators.required]],
       active: [true],
       estatus: ['Activos'],
@@ -77,6 +79,7 @@ export class CaptureProdComponent implements OnInit {
     });
     this.brands = [];
     this.category = [];
+    this.subCategory = [];
   }
 
   onSubmit() {
@@ -175,6 +178,7 @@ export class CaptureProdComponent implements OnInit {
       this.captureGeneral.controls.author.setValue(product.author);
       this.captureGeneral.controls.sold.setValue(product.sold);
       this.captureGeneral.controls.category.setValue(product.category);
+      this.captureGeneral.controls.subCategory.setValue(product.subCategory);
       this.captureGeneral.controls.brands.setValue(product.brands);
       this.captureGeneral.controls.sku.setValue(product.sku);
       this.captureGeneral.controls.upc.setValue(product.upc);
@@ -190,6 +194,11 @@ export class CaptureProdComponent implements OnInit {
       if (product.category) {
         product.category.forEach(cat => {
           this.categorySelected.push(cat.slug);
+        });
+      }
+      if (product.subCategory) {
+        product.subCategory.forEach(cat => {
+          this.subCategorySelected.push(cat.slug);
         });
       }
       return

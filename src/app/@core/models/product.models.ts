@@ -22,6 +22,7 @@ export class Product extends ProductExport {
   author: string;
   sold: string;
   category: Categorys[];
+  subCategory: Categorys[];
   brand: string;
   brands: Brands[];
   model: string;

@@ -165,6 +165,7 @@ export class ProductsComponent implements OnInit {
       sku: '',
       upc: '',
       category: [],
+      subCategory: [],
       brand: '',
       brands: [],
       model: '',
