@@ -84,6 +84,14 @@ export const DELIVERY_FRAGMENT = gql`
               product_category_id
             }
           }
+          subCategory {
+            name
+            slug
+            pivot {
+              product_id
+              product_category_id
+            }
+          }
           brand
           brands {
             name
