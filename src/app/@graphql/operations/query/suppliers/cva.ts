@@ -80,8 +80,8 @@ export const PRODUCTOSCVA_LIST_QUERY = gql`
 `;
 
 export const PRODUCTSPRICECVA_LIST_QUERY = gql`
-  query listPricesCva($brandName: String) {
-    listPricesCva(brandName: $brandName) {
+  query listPricesCva($groupName: String) {
+    listPricesCva(groupName: $groupName) {
       status
       message
       listPricesCva {
