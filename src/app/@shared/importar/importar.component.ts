@@ -474,9 +474,7 @@ export class ImportarComponent implements OnInit {
         }
         this.dataSupplier = productos;
         closeAlert();
-        console.log('this.dataSupplier: ', this.dataSupplier);
         return this.dataSupplier;
-
       } else {
         basicAlert(TYPE_ALERT.WARNING, 'No existen elementos para buscar.');
       }
@@ -539,14 +537,90 @@ export class ImportarComponent implements OnInit {
         // Carga de Productos
         const almacenes = await this.externalAuthService.getSucursalesCva();
         if (almacenes.status && almacenes.listSucursalesCva.length > 0) {
-          const brandsCva = await this.externalAuthService.getBrandsCva();
+          const groupsCva = await this.externalAuthService.getGroupsCva();
           let productosCva: Product[] = [];
-          for (const brand of brandsCva.listBrandsCva) {
-            const productosCvaTmp = await this.externalAuthService.getProductsPricesCva(brand.descripcion);
+
+          function excludeGroups(groupsToExclude: string[], allGroups: { grupo: string }[]): { grupo: string }[] {
+            const filteredGroups = allGroups.filter(groupObj => !groupsToExclude.includes(groupObj.grupo));
+            return filteredGroups;
+          }
+
+          // Grupos para excluir
+          const groupsToExclude = [
+            "ACCESO VIDEOCONFERENCIA",
+            "AIRE ACONDICIONADO",
+            "ALARMAS",
+            "ANTENAS",
+            "ASPIRADORAS",
+            "BASCULA",
+            "CAFETERA",
+            "CALCULADORA",
+            "CABLEADO ESTRUCTURADO",
+            "CONCENTRADOR DE OXIGENO",
+            "CONTADOR DE BILLETES",
+            "CONSOLAS",
+            "CONTROLES",
+            "COPIADORA",
+            "CURSO",
+            "DIGITALIZADOR",
+            "DRONES",
+            "EMPAQUES",
+            "FREIDORA DE AIRE",
+            "FAX",
+            "FUNDAS",
+            "HANDHELD",
+            "HIDROLAVADORAS",
+            "INSUMOS",
+            "INSUMOS GHIA",
+            "INTERFON",
+            "JUGUETES",
+            "KIOSKO",
+            "LICUADORA",
+            "LINEA BLANCA",
+            "MAQUINA PARA CORTAR CABELLO",
+            "MAQUINAS DE COSER",
+            "MAQUINAS DE ESCRIBIR",
+            "MATERIALES PARA PRODUCCION GHIA",
+            "MUEBLES PARA OFICINA",
+            "MICA",
+            "PCS",
+            "PASE",
+            "PARTES",
+            "PIZARRON",
+            "PORTA RETRATO DIGITAL",
+            "PRODUCTOS DE LIMPIEZA",
+            "PROMOCIONALES",
+            "RADIO RELOJ",
+            "RASURADORA",
+            "REFACCIONES",
+            "EFACCIONES GHIA / HAIER",
+            "REFACCIONES PARA UPS",
+            "REFACCIONES GHIA / HAIER",
+            "REPRODUCTORES",
+            "RELOJES",
+            "SERVICIOS CLOUD CVA",
+            "SERVICIOS METROCARRIER",
+            "SERVICIOS VIDEOCONFERENCIA",
+            "SINTONIZADOR",
+            "SOLUCION INTERWRITE",
+            "SOLUCIONES GSM",
+            "VENTILADORES",
+            "TRITURADORA DE DOCUMENTOS",
+            "VENTILADORES",
+            "TERMOMETRO",
+            "TIPO DE CONECTIVIDAD",
+            "PIZARRON",
+          ];
+          // Obtener la lista de grupos excluyendo los especificados
+          const filteredGroups = excludeGroups(groupsToExclude, groupsCva.listGroupsCva);
+
+          for (const group of filteredGroups) {
+            const productosCvaTmp = await this.externalAuthService.getProductsPricesCva(group.grupo);
             if (productosCvaTmp && productosCvaTmp.listPricesCva !== null && productosCvaTmp.listPricesCva.length > 0) {
               productosCva.push(...productosCvaTmp.listPricesCva);
             }
           }
+
           this.cvaAlmacenes = almacenes.listSucursalesCva;
           if (productosCva.length > 0) {
             let i = 1;
@@ -1153,16 +1227,26 @@ export class ImportarComponent implements OnInit {
             itemData.category = [];
             if (item.grupo) {
               const c = new Categorys();
-              c.name = item.solucion;
-              c.slug = slugify(item.solucion, { lower: true });
+              c.name = item.grupo;
+              c.slug = slugify(item.grupo, { lower: true });
+              itemData.category.push(c);
+            } else {
+              const c = new Categorys();
+              c.name = '';
+              c.slug = '';
               itemData.category.push(c);
             }
             // SubCategorias
             itemData.subCategory = [];
-            if (item.solucion) {
+            if (item.subgrupo) {
               const c1 = new Categorys();
-              c1.name = item.grupo;
-              c1.slug = slugify(item.grupo, { lower: true });
+              c1.name = item.subgrupo;
+              c1.slug = slugify(item.subgrupo, { lower: true });
+              itemData.subCategory.push(c1);
+            } else {
+              const c1 = new Categorys();
+              c1.name = '';
+              c1.slug = '';
               itemData.subCategory.push(c1);
             }
             // Marcas
@@ -1263,6 +1347,11 @@ export class ImportarComponent implements OnInit {
               c.name = productJson.categoria;
               c.slug = slugify(productJson.categoria, { lower: true });
               itemData.category.push(c);
+            } else {
+              const c = new Categorys();
+              c.name = '';
+              c.slug = '';
+              itemData.category.push(c);
             }
             //Subcategorias
             itemData.subCategory = [];
@@ -1270,6 +1359,11 @@ export class ImportarComponent implements OnInit {
               const c1 = new Categorys();
               c1.name = productJson.subcategoria;
               c1.slug = slugify(productJson.subcategoria, { lower: true });
+              itemData.subCategory.push(c1);
+            } else {
+              const c1 = new Categorys();
+              c1.name = '';
+              c1.slug = '';
               itemData.subCategory.push(c1);
             }
             // Marcas
