@@ -647,16 +647,26 @@ export class ImportarComponent implements OnInit {
           if (productosCt.status) {
             const productsJson = await this.getProductsCt();
             let i = 1;
+            const excludedCategories = [
+              'Caretas', 'Cubrebocas', 'Desinfectantes', 'Equipo', 'Termómetros',
+              'Acceso', 'Accesorios para seguridad', 'Camaras Deteccion',
+              'Control de Acceso', 'Sensores', 'Tarjetas de Acceso', 'Timbres',
+              'Administrativo', 'Contabilidad', 'Nóminas', 'Timbres Fiscales',
+              'Análogos', 'Video Conferencia', 'Accesorios de Papeleria', 'Articulos de Escritura',
+              'Basico de Papeleria', 'Cabezales', 'Cuadernos', 'Papel', 'Papelería', ''
+            ];
             for (const product of productosCt.stockProductsCt) {
-              productsJson.forEach(productJson => {
-                if (product.codigo === productJson.clave) {
-                  const productTmp: IProductoCt = this.convertirPromocion(product);
-                  const itemData: Product = this.setProduct(supplier.slug, productTmp, productJson);
-                  if (itemData.id !== undefined) {
-                    productos.push(itemData);
+              if (!excludedCategories.includes(product.subcategoria)) {
+                productsJson.forEach(productJson => {
+                  if (product.codigo === productJson.clave) {
+                    const productTmp: IProductoCt = this.convertirPromocion(product);
+                    const itemData: Product = this.setProduct(supplier.slug, productTmp, productJson);
+                    if (itemData.id !== undefined) {
+                      productos.push(itemData);
+                    }
                   }
-                }
-              });
+                });
+              }
             }
           }
         } else {
