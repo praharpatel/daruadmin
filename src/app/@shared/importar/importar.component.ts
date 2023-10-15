@@ -1030,160 +1030,9 @@ export class ImportarComponent implements OnInit {
 
     switch (proveedor) {
       case 'ingram':
-        const stock = parseInt(item.field26, 10);
-        if (stock >= this.stockMinimo) {
-          salePrice = 0;
-          itemData.id = item.field2;
-          itemData.name = item.field5;
-          itemData.slug = slugify(item.field5, { lower: true });
-          itemData.short_desc = item.field5 + '. ' + item.field6;
-          itemData.price = parseFloat(item.field7);
-          itemData.sale_price = salePrice;
-          itemData.review = 0;
-          itemData.ratings = 0;
-          itemData.until = this.getFechas(new Date());
-          itemData.top = false;
-          itemData.featured = false;
-          itemData.new = false;
-          itemData.sold = null;
-          itemData.stock = stock;
-          itemData.sku = item.field2;
-          itemData.partnumber = item.field8;
-          itemData.upc = item.field10;
-          unidad.id = 'PZ';
-          unidad.name = 'Pieza';
-          unidad.slug = 'pieza';
-          itemData.unidadDeMedida = unidad;
-          // Categorias
-          itemData.category = [];
-          c.name = 'item.categoria';
-          c.slug = ''; // slugify(item.categoria, { lower: true });
-          itemData.category.push(c);
-          // Marcas
-          itemData.brand = item.field4.toUpperCase();
-          itemData.brands = [];
-          b.name = item.field4;
-          b.slug = slugify(item.field4, { lower: true });
-          itemData.brands.push(b);
-          // SupplierProd
-          s.idProveedor = proveedor;
-          s.codigo = item.field2;
-          s.price = parseFloat(item.field7);
-          s.moneda = 'MXN';
-          s.branchOffices = [];
-          // if (productJson.length > 0) {
-          //   productJson.forEach(almacen => {
-          //     const branchoffice = new BranchOffices();
-          //     branchoffice.name = almacen.localidad;
-          //     branchoffice.cantidad = parseInt(almacen.existencia, 10);
-          //     s.branchOffices.push(branchoffice);
-          //   });
-          // }
-          itemData.variants = [];
-          itemData.suppliersProd = s;
-          // Imagenes
-          // if (imagenes.length > 0) {
-          //   imagenes.forEach(image => {
-          //     itemData.pictures = [];
-          //     i.width = '600';
-          //     i.height = '600';
-          //     i.url = image.url;
-          //     itemData.pictures.push(i);
-          //     // Imagenes pequeñas
-          //     itemData.sm_pictures = [];
-          //     is.width = '300';
-          //     is.height = '300';
-          //     is.url = image.url;
-          //     itemData.sm_pictures.push(is);
-          //   });
-          // }
-        }
         return itemData;
 
       case 'syscom':
-        salePrice = 0;
-        if (item.total_existencia >= this.stockMinimo) {
-          itemData.id = item.producto_id;
-          itemData.name = item.titulo === '' ? item.modelo : item.titulo;
-          itemData.slug = slugify(item.titulo === '' ? item.modelo : item.titulo, { lower: true });
-          itemData.short_desc = item.titulo + '. Modelo: ' + item.modelo;
-          itemData.price = parseFloat(item.precios.precio_lista);
-          itemData.review = 0;
-          itemData.ratings = 0;
-          itemData.until = this.getFechas(new Date());
-          const precioLista = parseFloat(item.precios.precio_lista);
-          const precioDescuento = parseFloat(item.precios.precio_descuento);
-          const precioEspecial = parseFloat(item.precios.precio_especial);
-          let featured = false;
-          if (precioEspecial < precioLista) {                   // Catalogar como producto feature
-            featured = true;
-            desc.total_descuento = precioEspecial;
-            desc.moneda_descuento = 'MXN';
-            desc.precio_descuento = precioEspecial;
-            salePrice = precioEspecial;
-          }
-          itemData.descuentos = desc;
-          if (precioDescuento < precioEspecial) {               // Catalogar como producto TOP
-            featured = true;
-            promo.clave_promocion = '';
-            promo.descripcion_promocion = 'Producto con Descuento';
-            promo.vencimiento_promocion = 'Total Existencias: ' + item.total_existencia.toString();
-            promo.disponible_en_promocion = precioDescuento;
-            promo.porciento = 0;
-            salePrice = precioDescuento;
-          }
-          itemData.sale_price = salePrice;
-          itemData.promociones = promo;
-          itemData.top = false;
-          itemData.featured = featured;
-          itemData.new = null;
-          itemData.sold = null;
-          itemData.stock = item.total_existencia;
-          itemData.sku = item.modelo;
-          itemData.partnumber = item.producto_id;
-          itemData.upc = item.sat_key;
-          unidad.id = item.unidad_de_medida.codigo_unidad;
-          unidad.name = item.unidad_de_medida.nombre;
-          unidad.slug = slugify(item.unidad_de_medida.nombre, { lower: true });
-          itemData.unidadDeMedida = unidad;
-          // Categorias
-          itemData.category = [];
-          item.categorias.forEach(categoria => {
-            const cat = new Categorys();
-            cat.name = categoria.nombre;
-            cat.slug = slugify(categoria.nombre, { lower: true });
-            itemData.category.push(cat);
-          });
-          // Marcas
-          itemData.brand = item.marca.toUpperCase();
-          itemData.brands = [];
-          b.name = item.marca;
-          b.slug = slugify(item.marca, { lower: true });
-          itemData.brands.push(b);
-          // SupplierProd
-          s.idProveedor = proveedor;
-          s.codigo = item.producto_id;
-          s.price = parseFloat(item.precios.precio_lista);
-          s.moneda = 'MXN';
-          s.branchOffices = [];
-          bo.name = 'Villahermosa';
-          bo.cantidad = item.total_existencia;
-          s.branchOffices.push(bo);
-          itemData.suppliersProd = s;
-          // Imagenes
-          itemData.pictures = [];
-          i.width = '600';
-          i.height = '600';
-          i.url = item.img_portada === '' ? item.marca_logo : item.img_portada;
-          itemData.pictures.push(i);
-          // Imagenes pequeñas
-          itemData.sm_pictures = [];
-          is.width = '300';
-          is.height = '300';
-          is.url = item.img_portada === '' ? item.marca_logo : item.img_portada;
-          itemData.variants = [];
-          itemData.sm_pictures.push(is);
-        }
         return itemData;
 
       case 'cva':
@@ -1271,10 +1120,14 @@ export class ImportarComponent implements OnInit {
             s.branchOffices = branchOffices;
             s.category = new Categorys();
             s.subCategory = new Categorys();
-            s.category.slug = slugify(item.solucion, { lower: true });;
-            s.category.name = item.solucion;
-            s.subCategory.slug = slugify(item.grupo, { lower: true });;
-            s.subCategory.name = item.grupo;
+            if (item.solucion) {
+              s.category.slug = slugify(item.solucion, { lower: true });;
+              s.category.name = item.solucion;
+            }
+            if (item.grupo) {
+              s.subCategory.slug = slugify(item.grupo, { lower: true });;
+              s.subCategory.name = item.grupo;
+            }
             itemData.suppliersProd = s;
             // Imagenes
             itemData.pictures = [];
@@ -1394,10 +1247,14 @@ export class ImportarComponent implements OnInit {
             s.branchOffices = branchOfficesCt;
             s.category = new Categorys();
             s.subCategory = new Categorys();
-            s.category.slug = slugify(productJson.categoria, { lower: true });;
-            s.category.name = productJson.categoria;
-            s.subCategory.slug = slugify(productJson.subcategoria, { lower: true });;
-            s.subCategory.name = productJson.subcategoria;
+            if (productJson.categoria) {
+              s.category.slug = slugify(productJson.categoria, { lower: true });;
+              s.category.name = productJson.categoria;
+            }
+            if (productJson.subcategoria) {
+              s.subCategory.slug = slugify(productJson.subcategoria, { lower: true });;
+              s.subCategory.name = productJson.subcategoria;
+            }
             itemData.suppliersProd = s;
             itemData.model = productJson.modelo;
             // Imagenes
@@ -1421,71 +1278,6 @@ export class ImportarComponent implements OnInit {
         return itemData;
 
       case 'exel':
-        salePrice = 0;
-        itemData.id = item.id_producto;
-        itemData.name = item.descripcion;
-        itemData.slug = slugify(item.descripcion, { lower: true });
-        itemData.short_desc = item.subcategoria + '. Codigo: ' + item.codigo_proveedor;
-        itemData.price = item.precioLista;
-        itemData.sale_price = salePrice;
-        itemData.review = 0;
-        itemData.ratings = 0;
-        itemData.until = this.getFechas(new Date());
-        itemData.top = false;
-        itemData.featured = false;
-        itemData.new = item.nuevo = 1 ? true : false;
-        itemData.sold = null;
-        itemData.stock = item.stock;
-        itemData.sku = item.id_producto;
-        itemData.partnumber = item.codigo_proveedor;
-        itemData.upc = item.codigo_barra;
-        unidad.id = 'PZ';
-        unidad.name = 'Pieza';
-        unidad.slug = 'pieza';
-        itemData.unidadDeMedida = unidad;
-        // Categorias
-        itemData.category = [];
-        c.name = item.categoria;
-        c.slug = slugify(item.categoria, { lower: true });
-        itemData.category.push(c);
-        // Marcas
-        itemData.brand = item.marca.toUpperCase();
-        itemData.brands = [];
-        b.name = item.marca;
-        b.slug = slugify(item.marca, { lower: true });
-        itemData.brands.push(b);
-        // SupplierProd
-        s.idProveedor = proveedor;
-        s.codigo = item.id_producto;
-        s.price = parseFloat(item.precioLista) * 1.50;
-        s.moneda = 'MXN';
-        s.branchOffices = [];
-        if (productJson.length > 0) {
-          productJson.forEach(almacen => {
-            const branchoffice = new BranchOffices();
-            branchoffice.name = almacen.localidad;
-            branchoffice.cantidad = parseInt(almacen.existencia, 10);
-            s.branchOffices.push(branchoffice);
-          });
-        }
-        itemData.variants = [];
-        itemData.suppliersProd = s;
-        // Imagenes
-        if (imagenes.length > 0) {
-          imagenes.forEach(image => {
-            itemData.pictures = [];
-            i.width = '600';
-            i.height = '600';
-            i.url = image.url;
-            itemData.pictures.push(i);
-            // Imagenes pequeñas
-            itemData.sm_pictures = [];
-            is.width = '300';
-            is.height = '300';
-            is.url = image.url;
-            itemData.sm_pictures.push(is);
-          });
-        }
         return itemData;
       default:
         break;
