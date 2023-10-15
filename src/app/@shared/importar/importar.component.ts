@@ -1120,10 +1120,14 @@ export class ImportarComponent implements OnInit {
             s.branchOffices = branchOffices;
             s.category = new Categorys();
             s.subCategory = new Categorys();
-            s.category.slug = slugify(item.solucion, { lower: true });;
-            s.category.name = item.solucion;
-            s.subCategory.slug = slugify(item.grupo, { lower: true });;
-            s.subCategory.name = item.grupo;
+            if (item.solucion) {
+              s.category.slug = slugify(item.solucion, { lower: true });;
+              s.category.name = item.solucion;
+            }
+            if (item.grupo) {
+              s.subCategory.slug = slugify(item.grupo, { lower: true });;
+              s.subCategory.name = item.grupo;
+            }
             itemData.suppliersProd = s;
             // Imagenes
             itemData.pictures = [];
@@ -1243,10 +1247,14 @@ export class ImportarComponent implements OnInit {
             s.branchOffices = branchOfficesCt;
             s.category = new Categorys();
             s.subCategory = new Categorys();
-            s.category.slug = slugify(productJson.categoria, { lower: true });;
-            s.category.name = productJson.categoria;
-            s.subCategory.slug = slugify(productJson.subcategoria, { lower: true });;
-            s.subCategory.name = productJson.subcategoria;
+            if (productJson.categoria) {
+              s.category.slug = slugify(productJson.categoria, { lower: true });;
+              s.category.name = productJson.categoria;
+            }
+            if (productJson.subcategoria) {
+              s.subCategory.slug = slugify(productJson.subcategoria, { lower: true });;
+              s.subCategory.name = productJson.subcategoria;
+            }
             itemData.suppliersProd = s;
             itemData.model = productJson.modelo;
             // Imagenes
