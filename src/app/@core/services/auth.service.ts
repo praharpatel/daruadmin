@@ -32,7 +32,6 @@ export class AuthenticationService extends ApiService {
           this.resetSession();
           return;
         }
-        console.log('start/result: ', result);
         this.updateSession(result);
       });
       this.updateSession({
