@@ -1076,7 +1076,7 @@ export class ImportarComponent implements OnInit {
             itemData.stock = disponible;
             itemData.sku = item.clave;
             itemData.partnumber = item.codigo_fabricante;
-            itemData.upc = item.codigo_fabricante;
+            itemData.upc = item.clave;
             unidad.id = 'PZ';
             unidad.name = 'Pieza';
             unidad.slug = 'pieza';
