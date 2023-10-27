@@ -90,7 +90,6 @@ export class ImportarComponent implements OnInit {
   ) { }
 
   // Define requests
-  private httpReq1$ = this.httpClient.get('assets/uploads/json/productos.json');
   private httpReq2$ = this.httpClient.get('assets/uploads/json/ct_almacenes.json');
   private httpReq3$ = this.httpClient.get('assets/uploads/json/ingram_products.json');
 
@@ -193,21 +192,16 @@ export class ImportarComponent implements OnInit {
 
   async getProd(): Promise<any> {
     try {
-      const result = await this.httpReq1$.toPromise();
-      return result;
+      const data = await this.httpClient.get('assets/uploads/json/productos.json').toPromise();
+      return data;
     } catch (error) {
-      // Manejar el error aquí
+      console.error('Error al cargar el archivo JSON:', error);
       return [];
-      // throw error; // Puedes volver a lanzar el error o manejarlo de otra manera
     }
   }
 
   async getAlma(): Promise<any> {
     return await this.httpReq2$.toPromise();
-  }
-
-  async getProductosIngram(): Promise<any> {
-    return await this.httpReq3$.toPromise();
   }
 
   async getProductsCt() {
@@ -219,19 +213,6 @@ export class ImportarComponent implements OnInit {
       )
       .catch((error: Error) => {
         infoEventAlert('No es posible importar el catalogo de productos.', error.message, TYPE_ALERT.ERROR);
-      });
-    return productsCt;
-  }
-
-  async getProductsIngram() {
-    const productsCt = await this.getProductosIngram()
-      .then(
-        async (result) => {
-          return await result;
-        }
-      )
-      .catch((error: Error) => {
-        infoEventAlert('No es posible importar el catalogo Ingram.', error.message, TYPE_ALERT.ERROR);
       });
     return productsCt;
   }
@@ -532,7 +513,6 @@ export class ImportarComponent implements OnInit {
 
   async getProducts(supplier: ISupplier, apiSelect: IApis, catalogValues: Catalog[]): Promise<any> {
     const productos: Product[] = [];
-    let resultados;
     switch (supplier.slug) {
       case 'cva':
         // Carga de Productos
@@ -640,37 +620,37 @@ export class ImportarComponent implements OnInit {
         }
         return await productos;
       case 'ct':
-        if (supplier.slug === 'ct') {
-          this.ctAlmacenes = await this.getAlmacenes();
-          const productosCt = await this.externalAuthService.getProductsCt();
-          if (productosCt.status) {
-            const productsJson = await this.getProductsCt();
-            let i = 1;
-            const excludedCategories = [
-              'Caretas', 'Cubrebocas', 'Desinfectantes', 'Equipo', 'Termómetros',
-              'Acceso', 'Accesorios para seguridad', 'Camaras Deteccion',
-              'Control de Acceso', 'Sensores', 'Tarjetas de Acceso', 'Timbres',
-              'Administrativo', 'Contabilidad', 'Nóminas', 'Timbres Fiscales',
-              'Análogos', 'Video Conferencia', 'Accesorios de Papeleria', 'Articulos de Escritura',
-              'Basico de Papeleria', 'Cabezales', 'Cuadernos', 'Papel', 'Papelería', ''
-            ];
-            for (const product of productosCt.stockProductsCt) {
-              if (!excludedCategories.includes(product.subcategoria)) {
-                productsJson.forEach(productJson => {
-                  if (product.codigo === productJson.clave) {
-                    const productTmp: IProductoCt = this.convertirPromocion(product);
-                    const itemData: Product = this.setProduct(supplier.slug, productTmp, productJson);
-                    if (itemData.id !== undefined) {
-                      productos.push(itemData);
-                    }
+        this.ctAlmacenes = await this.getAlmacenes();
+        const productosCt = await this.externalAuthService.getProductsCt();
+        if (productosCt.status) {
+          const productsJson = await this.getProductsCt();
+          let i = 1;
+          const excludedCategories = [
+            'Caretas', 'Cubrebocas', 'Desinfectantes', 'Equipo', 'Termómetros',
+            'Acceso', 'Accesorios para seguridad', 'Camaras Deteccion',
+            'Control de Acceso', 'Sensores', 'Tarjetas de Acceso', 'Timbres',
+            'Administrativo', 'Contabilidad', 'Nóminas', 'Timbres Fiscales',
+            'Análogos', 'Video Conferencia', 'Accesorios de Papeleria', 'Articulos de Escritura',
+            'Basico de Papeleria', 'Cabezales', 'Cuadernos', 'Papel', 'Papelería', ''
+          ];
+          for (const product of productosCt.stockProductsCt) {
+            if (!excludedCategories.includes(product.subcategoria)) {
+              productsJson.forEach(productJson => {
+                if (product.codigo === productJson.clave) {
+                  const productTmp: IProductoCt = this.convertirPromocion(product);
+                  const itemData: Product = this.setProduct(supplier.slug, productTmp, productJson);
+                  if (itemData.id !== undefined) {
+                    productos.push(itemData);
                   }
-                });
-              }
+                }
+              });
             }
           }
-        } else {
-          return await [];
         }
+        return await productos;
+      case 'ingram':
+        const productosIngram = await this.externalAuthService.getProductsIngram();
+        console.log('productosIngram: ', productosIngram);
         return await productos;
       default:
         break;
