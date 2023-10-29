@@ -1,7 +1,7 @@
 import gql from 'graphql-tag';
 
 export const PRODUCTSINGRAM_FRAGMENT = gql`
-  fragment ProductsIngramObject on PricesIngram {
+  fragment ProductsIngramObject on ResponsePricesIngram {
       productStatusMessage
       ingramPartNumber
       vendorPartNumber

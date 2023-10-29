@@ -651,6 +651,12 @@ export class ImportarComponent implements OnInit {
       case 'ingram':
         const productosIngram = await this.externalAuthService.getProductsIngram();
         console.log('productosIngram: ', productosIngram);
+        for (const prodIngram of productosIngram.pricesIngram) {
+          const itemData: Product = this.setProduct(supplier.slug, prodIngram);
+          if (itemData.id !== undefined) {
+            productos.push(itemData);
+          }
+        }
         return await productos;
       default:
         break;
@@ -704,6 +710,23 @@ export class ImportarComponent implements OnInit {
       console.error('Error al convertir el objeto JSON:', error);
       return null;
     }
+  }
+
+  getAlmacenIngram(branch): BranchOffices {
+    const almacen = new BranchOffices();
+    almacen.id = branch.warehouseId;
+    almacen.name = branch.location;
+    const parts = branch.location.split('-');
+    if (parts.length > 1) {
+      almacen.estado = branch.Estado;
+    } else {
+      almacen.estado = branch.Estado;
+    }
+    almacen.cp = '';
+    almacen.latitud = '';
+    almacen.longitud = '';
+    almacen.cantidad = branch.quantityAvailable;
+    return almacen;
   }
 
   getAlmacenCant(branch): BranchOffices {
@@ -1011,6 +1034,66 @@ export class ImportarComponent implements OnInit {
 
     switch (proveedor) {
       case 'ingram':
+        disponible = 0;
+        salePrice = 0;
+        if (item.availability.availabilityByWarehouse.length > 0) {
+          const branchOfficesIngram: BranchOffices[] = [];
+          let featured = false;
+          for (const element of item.availability.availabilityByWarehouse) {
+            const almacen = this.getAlmacenIngram(element);
+            if (almacen.cantidad >= this.stockMinimo) {
+              disponible = almacen.cantidad;
+              branchOfficesIngram.push(almacen);
+            }
+          }
+          if (branchOfficesIngram.length > 0) {
+            // TO-DO Promociones
+            salePrice = 0;
+            itemData.id = item.vendorPartNumber;
+            itemData.name = item.description;
+            itemData.slug = slugify(item.description, { lower: true });
+            itemData.short_desc = item.description;
+            if (item.pricing.mapPrice > 0) {
+              if (item.moneda === 'USD') {
+                itemData.price = parseFloat((parseFloat(item.pricing.mapPrice) * this.exchangeRate * this.utilidad).toFixed(2));
+                itemData.sale_price = parseFloat((salePrice * this.exchangeRate * this.utilidad).toFixed(2));
+              } else {
+                itemData.price = parseFloat(item.pricing.mapPrice) * this.utilidad;
+                itemData.sale_price = salePrice * this.utilidad;
+              }
+            } else {
+              itemData.price = salePrice;
+            }
+            itemData.review = 0;
+            itemData.ratings = 0;
+            itemData.until = this.getFechas(new Date());
+            itemData.top = false;
+            itemData.featured = featured;
+            itemData.new = null;
+            itemData.sold = null;
+            itemData.stock = disponible;
+            itemData.sku = item.ingramPartNumber;
+            itemData.upc = item.upc;
+            itemData.partnumber = item.vendorPartNumber;
+            unidad.id = 'PZ';
+            unidad.name = 'Pieza';
+            unidad.slug = 'pieza';
+            itemData.unidadDeMedida = unidad;
+            // Marcas
+            itemData.brand = item.vendorName.toLowerCase();
+            itemData.brands = [];
+            b.name = item.vendorName;
+            b.slug = slugify(item.vendorName, { lower: true });
+            itemData.brands.push(b);
+            // SupplierProd                 TO-DO
+            s.idProveedor = proveedor;
+            s.codigo = item.vendorPartNumber;;
+            // TO-DO Promociones
+            s.moneda = item.pricing.currencyCode;
+            s.branchOffices = branchOfficesIngram;
+            itemData.suppliersProd = s;
+          }
+        }
         return itemData;
 
       case 'syscom':
@@ -1260,6 +1343,7 @@ export class ImportarComponent implements OnInit {
 
       case 'exel':
         return itemData;
+
       default:
         break;
     }
