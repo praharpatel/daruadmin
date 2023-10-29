@@ -7,10 +7,10 @@ import { map } from 'rxjs/operators';
 import axios, { } from 'axios';
 import { Apollo } from 'apollo-angular';
 import { ApiService } from '@graphql/services/api.service';
-import { BRANDSCVA_LIST_QUERY, GROUPSCVA_LIST_QUERY, ORDERSCVA_LIST_QUERY, PAQUETERIASCVA_LIST_QUERY, PRODUCTOSCVA_LIST_QUERY, PRODUCTSPRICECVA_LIST_QUERY, SOLUCIONESCVA_LIST_QUERY, SUCURSALESCVA_LIST_QUERY } from '@graphql/operations/query/suppliers/cva';
+import { BRANDSCVA_LIST_QUERY, GROUPSCVA_LIST_QUERY, PAQUETERIASCVA_LIST_QUERY, PRODUCTOSCVA_LIST_QUERY, PRODUCTSPRICECVA_LIST_QUERY, SOLUCIONESCVA_LIST_QUERY, SUCURSALESCVA_LIST_QUERY } from '@graphql/operations/query/suppliers/cva';
 import { Catalog } from '@core/models/catalog.models';
 import { PRODUCTOSCT_LIST_QUERY } from '@graphql/operations/query/suppliers/ct';
-import { TOKENCT_FRAGMENT } from '@graphql/operations/fragment/suppliers/ct';
+import { PRODUCTSINGRAM_LIST_QUERY } from '@graphql/operations/query/suppliers/ingram';
 
 declare const require;
 const xml2js = require('xml2js');
@@ -613,8 +613,18 @@ export class ExternalAuthService extends ApiService {
   }
   //#endregion
 
-  //#region Openpay
-
+  //#region Ingram
+  async getProductsIngram(): Promise<any> {
+    return new Promise<any>((resolve, reject) => {
+      this.get(PRODUCTSINGRAM_LIST_QUERY, {}, {}).subscribe(
+        (result: any) => {
+          resolve(result.pricesIngram);
+        },
+        (error: any) => {
+          reject(error);
+        });
+    });
+  }
   //#endregion
 
 }
