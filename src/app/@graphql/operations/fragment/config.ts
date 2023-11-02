@@ -5,6 +5,7 @@ export const CONFIG_FRAGMENT = gql`
     id
     message
     exchange_rate
+    minimum_offer
     offer
   }
 `;
