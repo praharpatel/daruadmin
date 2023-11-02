@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Config } from '@core/models/config.models';
 import { ConfigsService } from '@core/services/config.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -21,6 +21,7 @@ export class ConfigComponent implements OnInit {
   habilitaGuardar: boolean;
   visualizarBotones: boolean;
   captureConfig: FormGroup;
+  exchangeRatePattern = '^[0-9]{1,2}(?:\\.[0-9]{1,2})?$';
 
   constructor(
     private formBuilder: FormBuilder,
@@ -39,18 +40,30 @@ export class ConfigComponent implements OnInit {
     this.visualizarBotones = false;
     this.captureConfig = this.formBuilder.group({
       id: ['', [Validators.required]],
-      exchange_rate: [0, [Validators.required]],
-      offer: [0, [Validators.required]],
+      exchange_rate: [0.0, [Validators.required, this.exchangeRateValidator]],
+      minimum_offer: [0, [Validators.required]],
+      offer: [true, [Validators.required]],
       message: ['', [Validators.required]]
     });
     this.configsService.getConfig('1').subscribe((result) => {
       this.configTemp.id = result.id;
       this.configTemp.message = result.message;
       this.configTemp.exchange_rate = result.exchange_rate;
+      this.configTemp.minimum_offer = result.minimum_offer;
       this.configTemp.offer = result.offer;
       this.config = this.configTemp;
       this.onSetConfig(this.config);
     });
+  }
+
+  exchangeRateValidator(control: FormControl) {
+    const value = control.value;
+    // Expresión regular para validar 2 enteros y 2 decimales
+    const pattern = /^[0-9]{1,2}(?:\.[0-9]{1,2})?$/;
+    if (!pattern.test(value)) {
+      return { invalidExchangeRateFormat: true };
+    }
+    return null;
   }
 
   // tslint:disable-next-line: no-unnecessary-initializer
@@ -59,12 +72,14 @@ export class ConfigComponent implements OnInit {
       this.captureConfig.controls.id.setValue(config.id);
       this.captureConfig.controls.message.setValue(config.message);
       this.captureConfig.controls.exchange_rate.setValue(config.exchange_rate);
+      this.captureConfig.controls.minimum_offer.setValue(config.minimum_offer);
       this.captureConfig.controls.offer.setValue(config.offer);
       return;
     }
     this.config.id = this.captureConfig.controls.id.value;
     this.config.message = this.captureConfig.controls.message.value;
-    this.config.exchange_rate = this.captureConfig.controls.exchange_rate.value;
+    this.config.exchange_rate = parseFloat(this.captureConfig.controls.exchange_rate.value);
+    this.config.minimum_offer = parseInt(this.captureConfig.controls.minimum_offer.value);
     this.config.offer = this.captureConfig.controls.offer.value;
   }
 
