@@ -24,19 +24,28 @@
                 <div class="row">
                   <div class="col-3">
                     <label for="id">Clave</label>
-                    <input type="text" class="form-control" id="id" formControlName="id" placeholder="ID"
+                    <input type="text" class="form-control text-end" id="id" formControlName="id" placeholder="ID"
                       [attr.disabled]="true">
                   </div>
-                  <div class="col-3"></div>
                   <div class="col-3">
                     <label for="exchange_rate">Tipo de Cambio</label>
-                    <input type="text" class="form-control" id="exchange_rate" formControlName="exchange_rate"
-                      [attr.disabled]="onlyView ? true : null" mask="000.000.000.000.000,00" data-reverse="true">
+                    <input type="text" class="form-control text-end" id="exchange_rate" formControlName="exchange_rate"
+                      [attr.disabled]="onlyView ? true : null" [pattern]="exchangeRatePattern">
+                    <div *ngIf="captureConfig.get('exchange_rate').hasError('invalidExchangeRateFormat')">
+                      El valor debe ser de formato 00.00 y no puede superar los 5 caracteres.
+                    </div>
                   </div>
                   <div class="col-3">
-                    <label for="offer">Cantidad Minima Ofertas</label>
-                    <input type="number" class="form-control" id="offer" formControlName="offer"
-                      [attr.disabled]="onlyView ? true : null" min="1" pattern="^[0-9]+">
+                    <label for="minimum_offer">Cantidad Minima Ofertas</label>
+                    <input type="number" class="form-control text-end" id="minimum_offer" formControlName="minimum_offer"
+                      [attr.disabled]="onlyView ? true : null" min="1" pattern="^[0-9]+" data-reverse="true">
+                  </div>
+                  <div class="col-3">
+                    <label for="offer">Habilitar Ofertas</label>
+                    <div class="form-check form-switch form-switch-md mb-3">
+                      <input class="form-check-input" type="checkbox" id="offer" formControlName="offer"
+                        [attr.disabled]="onlyView ? true : null">
+                    </div>
                   </div>
                 </div>
                 <div class="row">
