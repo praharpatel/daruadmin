@@ -589,6 +589,7 @@ export class ImportarComponent implements OnInit {
             "TERMOMETRO",
             "TIPO DE CONECTIVIDAD",
             "PIZARRON",
+            "CAMARAS"
           ];
           // Obtener la lista de grupos excluyendo los especificados
           const filteredGroups = excludeGroups(groupsToExclude, groupsCva.listGroupsCva);
@@ -631,7 +632,8 @@ export class ImportarComponent implements OnInit {
             'Control de Acceso', 'Sensores', 'Tarjetas de Acceso', 'Timbres',
             'Administrativo', 'Contabilidad', 'Nóminas', 'Timbres Fiscales',
             'Análogos', 'Video Conferencia', 'Accesorios de Papeleria', 'Articulos de Escritura',
-            'Basico de Papeleria', 'Cabezales', 'Cuadernos', 'Papel', 'Papelería', ''
+            'Basico de Papeleria', 'Cabezales', 'Cuadernos', 'Papel', 'Papelería', 'Camaras Deteccion',
+            'Apple','Accesorios para Apple','Adaptadores para Apple','Audífonos para Apple','Cables Lightning','iMac','iPad','MacBook'
           ];
           for (const product of productosCt.stockProductsCt) {
             if (!excludedCategories.includes(product.subcategoria)) {
