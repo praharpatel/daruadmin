@@ -13,19 +13,20 @@ import { TYPE_ALERT } from '@shared/alert/values.config';
 export class CaptureUserComponent implements OnInit {
 
   titulo = 'Capturando usuario';
+  @ViewChild('content') content: any;
+  @Input() role = 'ADMIN';
+  @Output() datosEnviar: FormData = new FormData();
+  @Output() userChange = new EventEmitter<IUser>();
   @Input() user: IUser = {
     id: '',
     name: '',
     lastname: '',
     email: '',
     password: '',
-    role: 'VENTAS',
+    role: this.role,
     active: false
   };
-  @Output() userChange = new EventEmitter<IUser>();
   submitted = false;
-  @ViewChild('content') content: any;
-  @Output() datosEnviar: FormData = new FormData();
   editMode = false;
   onlyView = false;
   roleView: string;
@@ -37,7 +38,7 @@ export class CaptureUserComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.roleView = 'VENTA';
+    this.roleView = 'ADMIN';
     this.estatus = 'Inactivo';
   }
 
@@ -65,7 +66,7 @@ export class CaptureUserComponent implements OnInit {
   onOpenModal(user: IUser, editMode: boolean = false, onlyView: boolean = false) {
     this.user = user;
     if (!editMode) {
-      this.user.role = 'VENTA';
+      this.user.role = 'ADMIN';
     }
     this.editMode = editMode;
     this.onlyView = onlyView;
@@ -97,7 +98,7 @@ export class CaptureUserComponent implements OnInit {
     switch (role) {
       case 'ADMIN':
         return 'Administrador';
-      case 'VENTA':
+      case 'SELLER':
         return 'Ventas';
       default:
         return '';
