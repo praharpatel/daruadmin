@@ -13,7 +13,7 @@ export class TablePaginationService extends ApiService {
     super(apollo);
   }
 
-  getCollectionData(query: DocumentNode, variables: object={}, context: object={}) {
+  getCollectionData(query: DocumentNode, variables: object = {}, context: object = {}) {
     return this.get(query, variables, context);
   }
 

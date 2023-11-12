@@ -1,23 +1,22 @@
-import { Component, Input, OnInit, ViewChild } from '@angular/core';
-import { ACTIVE_FILTERS } from 'src/app/@core/constants/filters';
-import { IResultData } from 'src/app/@core/interfaces/result-data.interface';
-import { ITableColumns } from 'src/app/@core/interfaces/table-columns.interface';
-import { UsersService } from 'src/app/@core/services/user.service';
-import { DocumentNode } from 'graphql';
-import { USERS_LIST_QUERY } from 'src/app/@graphql/operations/query/users';
-import { TablePaginationService } from 'src/app/@shared/table-pagination/table-pagination.service';
-import { CaptureUserComponent } from './capture-user/capture-user.component';
+import { Component, Input, OnInit } from '@angular/core';
+import { ACTIVE_FILTERS } from '@core/constants/filters';
+import { IResultData } from '@core/interfaces/result-data.interface';
+import { ITableColumns } from '@core/interfaces/table-columns.interface';
+import { IUser } from '@core/interfaces/user.interface';
+import { UsersService } from '@core/services/user.service';
+import { USERS_LIST_QUERY } from '@graphql/operations/query/users';
+import { optionsWithDetails } from '@shared/alert/alerts';
 import { basicAlert } from '@shared/alert/toasts';
 import { TYPE_ALERT } from '@shared/alert/values.config';
-import { optionsWithDetails } from '@shared/alert/alerts';
-import { IUser } from '@core/interfaces/user.interface';
+import { TablePaginationService } from '@shared/table-pagination/table-pagination.service';
+import { DocumentNode } from 'graphql';
 
 @Component({
-  selector: 'app-users',
-  templateUrl: './users.component.html',
-  styleUrls: ['./users.component.scss']
+  selector: 'app-clients',
+  templateUrl: './clients.component.html',
+  styleUrls: ['./clients.component.scss']
 })
-export class UsersComponent implements OnInit {
+export class ClientsComponent implements OnInit {
   query: DocumentNode = USERS_LIST_QUERY;
   context: object;
   itemsPage: number;
@@ -29,10 +28,9 @@ export class UsersComponent implements OnInit {
   user: IUser;
   editMode = false;
   nextId: string;
-  title: string = 'Catálogo de Usuarios';
-  role: string = 'ADMIN';
+  title: string = 'Catálogo de Clientes';
+  role: string = 'CLIENT';
 
-  @ViewChild('mdCaptureCat') modal: CaptureUserComponent;
   @Input() datosEnviar: FormData = new FormData();
 
   constructor(
@@ -50,6 +48,7 @@ export class UsersComponent implements OnInit {
     };
     this.include = false;
     this.filterActiveValues = ACTIVE_FILTERS.ALL;
+    this.role = 'CLIENT';
     this.columns = [
       {
         property: 'id',
@@ -90,15 +89,8 @@ export class UsersComponent implements OnInit {
     const user = $event[1];
     this.mostrarBoton = true;
     switch (action) {
-      case 'add':                                       // Agregar elemento
-        this.addForm(this.onNewCatalog());
-        break;
-      case 'edit':                                      // Modificar elemento
-        this.updateForm(user);
-        break;
       case 'info':                                      // Mostrar información del elemento
         this.mostrarBoton = false;
-        this.updateForm(user, true, true);
         break;
       case 'block':                                     // Bloquear elemento
         this.unblockForm(user, false);
@@ -121,16 +113,6 @@ export class UsersComponent implements OnInit {
       lastname: '',
       active: false
     };
-  }
-
-  private async addForm(user: IUser, editMode: boolean = false) {
-    this.editMode = editMode;
-    this.modal.onOpenModal(user, editMode);
-  }
-
-  private async updateForm(user: IUser, editMode: boolean = true, onlyView: boolean = false) {
-    this.editMode = editMode;
-    this.modal.onOpenModal(user, editMode, onlyView);
   }
 
   userBack(event) {
@@ -156,7 +138,6 @@ export class UsersComponent implements OnInit {
           );
           setTimeout(() => {
             this.tablePaginationService.refreshTable();
-            this.modal.onCloseModal();
           }, 2900);
         } else {
           basicAlert(TYPE_ALERT.WARNING, res.message);
@@ -172,7 +153,6 @@ export class UsersComponent implements OnInit {
           if (res.status) {
             basicAlert(TYPE_ALERT.SUCCESS, res.message);
             setTimeout(() => {
-              this.modal.onCloseModal();
               this.tablePaginationService.refreshTable();
             }, 2900);
           } else {
