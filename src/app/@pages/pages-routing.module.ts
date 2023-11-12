@@ -16,6 +16,7 @@ import { ChatComponent } from './chat/chat.component';
 import { DefaultComponent } from './dashboards/default/default.component';
 import { FilemanagerComponent } from './filemanager/filemanager.component';
 import { CuponsComponent } from './catalogs/cupons/cupons.component';
+import { ClientsComponent } from './catalogs/clients/clients.component';
 
 const routes: Routes = [
   { path: '', redirectTo: 'dashboard' },
@@ -54,6 +55,10 @@ const routes: Routes = [
   },
   {
     path: 'users', component: UsersComponent,
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'clients', component: ClientsComponent,
     canActivate: [AuthGuard]
   },
   {

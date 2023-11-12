@@ -119,6 +119,12 @@ export const MENU: MenuItem[] = [
         link: '/config',
         parentId: 7
       },
+      {
+        id: 8,
+        label: 'Clientes',
+        link: '/clients',
+        parentId: 8
+      },
     ]
   },
   {

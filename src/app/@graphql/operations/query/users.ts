@@ -17,8 +17,8 @@ export const LOGIN_QUERY = gql`
 `;
 
 export const USERS_LIST_QUERY = gql`
-  query userList($page: Int, $itemsPage: Int, $active: ActiveFilterEnum, $filterName: String, $include: Boolean!) {
-    users(page: $page, itemsPage: $itemsPage, active: $active, filterName: $filterName) {
+  query userList($page: Int, $itemsPage: Int, $active: ActiveFilterEnum, $filterName: String, $include: Boolean!, $role: String!) {
+    users(page: $page, itemsPage: $itemsPage, active: $active, filterName: $filterName, role: $role) {
       info {
         ...ResultInfoObject
       }
