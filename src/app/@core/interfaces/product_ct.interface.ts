@@ -19,18 +19,18 @@ export interface xIProductCt {
   price: number;
   moneda: string;
   tipoCambio: number;
-  especificaciones: IEspecificaciones[];
   promociones: IPromociones[];
-}
-
-export interface IExistencia {
-  almacen: string;
-  cantidad: number;
+  especificaciones: IEspecificaciones[];
 }
 
 export interface IEspecificaciones {
   tipo: string;
   valor: string;
+}
+
+export interface IExistencia {
+  almacen: string;
+  cantidad: number;
 }
 
 export interface IPromociones {

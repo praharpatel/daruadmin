@@ -176,7 +176,8 @@ export class ProductsComponent implements OnInit {
       active: true,
       suppliersProd: null,
       descuentos: null,
-      promociones: null
+      promociones: null,
+      especificaciones: []
     };
   }
 

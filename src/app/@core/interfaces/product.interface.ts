@@ -31,6 +31,12 @@ export interface IProduct {
   suppliersProd?: ISupplierProd;
   descuentos: IDescuentos;
   promociones: IPromociones;
+  especificaciones: IEspecificaciones[];
+}
+
+export interface IEspecificaciones {
+  tipo: string;
+  valor: string;
 }
 
 export interface ICategorys {
