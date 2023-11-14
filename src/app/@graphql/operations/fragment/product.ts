@@ -113,5 +113,9 @@ export const PRODUCT_FRAGMENT = gql`
       disponible_en_promocion
       porciento
     }
+    especificaciones {
+      tipo
+      valor
+    }
   }
 `;

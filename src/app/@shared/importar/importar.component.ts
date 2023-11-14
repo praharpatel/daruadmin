@@ -7,7 +7,7 @@ import { IAlmacen, IAlmacenes, IProductoCt, IPromocion } from '@core/interfaces/
 import { AddCatalog, Catalog, SupplierCat } from '@core/models/catalog.models';
 import {
   AddProduct, Brands, Categorys, Picture, Product, UnidadDeMedida, BranchOffices,
-  SupplierProd, ProductExport, Descuentos, Promociones, PromocionBranchOffice, Vigente
+  SupplierProd, ProductExport, Descuentos, Promociones, PromocionBranchOffice, Vigente, Especificacion
 } from '@core/models/product.models';
 import { BrandsService } from '@core/services/brand.service';
 import { CategoriesService } from '@core/services/categorie.service';
@@ -633,7 +633,7 @@ export class ImportarComponent implements OnInit {
             'Administrativo', 'Contabilidad', 'Nóminas', 'Timbres Fiscales',
             'Análogos', 'Video Conferencia', 'Accesorios de Papeleria', 'Articulos de Escritura',
             'Basico de Papeleria', 'Cabezales', 'Cuadernos', 'Papel', 'Papelería', 'Camaras Deteccion',
-            'Apple','Accesorios para Apple','Adaptadores para Apple','Audífonos para Apple','Cables Lightning','iMac','iPad','MacBook'
+            'Apple', 'Accesorios para Apple', 'Adaptadores para Apple', 'Audífonos para Apple', 'Cables Lightning', 'iMac', 'iPad', 'MacBook'
           ];
           for (const product of productosCt.stockProductsCt) {
             if (!excludedCategories.includes(product.subcategoria)) {
@@ -1338,6 +1338,15 @@ export class ImportarComponent implements OnInit {
             is.url = productJson.imagen;
             itemData.variants = [];
             itemData.sm_pictures.push(is);
+            itemData.especificaciones = [];
+            if (item.especificaciones && item.especificaciones.length > 0) {
+              for (const e of item.especificaciones) {
+                const espec: Especificacion = new Especificacion();
+                espec.tipo = e.tipo;
+                espec.valor = e.valor;
+                itemData.especificaciones.push(espec);
+              }
+            }
             return itemData;
           }
         }

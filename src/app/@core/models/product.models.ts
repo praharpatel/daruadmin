@@ -35,6 +35,12 @@ export class Product extends ProductExport {
   suppliersProd?: SupplierProd;
   descuentos: Descuentos;
   promociones: Promociones;
+  especificaciones: Especificacion[];
+}
+
+export class Especificacion {
+  tipo: string;
+  valor: string;
 }
 
 export class Categorys {
