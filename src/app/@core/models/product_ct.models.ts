@@ -19,18 +19,18 @@ export class xProductCt {
   price: number;
   moneda: string;
   tipoCambio: number;
-  especificaciones: Especificaciones[];
   promociones: Promociones[];
+  especificaciones: IEspecificaciones[];
+}
+
+export class IEspecificaciones {
+  tipo: string;
+  valor: string;
 }
 
 export class Existencia {
   almacen: string;
   cantidad: number;
-}
-
-export class Especificaciones {
-  tipo: string;
-  valor: string;
 }
 
 export class Promociones {
