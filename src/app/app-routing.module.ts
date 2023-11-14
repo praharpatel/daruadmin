@@ -27,7 +27,8 @@ const routes: Routes = [
   },
   {
     path: '**',
-    component: Page404Component
+    redirectTo: "dashboard",
+    pathMatch: 'full'
   },
 ];
 
