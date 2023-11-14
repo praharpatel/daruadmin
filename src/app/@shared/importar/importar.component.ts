@@ -1339,8 +1339,8 @@ export class ImportarComponent implements OnInit {
             itemData.variants = [];
             itemData.sm_pictures.push(is);
             itemData.especificaciones = [];
-            if (item.especificaciones && item.especificaciones.length > 0) {
-              for (const e of item.especificaciones) {
+            if (productJson.especificaciones && productJson.especificaciones.length > 0) {
+              for (const e of productJson.especificaciones) {
                 const espec: Especificacion = new Especificacion();
                 espec.tipo = e.tipo;
                 espec.valor = e.valor;
