@@ -11,6 +11,15 @@ import { NgbDropdownModule, NgbTooltipModule, NgbNavModule } from '@ng-bootstrap
 import { SimplebarAngularModule } from 'simplebar-angular';
 
 import { DefaultComponent } from './default/default.component';
+import { Routes } from '@angular/router';
+
+const routes: Routes = [
+  {
+    path: "",
+    component: DefaultComponent,
+    data: { pageTitle: "Welcome" },
+  },
+];
 
 @NgModule({
   declarations: [DefaultComponent],
