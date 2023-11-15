@@ -2,8 +2,7 @@ import { Routes, RouterModule } from '@angular/router';
 
 import { AuthGuard } from './@core/guards/auth.guard';
 import { LayoutComponent } from './@layouts/layout.component';
-import { Page404Component } from './@extrapages/page404/page404.component';
-import { ModuleWithProviders } from '@angular/core';
+import { NgModule } from '@angular/core';
 
 export const routes: Routes = [
   {
@@ -40,19 +39,13 @@ export const routes: Routes = [
   { path: '**', redirectTo: 'dashboard' },
 ];
 
-// @NgModule({
-//   imports: [
-//     RouterModule.forRoot(routes, {
-//       scrollPositionRestoration: 'top',
-//       relativeLinkResolution: 'legacy',
-//       useHash: true,
-//     }),
-//   ],
-//   exports: [RouterModule],
-// })
-// export class AppRoutingModule { }
-
-export const AppRoutingModule = RouterModule.forRoot(routes, {
-  useHash: true, scrollPositionRestoration: 'top',
-  relativeLinkResolution: 'legacy',
-});
+@NgModule({
+  imports: [
+    RouterModule.forRoot(routes, {
+      scrollPositionRestoration: 'top',
+      relativeLinkResolution: 'legacy',
+    }),
+  ],
+  exports: [RouterModule],
+})
+export class AppRoutingModule { }
