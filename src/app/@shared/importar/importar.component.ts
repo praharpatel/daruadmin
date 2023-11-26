@@ -1135,7 +1135,7 @@ export class ImportarComponent implements OnInit {
               promo.porciento = 0;
             }
             itemData.sale_price = salePrice;
-            itemData.exchangeRate =item.tipocambio > 0 ? item.tipocambio : this.exchangeRate;
+            itemData.exchangeRate = item.tipocambio > 0 ? item.tipocambio : this.exchangeRate;
             itemData.promociones = promo;
             itemData.new = false;
             itemData.sold = null;
@@ -1241,6 +1241,10 @@ export class ImportarComponent implements OnInit {
               promo.disponible_en_promocion = item.almacenes[0].promociones[0].precio;
               promo.porciento = item.almacenes[0].promociones[0].porciento;
               salePrice = item.almacenes[0].promociones[0].precio;
+              if (salePrice === 0 && promo.porciento > 0) {
+                const desc = parseFloat(item.almacenes[0].promociones[0].porciento) * parseFloat(item.precio) / 100;
+                salePrice = item.precio - desc;
+              }
               itemData.promociones = promo;
             }
             itemData.id = productJson.clave;
@@ -1350,6 +1354,13 @@ export class ImportarComponent implements OnInit {
                 itemData.especificaciones.push(espec);
               }
             }
+            // // Para validar un producto en depuracion.
+            // if (productJson.numParte === 'TN630') {
+            //   console.log('promo: ', promo)
+            //   console.log('productJson: ', productJson)
+            //   console.log('item: ', item)
+            //   console.log('itemData: ', itemData)
+            // }
             return itemData;
           }
         }
