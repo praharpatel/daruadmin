@@ -152,6 +152,7 @@ export class ProductsComponent implements OnInit {
       short_desc: '',
       price: 0,
       sale_price: 0,
+      exchangeRate: 0,
       review: 0,
       ratings: 0,
       until: '',

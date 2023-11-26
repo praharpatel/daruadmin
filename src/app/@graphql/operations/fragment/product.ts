@@ -8,6 +8,7 @@ export const PRODUCT_FRAGMENT = gql`
     short_desc
     price
     sale_price
+    exchangeRate
     review
     ratings
     until

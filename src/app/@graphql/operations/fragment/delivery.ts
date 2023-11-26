@@ -65,6 +65,7 @@ export const DELIVERY_FRAGMENT = gql`
           slug
           price
           sale_price
+          exchangeRate
           review
           ratings
           until

@@ -5,6 +5,7 @@ export interface IProduct {
   short_desc?: string;
   price: number;
   sale_price: number;
+  exchangeRate: number;
   review: number;
   ratings: number;
   until: string;

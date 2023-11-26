@@ -57,6 +57,7 @@ export class CaptureProdComponent implements OnInit {
       short_desc: ['', [Validators.required]],
       price: [0, [Validators.required]],
       sale_price: [0],
+      exchangeRate: [0],
       review: [0],
       ratings: [0],
       until: [null],
@@ -169,6 +170,7 @@ export class CaptureProdComponent implements OnInit {
       this.captureGeneral.controls.short_desc.setValue(product.short_desc);
       this.captureGeneral.controls.price.setValue(product.price);
       this.captureGeneral.controls.sale_price.setValue(product.sale_price);
+      this.captureGeneral.controls.exchangeRate.setValue(product.exchangeRate);
       this.captureGeneral.controls.review.setValue(product.review);
       this.captureGeneral.controls.ratings.setValue(product.ratings);
       this.captureGeneral.controls.until.setValue(product.until);
