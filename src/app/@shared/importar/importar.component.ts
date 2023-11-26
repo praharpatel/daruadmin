@@ -1233,7 +1233,6 @@ export class ImportarComponent implements OnInit {
           if (branchOfficesCt.length > 0) {                         // Si hay mas de 10 elementos disponibles
             // Si hay promociones en los almacenes ocupa el primero y asigna el total de disponibilidad
             if (item.almacenes[0].promociones[0]) {
-              featured = true;
               promo.clave_promocion = '';
               promo.descripcion_promocion = 'Producto con Descuento';
               promo.inicio_promocion = item.almacenes[0].promociones[0].vigente.ini;
@@ -1241,10 +1240,12 @@ export class ImportarComponent implements OnInit {
               promo.disponible_en_promocion = item.almacenes[0].promociones[0].precio;
               promo.porciento = item.almacenes[0].promociones[0].porciento;
               salePrice = item.almacenes[0].promociones[0].precio;
-              if (salePrice === 0 && promo.porciento > 0) {
-                const desc = parseFloat(item.almacenes[0].promociones[0].porciento) * parseFloat(item.precio) / 100;
-                salePrice = item.precio - desc;
-              }
+              featured = salePrice > 0 ? true : false;
+              // // Se elimina hasta confirmar que es descuento.
+              // if (salePrice === 0 && promo.porciento > 0) {
+              //   const desc = parseFloat(item.almacenes[0].promociones[0].porciento) * parseFloat(item.precio) / 100;
+              //   salePrice = item.precio - desc;
+              // }
               itemData.promociones = promo;
             }
             itemData.id = productJson.clave;
