@@ -1125,7 +1125,7 @@ export class ImportarComponent implements OnInit {
               salePrice = desc.precio_descuento;
             }
             itemData.descuentos = desc;
-            itemData.featured = item.DisponibleEnPromocion !== 'Sin Descuento' ? true : false;
+            itemData.featured = (item.DisponibleEnPromocion !== 'Sin Descuento' && item.TotalDescuento > 0) ? true : false;
             if (item.DisponibleEnPromocion !== 'Sin Descuento') {
               promo.clave_promocion = item.ClavePromocion;
               promo.descripcion_promocion = item.DescripcionPromocion;
