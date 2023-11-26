@@ -1066,6 +1066,7 @@ export class ImportarComponent implements OnInit {
             } else {
               itemData.price = salePrice;
             }
+            itemData.exchangeRate = this.exchangeRate;
             itemData.review = 0;
             itemData.ratings = 0;
             itemData.until = this.getFechas(new Date());
@@ -1134,6 +1135,7 @@ export class ImportarComponent implements OnInit {
               promo.porciento = 0;
             }
             itemData.sale_price = salePrice;
+            itemData.exchangeRate =item.tipocambio > 0 ? item.tipocambio : this.exchangeRate;
             itemData.promociones = promo;
             itemData.new = false;
             itemData.sold = null;
@@ -1252,6 +1254,7 @@ export class ImportarComponent implements OnInit {
               itemData.price = parseFloat(item.precio) * this.utilidad;
               itemData.sale_price = salePrice * this.utilidad;
             }
+            itemData.exchangeRate = this.exchangeRate;
             itemData.review = 0;
             itemData.ratings = 0;
             itemData.until = this.getFechas(new Date());
