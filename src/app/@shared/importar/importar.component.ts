@@ -111,12 +111,12 @@ export class ImportarComponent implements OnInit {
     this.configsService.getConfig('1').subscribe((result) => {
       this.offer = parseInt(result.ofer, 10);
       this.exchangeRate = parseFloat(result.exchange_rate);
+      this.stockMinimo = parseInt(result.minimum_offer);
     });
   }
 
   onOpenModal(catalogs: [Catalog]) {
     this.apiName = '';
-    this.stockMinimo = 10;
     this.data = [];
     this.dataSupplier = [];
     this.dataExport = [];
@@ -232,7 +232,6 @@ export class ImportarComponent implements OnInit {
 
   async onOpenModalProduct(products: [Product]) {
     this.apiName = '';
-    this.stockMinimo = 10;
     this.data = [];
     this.brands = [];
     this.dataSupplier = [];
@@ -302,7 +301,6 @@ export class ImportarComponent implements OnInit {
   //#region Metodos de Seleccion
   onSelectSupplier() {
     this.apiName = '';
-    this.stockMinimo = 10;
     this.onlySearch = false;
     this.valorSearch = new Catalog();
     if (this.supplier) {
@@ -651,14 +649,27 @@ export class ImportarComponent implements OnInit {
         }
         return await productos;
       case 'ingram':
+        console.log('Import Ingram Products')
         const productosIngram = await this.externalAuthService.getProductsIngram();
         console.log('productosIngram: ', productosIngram);
         for (const prodIngram of productosIngram.pricesIngram) {
-          const itemData: Product = this.setProduct(supplier.slug, prodIngram);
-          if (itemData.id !== undefined) {
-            productos.push(itemData);
+          if (prodIngram.availability && prodIngram.availability.availabilityByWarehouse) {
+            console.log('prodIngram: ', prodIngram);
+            for (const almacen of prodIngram.availability.availabilityByWarehouse) {
+              if (almacen.quantityBackordered >= this.stockMinimo) {
+                console.log('almacen: ', almacen);
+              }
+            }
           }
+          // if (prodIngram.productClass !== '') {
+
+          // }
+          // const itemData: Product = this.setProduct(supplier.slug, prodIngram);
+          // if (itemData.id !== undefined) {
+          //   productos.push(itemData);
+          // }
         }
+        console.log('productos: ', productos);
         return await productos;
       default:
         break;
