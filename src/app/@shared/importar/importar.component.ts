@@ -1045,6 +1045,18 @@ export class ImportarComponent implements OnInit {
     let disponible = 0;
     let salePrice = 0;
 
+    // Eliminar cuando HP Autorice vender sus productos
+    if (item.vendorName && (item.vendorName.toLowerCase() === 'hp' || item.vendorName.toLowerCase() === 'hewlett packard enterprise')) {
+      return itemData;
+    }
+    if (item.marca && (item.marca.toLowerCase() === 'hp' || item.marca.toLowerCase() === 'hewlett packard enterprise')) {
+      return itemData;
+    }
+    if (productJson.marca && (productJson.marca.toLowerCase() === 'hp' || productJson.marca.toLowerCase() === 'hewlett packard enterprise')) {
+      return itemData;
+    }
+    // Fin Eliminar cuando HP Autorice vender sus productos
+
     switch (proveedor) {
       case 'ingram':
         disponible = 0;
