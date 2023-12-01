@@ -1046,13 +1046,13 @@ export class ImportarComponent implements OnInit {
     let salePrice = 0;
 
     // Eliminar cuando HP Autorice vender sus productos
-    if (item.vendorName && (item.vendorName.toLowerCase() === 'hp' || item.vendorName.toLowerCase() === 'hewlett packard enterprise')) {
+    if (proveedor === 'ct' && item.vendorName && (item.vendorName.toLowerCase() === 'hp' || item.vendorName.toLowerCase() === 'hewlett packard enterprise')) {
       return itemData;
     }
-    if (item.marca && (item.marca.toLowerCase() === 'hp' || item.marca.toLowerCase() === 'hewlett packard enterprise')) {
+    if (proveedor === 'cva' && item && item.marca && (item.marca.toLowerCase() === 'hp' || item.marca.toLowerCase() === 'hewlett packard enterprise')) {
       return itemData;
     }
-    if (productJson.marca && (productJson.marca.toLowerCase() === 'hp' || productJson.marca.toLowerCase() === 'hewlett packard enterprise')) {
+    if (proveedor === 'ingram' && productJson.marca && (productJson.marca.toLowerCase() === 'hp' || productJson.marca.toLowerCase() === 'hewlett packard enterprise')) {
       return itemData;
     }
     // Fin Eliminar cuando HP Autorice vender sus productos
