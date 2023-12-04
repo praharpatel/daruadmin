@@ -17,16 +17,7 @@ export class ProductIngram {
   availability: {
     available: boolean;
     totalAvailability: number;
-    availabilityByWarehouse: {
-      warehouseId: number;
-      location: string;
-      quantityAvailable: number;
-      quantityBackordered: number;
-      backOrderInfo?: {
-        quantity: number;
-        etaDate: string;
-      }[];
-    }[];
+    availabilityByWarehouse: AvailabilityByWarehouse[];
   };
   pricing: {
     mapPrice: number;
@@ -35,31 +26,48 @@ export class ProductIngram {
     customerPrice: number;
   };
   discounts: {
-    specialPricing: {
-      specialPricingAvailableQuantity: number;
-      specialPricingExpirationDate: string;
-      specialBidNumber: string;
-      specialPricingMinQuantity: number;
-      specialPricingEffectiveDate: string;
-      discountType: string;
-      specialPricingDiscount: number;
-      governmentDiscountType: string;
-      governmentDiscountedCustomerPrice: number;
-    }[];
-    quantityDiscounts: {
-      currencyType: string;
-      amount: number;
-      quantity: number;
-      conditionType: string;
-      currencyCode: string;
-    }[];
+    specialPricing: SpecialPricing[];
+    quantityDiscounts: QuantityDiscounts[];
   };
   bundlePartIndicator: string;
-  serviceFees: {
-    conditionType: string;
-    description: string;
-    amount: string;
-    endDate: string;
-    currencyCode: string;
-  }[];
+  serviceFees: ServiceFees[];
+}
+
+export class AvailabilityByWarehouse {
+  warehouseId: number;
+  location: string;
+  quantityAvailable: number;
+  quantityBackordered: number;
+  backOrderInfo?: {
+    quantity: number;
+    etaDate: string;
+  }
+}
+
+export class SpecialPricing {
+  specialPricingAvailableQuantity: number;
+  specialPricingExpirationDate: string;
+  specialBidNumber: string;
+  specialPricingMinQuantity: number;
+  specialPricingEffectiveDate: string;
+  discountType: string;
+  specialPricingDiscount: number;
+  governmentDiscountType: string;
+  governmentDiscountedCustomerPrice: number;
+}
+
+export class QuantityDiscounts {
+  currencyType: string;
+  amount: number;
+  quantity: number;
+  conditionType: string;
+  currencyCode: string;
+}
+
+export class ServiceFees {
+  conditionType: string;
+  description: string;
+  amount: string;
+  endDate: string;
+  currencyCode: string;
 }
