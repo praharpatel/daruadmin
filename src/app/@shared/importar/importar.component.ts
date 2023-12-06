@@ -1188,7 +1188,7 @@ export class ImportarComponent implements OnInit {
               promo.porciento = 0;
             }
             itemData.sale_price = salePrice;
-            itemData.featured = (desc.precio_descuento > 0 && desc.precio_descuento < item.precio) ? true : false;
+            itemData.featured = (item.PrecioDescuento > 0 && item.PrecioDescuento < item.precio) ? true : false;
             itemData.exchangeRate = item.tipocambio > 0 ? item.tipocambio : this.exchangeRate;
             itemData.promociones = promo;
             itemData.new = false;
