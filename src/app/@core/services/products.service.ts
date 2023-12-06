@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ADD_PRODUCT, ADD_PRODUCT_LIST, BLOCK_PRODUCT, UPDATE_PRODUCT } from '@graphql/operations/mutation/product';
-import { PRODUCTS_LIST_QUERY, PRODUCT_ID_QUERY } from '@graphql/operations/query/product';
+import { PRODUCTS_LIST_QUERY, PRODUCT_FIELD_QUERY, PRODUCT_ICECAT_QUERY, PRODUCT_ID_QUERY, PRODUCT_QUERY } from '@graphql/operations/query/product';
 import { ApiService } from '@graphql/services/api.service';
 import { Apollo } from 'apollo-angular';
 import { map } from 'rxjs/operators';
@@ -70,6 +70,44 @@ export class ProductsService extends ApiService {
     }).pipe(map((result: any) => {
       return result.products;
     }));
+  }
+
+  async getProduct(): Promise<any> {
+    return new Promise<any>((resolve, reject) => {
+      this.get(PRODUCT_QUERY, {}, {}).subscribe(
+        (result: any) => {
+          resolve(result.product);
+        },
+        (error: any) => {
+          reject(error);
+        });
+    });
+  }
+
+  async getProductField(partNumber: String): Promise<any> {
+    return new Promise<any>((resolve, reject) => {
+      this.get(PRODUCT_FIELD_QUERY, { partNumber }, {}).subscribe(
+        (result: any) => {
+          console.log('result: ', result);
+          resolve(result.product);
+        },
+        (error: any) => {
+          reject(error);
+        });
+    });
+  }
+
+  async getIcecatProduct(brandIcecat: String, productIcecat: String): Promise<any> {
+    return new Promise<any>((resolve, reject) => {
+      this.get(PRODUCT_ICECAT_QUERY, { brandIcecat, productIcecat }, {}).subscribe(
+        (result: any) => {
+          console.log('result: ', result);
+          resolve(result.icecatProductLocal);
+        },
+        (error: any) => {
+          reject(error);
+        });
+    });
   }
 
   next() {
