@@ -9,6 +9,7 @@ import {
   AddProduct, Brands, Categorys, Picture, Product, UnidadDeMedida, BranchOffices,
   SupplierProd, ProductExport, Descuentos, Promociones, PromocionBranchOffice, Vigente, Especificacion
 } from '@core/models/product.models';
+import { AvailabilityByWarehouse } from '@core/models/productingram.models';
 import { BrandsService } from '@core/services/brand.service';
 import { CategoriesService } from '@core/services/categorie.service';
 import { ConfigsService } from '@core/services/config.service';
@@ -605,7 +606,7 @@ export class ImportarComponent implements OnInit {
             for (const product of productosCva) {
               let itemData = new Product();
               product.id = i;
-              itemData = this.setProduct(supplier.slug, product);
+              itemData = await this.setProduct(supplier.slug, product);
               if (itemData.id !== undefined) {
                 productos.push(itemData);
               }
@@ -635,10 +636,10 @@ export class ImportarComponent implements OnInit {
           ];
           for (const product of productosCt.stockProductsCt) {
             if (!excludedCategories.includes(product.subcategoria)) {
-              productsJson.forEach(productJson => {
+              productsJson.forEach(async productJson => {
                 if (product.codigo === productJson.clave) {
                   const productTmp: IProductoCt = this.convertirPromocion(product);
-                  const itemData: Product = this.setProduct(supplier.slug, productTmp, productJson);
+                  const itemData: Product = await this.setProduct(supplier.slug, productTmp, productJson);
                   if (itemData.id !== undefined) {
                     productos.push(itemData);
                   }
@@ -651,23 +652,42 @@ export class ImportarComponent implements OnInit {
       case 'ingram':
         console.log('Import Ingram Products')
         const productosIngram = await this.externalAuthService.getProductsIngram();
+        const catalogIngrams = await this.externalAuthService.getCatalogIngrams();
         console.log('productosIngram: ', productosIngram);
+        console.log('catalogIngrams: ', catalogIngrams);
         for (const prodIngram of productosIngram.pricesIngram) {
           if (prodIngram.availability && prodIngram.availability.availabilityByWarehouse) {
-            console.log('prodIngram: ', prodIngram);
+            const warehouses: AvailabilityByWarehouse[] = [];
             for (const almacen of prodIngram.availability.availabilityByWarehouse) {
               if (almacen.quantityBackordered >= this.stockMinimo) {
-                console.log('almacen: ', almacen);
+                const warehouse: AvailabilityByWarehouse = almacen;
+                warehouses.push(warehouse);
+              }
+            }
+            if (warehouses.length > 0) {
+              if (prodIngram.availability.availabilityByWarehouse.length !== warehouses.length) {
+                prodIngram.availability.availabilityByWarehouse = warehouses;
+                // Si el producto cumple con los requisitos lo agrega.
+                const catalogIngram = catalogIngrams.catalogIngrams.find(cat => {
+                  return cat.imSKU.trim() === prodIngram.ingramPartNumber.trim();
+                });
+                if (catalogIngram) {
+                  console.log('prodIngram: ', prodIngram);
+                  console.log('catalogIngram: ', catalogIngram);
+                  if (prodIngram.availability && prodIngram.availability.availabilityByWarehouse
+                    && prodIngram.availability.availabilityByWarehouse.length > 0) {
+                    const itemData: Product = await this.setProduct(supplier.slug, prodIngram, catalogIngram);
+                    console.log('prodIngram.discounts: ', prodIngram.discounts);
+                    if (itemData.id !== undefined) {
+                      productos.push(itemData);
+                    }
+                  }
+                  // } else {
+                  //   console.log('prodIngram.ingramPartNumber.trim(): ', prodIngram.ingramPartNumber.trim());
+                }
               }
             }
           }
-          // if (prodIngram.productClass !== '') {
-
-          // }
-          // const itemData: Product = this.setProduct(supplier.slug, prodIngram);
-          // if (itemData.id !== undefined) {
-          //   productos.push(itemData);
-          // }
         }
         console.log('productos: ', productos);
         return await productos;
@@ -738,7 +758,8 @@ export class ImportarComponent implements OnInit {
     almacen.cp = '';
     almacen.latitud = '';
     almacen.longitud = '';
-    almacen.cantidad = branch.quantityAvailable;
+    almacen.cantidad = branch.quantityBackordered;
+    // almacen.cantidad = branch.quantityAvailable;
     return almacen;
   }
 
@@ -1031,7 +1052,7 @@ export class ImportarComponent implements OnInit {
     return branchOffices;
   }
 
-  setProduct(proveedor: string, item: any, productJson: any = null, imagenes: any = null) {
+  async setProduct(proveedor: string, item: any, productJson: any = null, imagenes: any = null) {
     const itemData = new Product();
     const unidad = new UnidadDeMedida();
     const b = new Brands();
@@ -1046,7 +1067,7 @@ export class ImportarComponent implements OnInit {
     let salePrice = 0;
 
     // Eliminar cuando HP Autorice vender sus productos
-    if (item.vendorName && (item.vendorName.toLowerCase() === 'hp' || item.vendorName.toLowerCase() === 'hewlett packard enterprise')) {
+    if (item.description && item.description.toLowerCase().startsWith('hp')) {
       return itemData;
     }
     if (item && item.marca && (item.marca.toLowerCase() === 'hp' || item.marca.toLowerCase() === 'hewlett packard enterprise')) {
@@ -1059,69 +1080,79 @@ export class ImportarComponent implements OnInit {
 
     switch (proveedor) {
       case 'ingram':
-        disponible = 0;
-        salePrice = 0;
-        if (item.availability.availabilityByWarehouse.length > 0) {
-          const branchOfficesIngram: BranchOffices[] = [];
-          let featured = false;
-          for (const element of item.availability.availabilityByWarehouse) {
-            const almacen = this.getAlmacenIngram(element);
-            if (almacen.cantidad >= this.stockMinimo) {
-              disponible = almacen.cantidad;
-              branchOfficesIngram.push(almacen);
-            }
-          }
-          if (branchOfficesIngram.length > 0) {
-            // TO-DO Promociones
-            salePrice = 0;
-            itemData.id = item.vendorPartNumber;
-            itemData.name = item.description;
-            itemData.slug = slugify(item.description, { lower: true });
-            itemData.short_desc = item.description;
-            if (item.pricing.mapPrice > 0) {
-              if (item.moneda === 'USD') {
-                itemData.price = parseFloat((parseFloat(item.pricing.mapPrice) * this.exchangeRate * this.utilidad).toFixed(2));
-                itemData.sale_price = parseFloat((salePrice * this.exchangeRate * this.utilidad).toFixed(2));
-              } else {
-                itemData.price = parseFloat(item.pricing.mapPrice) * this.utilidad;
-                itemData.sale_price = salePrice * this.utilidad;
+        try {
+          disponible = 0;
+          salePrice = 0;
+          if (item.availability && item.availability.availabilityByWarehouse && item.availability.availabilityByWarehouse.length > 0) {
+            const branchOfficesIngram: BranchOffices[] = [];
+            let featured = false;
+            for (const element of item.availability.availabilityByWarehouse) {
+              // console.log('availabilityByWarehouse.element: ', element);
+              const almacen = this.getAlmacenIngram(element);
+              if (almacen.cantidad >= this.stockMinimo) {
+                console.log('availabilityByWarehouse.almacen.cantidad: ', almacen.cantidad);
+                disponible = almacen.cantidad;
+                branchOfficesIngram.push(almacen);
               }
-            } else {
-              itemData.price = salePrice;
             }
-            itemData.exchangeRate = this.exchangeRate;
-            itemData.review = 0;
-            itemData.ratings = 0;
-            itemData.until = this.getFechas(new Date());
-            itemData.top = false;
-            itemData.featured = featured;
-            itemData.new = null;
-            itemData.sold = null;
-            itemData.stock = disponible;
-            itemData.sku = item.ingramPartNumber;
-            itemData.upc = item.upc;
-            itemData.partnumber = item.vendorPartNumber;
-            unidad.id = 'PZ';
-            unidad.name = 'Pieza';
-            unidad.slug = 'pieza';
-            itemData.unidadDeMedida = unidad;
-            // Marcas
-            itemData.brand = item.vendorName.toLowerCase();
-            itemData.brands = [];
-            b.name = item.vendorName;
-            b.slug = slugify(item.vendorName, { lower: true });
-            itemData.brands.push(b);
-            // SupplierProd                 TO-DO
-            s.idProveedor = proveedor;
-            s.codigo = item.vendorPartNumber;;
-            // TO-DO Promociones
-            s.moneda = item.pricing.currencyCode;
-            s.branchOffices = branchOfficesIngram;
-            itemData.suppliersProd = s;
+            console.log('branchOfficesIngram: ', branchOfficesIngram);
+            if (branchOfficesIngram.length > 0) {
+              // TO-DO Promociones
+              salePrice = 0;
+              itemData.id = item.vendorPartNumber.trim();
+              itemData.name = productJson.descriptionLine1.trim();
+              itemData.slug = slugify(productJson.descriptionLine1.trim(), { lower: true });
+              itemData.short_desc = productJson.descriptionLine1.trim() + '. ' + productJson.descriptionLine2.trim();
+              if (item.pricing.retailPrice > 0) {
+                if (item.moneda === 'USD') {
+                  itemData.price = parseFloat((parseFloat(item.pricing.retailPrice) * this.exchangeRate * this.utilidad).toFixed(2));
+                  itemData.sale_price = parseFloat((salePrice * this.exchangeRate * this.utilidad).toFixed(2));
+                } else {
+                  itemData.price = parseFloat(item.pricing.retailPrice) * this.utilidad;
+                  itemData.sale_price = salePrice * this.utilidad;
+                }
+              } else {
+                itemData.price = salePrice;
+              }
+              itemData.exchangeRate = this.exchangeRate;
+              itemData.review = 0;
+              itemData.ratings = 0;
+              itemData.until = this.getFechas(new Date());
+              itemData.top = false;
+              itemData.featured = featured;
+              itemData.new = null;
+              itemData.sold = null;
+              itemData.stock = disponible;
+              itemData.sku = item.vendorNumber.trim();
+              itemData.upc = item.upc;
+              itemData.partnumber = item.vendorPartNumber.trim();
+              unidad.id = 'PZ';
+              unidad.name = 'Pieza';
+              unidad.slug = 'pieza';
+              itemData.unidadDeMedida = unidad;
+              // Marcas
+              itemData.brand = item.vendorName.toLowerCase();
+              itemData.brands = [];
+              b.name = item.vendorName;
+              b.slug = slugify(item.vendorName, { lower: true });
+              itemData.brands.push(b);
+              // SupplierProd                 TO-DO
+              s.idProveedor = proveedor;
+              s.codigo = item.vendorPartNumber;;
+              // TO-DO Promociones
+              s.moneda = item.pricing.currencyCode;
+              s.branchOffices = branchOfficesIngram;
+              itemData.suppliersProd = s;
+            }
           }
+          console.log('itemData: ', itemData);
+          return itemData;
+        } catch (error) {
+          console.log('error.message: ', error.message);
+          console.log('error: ', error);
+          console.log('itemData: ', itemData);
+          return itemData;
         }
-        return itemData;
-
       case 'syscom':
         return itemData;
 
@@ -1149,7 +1180,6 @@ export class ImportarComponent implements OnInit {
               salePrice = desc.precio_descuento;
             }
             itemData.descuentos = desc;
-            itemData.featured = (item.DisponibleEnPromocion !== 'Sin Descuento' && item.TotalDescuento > 0) ? true : false;
             if (item.DisponibleEnPromocion !== 'Sin Descuento') {
               promo.clave_promocion = item.ClavePromocion;
               promo.descripcion_promocion = item.DescripcionPromocion;
@@ -1158,6 +1188,7 @@ export class ImportarComponent implements OnInit {
               promo.porciento = 0;
             }
             itemData.sale_price = salePrice;
+            itemData.featured = (desc.total_descuento > 0 && desc.total_descuento < item.precio) ? true : false;
             itemData.exchangeRate = item.tipocambio > 0 ? item.tipocambio : this.exchangeRate;
             itemData.promociones = promo;
             itemData.new = false;
