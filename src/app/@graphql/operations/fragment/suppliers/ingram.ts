@@ -67,3 +67,33 @@ export const PRODUCTSINGRAM_FRAGMENT = gql`
       }
   }
 `;
+
+export const CATALOGINGRAM_FRAGMENT = gql`
+  fragment CatalogIngramObject on ResponseCatalogoIngram {
+    changeCode
+    imSKU
+    vendorNumber
+    vendorName
+    descriptionLine1
+    descriptionLine2
+    retailPriceMSRP
+    vendorPartNumber
+    weight
+    upcCode
+    length
+    width
+    height
+    customerCostChangeCode
+    customerCost
+    specialPricingChangeCode
+    stockAvailableYN
+    partStatus
+    allianceProduct
+    cpuCode
+    mediaCode
+    ingramCatSubcategory
+    yIfPartStockedAtIM
+    rebateAppliedToCostYN
+    substituteIMPartNumber
+  }
+`;
