@@ -766,7 +766,7 @@ export class ImportarComponent implements OnInit {
   getAlmacenCant(branch): BranchOffices {
     const almacen = new BranchOffices();
     const almacenEstado = this.getCtAlmacenes(branch.almacen.key);
-    almacen.id = almacenEstado.id;
+    almacen.id = almacenEstado.id.toString();
     almacen.name = almacenEstado.Sucursal;
     almacen.estado = almacenEstado.Estado;
     almacen.cp = almacenEstado.CP;
