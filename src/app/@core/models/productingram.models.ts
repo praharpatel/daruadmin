@@ -7,6 +7,9 @@ export class ProductIngram {
   vendorNumber: string;
   vendorName: string;
   description: string;
+  category: string;
+  subCategory: string;
+  newProduct: boolean;
   productClass: string;
   uom: string;
   acceptBackOrder: boolean;
