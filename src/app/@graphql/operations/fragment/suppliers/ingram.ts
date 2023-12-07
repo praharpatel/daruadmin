@@ -10,6 +10,9 @@ export const PRODUCTSINGRAM_FRAGMENT = gql`
       vendorNumber
       vendorName
       description
+      category
+      subCategory
+      newProduct
       productClass
       uom
       acceptBackOrder
