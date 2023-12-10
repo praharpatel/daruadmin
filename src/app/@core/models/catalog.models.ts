@@ -2,12 +2,15 @@ import { Picture } from './product.models';
 
 export class Catalog {
   id: string;
-  description: string;
-  slug: string;
+  description?: string;
+  slug?: string;
   order?: number;
   active?: boolean;
   suppliersCat?: SupplierCat[];
   pictures?: Picture[];
+  email?: string;
+  name?: string;
+  cupon?: string;
 }
 
 export class AddCatalog {

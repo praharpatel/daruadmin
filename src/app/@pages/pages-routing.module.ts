@@ -17,6 +17,7 @@ import { DefaultComponent } from './dashboards/default/default.component';
 import { FilemanagerComponent } from './filemanager/filemanager.component';
 import { CuponsComponent } from './catalogs/cupons/cupons.component';
 import { ClientsComponent } from './catalogs/clients/clients.component';
+import { WelcomesComponent } from './catalogs/welcomes/welcomes.component';
 
 const routes: Routes = [
   { path: '', redirectTo: 'dashboard' },
@@ -67,6 +68,10 @@ const routes: Routes = [
   },
   {
     path: 'cupons', component: CuponsComponent,
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'welcomes', component: WelcomesComponent,
     canActivate: [AuthGuard]
   },
   {
