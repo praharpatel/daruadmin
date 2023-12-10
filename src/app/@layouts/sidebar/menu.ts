@@ -117,13 +117,19 @@ export const MENU: MenuItem[] = [
         id: 7,
         label: 'Configuraciones',
         link: '/config',
-        parentId: 7
+        parentId: 6
       },
       {
         id: 8,
         label: 'Clientes',
         link: '/clients',
-        parentId: 8
+        parentId: 6
+      },
+      {
+        id: 9,
+        label: 'Cupones Bienvenida',
+        link: '/welcomes',
+        parentId: 6
       },
     ]
   },

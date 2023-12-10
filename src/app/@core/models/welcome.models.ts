@@ -3,4 +3,5 @@ export class Welcome {
   email?: string;
   name?: string;
   cupon?: string;
+  active?: boolean;
 }
