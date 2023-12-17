@@ -47,25 +47,58 @@
   <div class="row">
     <form [formGroup]="captureForm" (ngSubmit)="onSubmit()" #forma="ngForm">
       <div class="container-fluid p-0">
-        <div class="row">
+        <div *ngIf="!onlyCupons" class="row">
           <div class="col-4">
             <label for="clave">Clave</label>
-            <input type="text" class="form-control" id="clave" formControlName="clave" placeholder="Teclea la clave"
-              [attr.disabled]="true">
+            <input type="text" class="form-control text-center" id="clave" formControlName="clave"
+              placeholder="Teclea la clave" [attr.disabled]="true">
           </div>
-          <div *ngIf="!onlyCupons" class="col-4">
+          <div class="col-4">
             <label for="order">Orden</label>
-            <input type="text" class="form-control" id="order" formControlName="order" placeholder="Teclea el orden"
-              [attr.disabled]="onlyView ? true : null">
-          </div>
-          <div *ngIf="onlyCupons" class="col-4">
-            <label for="order">% de Descuento</label>
-            <input type="text" class="form-control" id="order" formControlName="order" placeholder="Teclea el descuento"
-              [attr.disabled]="onlyView ? true : null">
+            <input type="number" class="form-control text-end" id="order" formControlName="order"
+              placeholder="Teclea el orden" [attr.disabled]="onlyView ? true : null">
           </div>
           <div class="col-4">
             <label for="estatus">Estatus</label>
-            <input type="text" class="form-control" id="estatus" formControlName="estatus" [attr.disabled]="true">
+            <input type="text" class="form-control text-center" id="estatus" formControlName="estatus"
+              [attr.disabled]="true">
+          </div>
+        </div>
+        <div *ngIf="onlyCupons" class="row">
+          <div class="col-3">
+            <label for="clave">Clave</label>
+            <input type="text" class="form-control text-center" id="clave" formControlName="clave"
+              placeholder="Teclea la clave" [attr.disabled]="true">
+          </div>
+          <div class="col-3">
+            <label for="typeDiscount">Tipo de Descuento</label>
+            <select name="typeDiscount" id="typeDiscount" formControlName="typeDiscount" class="form-control"
+              (change)="changedTypeDiscount($event)">
+              <option value="" disabled [selected]="true">Elije tipo de descuento</option>
+              <option value="importe">Por Importe</option>
+              <option value="porcentaje">Por Porcentaje</option>
+            </select>
+          </div>
+          <div class="col-2">
+            <label for="amountDiscount">Descuento</label>
+            <input type="number" class="form-control text-end" id="amountDiscount" formControlName="amountDiscount"
+              placeholder="Teclea el descuento" [attr.disabled]="onlyView ? true : null" min="1.00" maxlength="6">
+            <div *ngIf="captureForm.get('amountDiscount').hasError('invalidExchangeRateFormat')">
+              El valor debe ser de formato 000.00 y no puede superar los 6 caracteres.
+            </div>
+          </div>
+          <div class="col-2">
+            <label for="minimumPurchase">Monto M&iacute;nimo</label>
+            <input type="number" class="form-control text-end" id="minimumPurchase" formControlName="minimumPurchase"
+              placeholder="Teclea el descuento" [attr.disabled]="onlyView ? true : null" min="1" maxlength="4">
+            <div *ngIf="captureForm.get('minimumPurchase').hasError('invalidExchangeRateFormat')">
+              El valor debe ser de formato 0000 y no puede superar los 4 caracteres.
+            </div>
+          </div>
+          <div class="col-2">
+            <label for="estatus">Estatus</label>
+            <input type="text" class="form-control text-center" id="estatus" formControlName="estatus"
+              [attr.disabled]="true">
           </div>
         </div>
         <div class="row">
@@ -74,11 +107,16 @@
             <input type="text" class="form-control" id="description" formControlName="description"
               placeholder="Teclea la descripción" [attr.disabled]="onlyView ? true : null">
           </div>
-          <div *ngIf="onlyCupons" class="col-12">
+          <div *ngIf="onlyCupons" class="col-3">
+            <label for="cupon">Cup&oacute;n</label>
+            <input type="text" class="form-control" id="cupon" formControlName="cupon"
+              placeholder="Teclea el cup&oacute;n" [attr.disabled]="onlyView ? true : null"
+              (input)="convertToUppercase($event)" maxlength="15">
+          </div>
+          <div *ngIf="onlyCupons" class="col-9">
             <label for="description">Descripcion</label>
             <input type="text" class="form-control" id="description" formControlName="description"
-              placeholder="Teclea la descripción" [attr.disabled]="onlyView ? true : null"
-              (input)="convertToUppercase($event)">
+              placeholder="Teclea la descripción" [attr.disabled]="onlyView ? true : null" maxlength="60">
           </div>
         </div>
       </div>

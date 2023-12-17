@@ -77,6 +77,9 @@
                     <span *ngIf="val.property != 'active'; else activeValue">
                       <span *ngIf="val.property != 'featured'; else featuredValue">
                         <span *ngIf="val.property != 'top'; else topValue">
+                          <!-- <span *ngIf="(val.class == 'numero' && val.property!='amountDiscount') || (val.class == 'numero')">
+                            {{ formatoMoneda(data[val.property], true) }}
+                          </span> -->
                           <span *ngIf="val.class == 'numero'">{{ formatoMoneda(data[val.property], true) }}</span>
                           <span *ngIf="val.class != 'numero'">
                             <span *ngIf="val.class != 'img'">
