@@ -1,12 +1,11 @@
 import { Injectable } from '@angular/core';
 import { Apollo } from 'apollo-angular';
-import { ICatalog } from 'src/app/@core/interfaces/catalog.interface';
 import { ADD_CUPON, BLOCK_CUPON, UPDATE_CUPON } from 'src/app/@graphql/operations/mutation/cupons';
 import { CUPONS_LIST_QUERY, CUPON_ID_QUERY } from 'src/app/@graphql/operations/query/cupons';
 import { ApiService } from 'src/app/@graphql/services/api.service';
 import { map } from 'rxjs/operators';
-import { ISupplier } from '@core/interfaces/supplier.interface';
 import { ACTIVE_FILTERS } from '@core/constants/filters';
+import { ICupon } from '@core/interfaces/cupon.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -17,7 +16,7 @@ export class CuponsService extends ApiService {
     super(apollo);
   }
 
-  add(cupon: ICatalog) {
+  add(cupon: ICupon) {
     return this.set(
       ADD_CUPON,
       {
@@ -28,7 +27,7 @@ export class CuponsService extends ApiService {
       );
   }
 
-  update(cupon: ICatalog) {
+  update(cupon: ICupon) {
     return this.set(
       UPDATE_CUPON,
       {

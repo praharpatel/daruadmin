@@ -1,7 +1,8 @@
 import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { IPicture } from '@core/interfaces/product.interface';
-import { AddCatalog, Catalog } from '@core/models/catalog.models';
+import { AddCatalog, AddCupon, Catalog } from '@core/models/catalog.models';
+import { Cupon } from '@core/models/cupon.models';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { basicAlert } from 'src/app/@shared/alert/toasts';
 import { TYPE_ALERT } from 'src/app/@shared/alert/values.config';
@@ -21,12 +22,14 @@ export class CaptureCatComponent implements OnInit {
 
   files: File[] = [];
   pictures: IPicture[];
+  typeDiscount: string;
 
-  // @Input() catalog: ICatalog;
   @Input() onlyCupons: boolean = false;
   @Input() catalog: Catalog;
+  @Input() cupon: Cupon;
   @Output() datosEnviar: FormData = new FormData();
   @Output() catalogChange = new EventEmitter<AddCatalog>();
+  @Output() cuponChange = new EventEmitter<AddCupon>();
   @ViewChild('content') content: any;
 
   constructor(
@@ -49,29 +52,82 @@ export class CaptureCatComponent implements OnInit {
   }
 
   updateCaptureForm() {
-    this.captureForm = this.formBuilder.group({
-      clave: ['1', [Validators.required]],
-      estatus: ['Activos'],
-      order: [this.onlyCupons ? 0 : 1000],
-      active: [true],
-      description: ['', [Validators.required]]
-    });
+    if (this.onlyCupons) {
+      this.captureForm = this.formBuilder.group({
+        clave: ['1', [Validators.required]],
+        typeDiscount: ['', [Validators.required]],
+        amountDiscount: [0.0, [Validators.required, this.exchangeRateValidator]],
+        minimumPurchase: [0, [Validators.required, this.exchangeRateValidatorInt]],
+        estatus: ['Activos'],
+        cupon: ['', [Validators.required]],
+        description: ['', [Validators.required]],
+        active: [true]
+      });
+    } else {
+      this.captureForm = this.formBuilder.group({
+        clave: ['1', [Validators.required]],
+        estatus: ['Activos'],
+        order: [1000],
+        active: [true],
+        description: ['', [Validators.required]]
+      });
+    }
   }
 
-  onSetCatalog(catalog: Catalog = undefined) {
-    if (catalog) {
-      this.pictures = [];
-      this.pictures = catalog.pictures;
-      this.captureForm.controls.clave.setValue(catalog.id);
-      this.captureForm.controls.description.setValue(catalog.description);
-      this.captureForm.controls.order.setValue(catalog.order);
-      this.captureForm.controls.active.setValue(catalog.active);
-      return
+  exchangeRateValidator(control: FormControl) {
+    const value = control.value;
+    // Expresión regular para validar 3 enteros y 2 decimales
+    const pattern = /^[0-9]{1,3}(?:\.[0-9]{1,2})?$/;
+    if (!pattern.test(value)) {
+      return { invalidExchangeRateFormat: true };
     }
-    this.catalog.id = this.captureForm.controls.clave.value;
-    this.catalog.description = this.captureForm.controls.description.value;
-    this.catalog.order = parseInt(this.captureForm.controls.order.value);
-    this.catalog.active = this.captureForm.controls.active.value;
+    return null;
+  }
+
+  exchangeRateValidatorInt(control: FormControl) {
+    const value = control.value;
+    // Expresión regular para validar 4 enteros
+    const pattern = /^[0-9]{1,4}$/;
+    if (!pattern.test(value)) {
+      return { invalidExchangeRateFormat: true };
+    }
+    return null;
+  }
+
+  onSetCatalog(catalog: Catalog = undefined, cupon: Cupon = undefined) {
+    if (this.onlyCupons) {
+      if (cupon) {
+        this.pictures = [];
+        this.captureForm.controls.cupon.setValue(cupon.cupon.toUpperCase());
+        this.captureForm.controls.description.setValue(cupon.description);
+        this.captureForm.controls.typeDiscount.setValue(cupon.typeDiscount);
+        this.captureForm.controls.amountDiscount.setValue(cupon.amountDiscount);
+        this.captureForm.controls.minimumPurchase.setValue(cupon.minimumPurchase);
+        this.captureForm.controls.active.setValue(cupon.active);
+        return
+      }
+      this.cupon.id = this.captureForm.controls.clave.value;
+      this.cupon.cupon = this.captureForm.controls.cupon.value.toUpperCase();
+      this.cupon.description = this.captureForm.controls.description.value;
+      this.cupon.typeDiscount = this.captureForm.controls.typeDiscount.value;
+      this.cupon.amountDiscount = parseFloat(this.captureForm.controls.amountDiscount.value);
+      this.cupon.minimumPurchase = parseFloat(this.captureForm.controls.minimumPurchase.value);
+      this.cupon.active = this.captureForm.controls.active.value;
+    } else {
+      if (catalog) {
+        this.pictures = [];
+        this.pictures = catalog.pictures;
+        this.captureForm.controls.clave.setValue(catalog.id);
+        this.captureForm.controls.description.setValue(catalog.description);
+        this.captureForm.controls.order.setValue(catalog.order);
+        this.captureForm.controls.active.setValue(catalog.active);
+        return
+      }
+      this.catalog.id = this.captureForm.controls.clave.value;
+      this.catalog.description = this.captureForm.controls.description.value;
+      this.catalog.order = parseInt(this.captureForm.controls.order.value);
+      this.catalog.active = this.captureForm.controls.active.value;
+    }
   }
 
   onSubmit() {
@@ -81,27 +137,53 @@ export class CaptureCatComponent implements OnInit {
       return;
     }
     this.onSetCatalog();
-    const addCatalog = new AddCatalog();
-    addCatalog.tipo = 'item';
-    addCatalog.item = this.catalog;
-    addCatalog.list = [];
-    addCatalog.files = this.files;
-    this.catalogChange.emit(addCatalog);
+    if (this.onlyCupons) {
+      const addCupon = new AddCupon();
+      addCupon.tipo = 'item';
+      addCupon.item = this.cupon;
+      addCupon.list = [];
+      addCupon.files = this.files;
+      this.cuponChange.emit(addCupon);
+    } else {
+      const addCatalog = new AddCatalog();
+      addCatalog.tipo = 'item';
+      addCatalog.item = this.catalog;
+      addCatalog.list = [];
+      addCatalog.files = this.files;
+      this.catalogChange.emit(addCatalog);
+    }
   }
 
-  onOpenModal(catalog: Catalog, editMode: boolean = false, onlyView: boolean = false) {
+  onOpenModal(catalog: Catalog = undefined, editMode: boolean = false,
+    onlyView: boolean = false, cupon: Cupon = undefined) {
+    this.cupon = cupon;
     this.catalog = catalog;
     this.editMode = editMode;
     this.onlyView = onlyView;
     // Cambia el título de acuerdo a si es solo vista, edición o nuevo.
     this.titulo = this.editMode ? onlyView ? 'Consultar' : 'Modificar' : 'Agregar';
     // Campos para editar
-    const valorEditar = this.editMode ? this.catalog.active ? 'Activo' : 'Inactivo' : 'Activo';
-    this.captureForm.controls.clave.setValue(this.catalog.id);
-    this.captureForm.controls.estatus.setValue(valorEditar);
-    this.captureForm.controls.description.setValue(this.catalog.description);
+    if (this.onlyCupons) {
+      const valorEditar = this.editMode ? this.cupon.active ? 'Activo' : 'Inactivo' : 'Activo';
+      this.captureForm.controls.clave.setValue(this.cupon.id);
+      this.captureForm.controls.estatus.setValue(valorEditar);
+      this.captureForm.controls.cupon.setValue(this.cupon.cupon);
+      this.captureForm.controls.description.setValue(this.cupon.description);
+      this.captureForm.controls.typeDiscount.setValue(this.cupon.typeDiscount);
+      this.captureForm.controls.amountDiscount.setValue(this.cupon.amountDiscount);
+      this.captureForm.controls.minimumPurchase.setValue(this.cupon.minimumPurchase);
+    } else {
+      const valorEditar = this.editMode ? this.catalog.active ? 'Activo' : 'Inactivo' : 'Activo';
+      this.captureForm.controls.clave.setValue(this.catalog.id);
+      this.captureForm.controls.estatus.setValue(valorEditar);
+      this.captureForm.controls.description.setValue(this.catalog.description);
+    }
     // this.captureForm.controls.order.setValue(1);
     this.modal.open(this.content, { size: 'lg' });
+
+    setTimeout(() => {
+      this.setDiscountTypeValue();
+    }, 100);
   }
 
   onCloseModal() {
@@ -165,16 +247,19 @@ export class CaptureCatComponent implements OnInit {
 
   convertToUppercase(event: any) {
     let inputValue = event.target.value.toUpperCase();
-    // Eliminar caracteres no válidos
     inputValue = inputValue.replace(/[^A-Z0-9]/g, '');
-    // Limitar a 11 caracteres alfanuméricos
-    if (inputValue.length > 11) {
-      inputValue = inputValue.slice(0, 11);
-    }
-    // Formatear como "DARU-XXXXXX"
-    if (inputValue.length >= 5) {
-      inputValue = "DARU-" + inputValue.slice(4); // Mantener solo los últimos 6 caracteres
+    if (inputValue.length > 15) {
+      inputValue = inputValue.slice(0, 15);
     }
     event.target.value = inputValue;
+  }
+
+  changedTypeDiscount(event: any) {
+    this.typeDiscount = event && event.target ? event.target.value : '';
+  }
+
+  setDiscountTypeValue() {
+    const discountType = this.cupon.typeDiscount;
+    this.captureForm.controls.typeDiscount.setValue(discountType);
   }
 }
