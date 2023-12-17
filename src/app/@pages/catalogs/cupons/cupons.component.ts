@@ -1,9 +1,9 @@
 import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { ACTIVE_FILTERS } from '@core/constants/filters';
-import { ICatalog } from '@core/interfaces/catalog.interface';
+import { ICupon } from '@core/interfaces/cupon.interface';
 import { IResultData } from '@core/interfaces/result-data.interface';
 import { ITableColumns } from '@core/interfaces/table-columns.interface';
-import { Catalog } from '@core/models/catalog.models';
+import { Cupon } from '@core/models/cupon.models';
 import { CuponsService } from '@core/services/cupon.service';
 import { CUPONS_LIST_QUERY } from '@graphql/operations/query/cupons';
 import { optionsWithDetails } from '@shared/alert/alerts';
@@ -27,7 +27,7 @@ export class CuponsComponent implements OnInit {
   columns: Array<ITableColumns>;
   filterActiveValues: ACTIVE_FILTERS;
   mostrarBoton: boolean;
-  catalog: Catalog;
+  cupon: Cupon;
   editMode = false;
   nextId: string;
   title = 'Catálogo de Cupones';
@@ -59,34 +59,38 @@ export class CuponsComponent implements OnInit {
         class: 'clave'
       },
       {
-        property: 'order',
-        label: 'Descuento',
-        class: 'clave'
-      },
-      {
-        property: 'description',
+        property: 'cupon',
         label: 'Cupon',
         class: 'descriptionShort'
       },
       {
-        property: 'slug',
-        label: 'Slug',
+        property: 'description',
+        label: 'Descripcion',
         class: 'descriptionShort'
+      },
+      {
+        property: 'typeDiscount',
+        label: 'Tipo Descuento',
+        class: 'clave'
+      },
+      {
+        property: 'amountDiscount',
+        label: 'Descuento',
+        class: 'importe'
       },
       {
         property: 'active',
         label: 'Activo?',
-        class: 'clave'
+        class: 'number'
       }
     ];
-    this.catalog = new Catalog();
+    this.cupon = new Cupon();
     this.NextId();
   }
 
   NextId() {
     // Obtiene el siguiente Id del Catálogo
     this.cuponsService.next().subscribe(result => {
-      console.log('cuponsService/result: ', result);
       this.nextId = result;
     });
   }
@@ -94,7 +98,7 @@ export class CuponsComponent implements OnInit {
   async takeAction($event) {
     // Obtiene la informacion para las acciones
     const action = $event[0];
-    const catalog = $event[1];
+    const cupon = $event[1];
     this.mostrarBoton = true;
     switch (action) {
       case 'add':                                       // Agregar elemento
@@ -102,17 +106,17 @@ export class CuponsComponent implements OnInit {
         this.addForm();
         break;
       case 'edit':                                      // Modificar elemento
-        this.updateForm(catalog);
+        this.updateForm(cupon);
         break;
       case 'info':                                      // Mostrar información del elemento
         this.mostrarBoton = false;
-        this.updateForm(catalog, true, true);
+        this.updateForm(cupon, true, true);
         break;
       case 'block':                                     // Bloquear elemento
-        this.unblockForm(catalog, false);
+        this.unblockForm(cupon, false);
         break;
       case 'unblock':                                   // Bloquear elemento
-        this.unblockForm(catalog, true);
+        this.unblockForm(cupon, true);
         break;
       default:
         break;
@@ -120,13 +124,15 @@ export class CuponsComponent implements OnInit {
   }
 
   onNewCatalog() {
-    this.catalog = new Catalog();
+    this.cupon = new Cupon();
     this.NextId();
-    this.catalog = {
+    this.cupon = {
       id: this.nextId,
+      cupon: '',
       description: '',
-      slug: '',
-      order: 1000,
+      typeDiscount: '',
+      amountDiscount: 0,
+      minimumPurchase: 0,
       active: true
     };
   }
@@ -134,16 +140,16 @@ export class CuponsComponent implements OnInit {
   private async addForm(editMode: boolean = false) {
     this.editMode = editMode;
     setTimeout(() => {
-      this.modal.onOpenModal(this.catalog, editMode);
+      this.modal.onOpenModal(undefined, editMode, false, this.cupon);
     }, 2000);
   }
 
-  private async updateForm(catalog: Catalog, editMode: boolean = true, onlyView: boolean = false) {
+  private async updateForm(cupon: Cupon, editMode: boolean = true, onlyView: boolean = false) {
     this.editMode = editMode;
-    this.modal.onOpenModal(catalog, editMode, onlyView);
+    this.modal.onOpenModal(undefined, editMode, onlyView, cupon);
   }
 
-  catalogBack(event) {
+  cuponBack(event) {
     if (event.tipo === 'item') {
       if (this.editMode) {                        // Si es un  para editar
         this.updateCatalog(event.item);
@@ -153,8 +159,8 @@ export class CuponsComponent implements OnInit {
     }
   }
 
-  private addCatalog(catalog: ICatalog) {
-    this.cuponsService.add(catalog).subscribe(
+  private addCatalog(cupon: ICupon) {
+    this.cuponsService.add(cupon).subscribe(
       (res: any) => {
         if (res.status) {
           basicAlert(TYPE_ALERT.SUCCESS, res.message);
@@ -169,9 +175,9 @@ export class CuponsComponent implements OnInit {
     );
   }
 
-  private updateCatalog(catalog: ICatalog) {
-    if (catalog.description !== '') {
-      this.cuponsService.update(catalog).subscribe(
+  private updateCatalog(cupon: ICupon) {
+    if (cupon.description !== '') {
+      this.cuponsService.update(cupon).subscribe(
         (res: any) => {
           if (res.status) {
             basicAlert(TYPE_ALERT.SUCCESS, res.message);

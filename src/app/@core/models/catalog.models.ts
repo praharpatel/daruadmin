@@ -1,3 +1,4 @@
+import { Cupon } from './cupon.models';
 import { Picture } from './product.models';
 
 export class Catalog {
@@ -17,6 +18,13 @@ export class AddCatalog {
   tipo: string;
   item: Catalog;
   list: Catalog[];
+  files?: File[];
+}
+
+export class AddCupon {
+  tipo: string;
+  item: Cupon;
+  list: Cupon[];
   files?: File[];
 }
 
