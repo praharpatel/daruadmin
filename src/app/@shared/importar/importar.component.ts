@@ -1067,18 +1067,6 @@ export class ImportarComponent implements OnInit {
     let disponible = 0;
     let salePrice = 0;
 
-    // Eliminar cuando HP Autorice vender sus productos
-    if (item.description && item.description.toLowerCase().startsWith('hp')) {
-      return itemData;
-    }
-    if (item && item.marca && (item.marca.toLowerCase() === 'hp' || item.marca.toLowerCase() === 'hewlett packard enterprise')) {
-      return itemData;
-    }
-    if (productJson && productJson.marca && (productJson.marca.toLowerCase() === 'hp' || productJson.marca.toLowerCase() === 'hewlett packard enterprise')) {
-      return itemData;
-    }
-    // Fin Eliminar cuando HP Autorice vender sus productos
-
     switch (proveedor) {
       case 'ingram':
         try {
